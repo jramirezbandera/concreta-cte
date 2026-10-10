@@ -173,7 +173,7 @@ describe("memoria y ficha de HS3", () => {
     expect(t[3]).toMatch(/El más cargado de la vertical A, el de la cocina, recoge 3 plantas × 11 = 33 l\/s y necesita 83 cm², un Ø110\./);
     expect(t[4]).toMatch(/Los trasteros, de 36 m², extraen 25,2 l\/s con la ventilación del garaje\./);
     expect(t[5]).toBe("El local sin uso definido se ventilará conforme al RITE cuando se proyecte su actividad.");
-    expect(m.tabla.cabecera[0]).toBe("Local · vivienda A");
+    expect(m.tablas[0].cabecera[0]).toBe("Local · vivienda A");
     expect(textoPlanoMemoria(m)).toMatch(/^Calidad del aire interior\n\n/);
   });
 

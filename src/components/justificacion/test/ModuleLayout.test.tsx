@@ -192,7 +192,7 @@ describe("ModuleLayout · v4 (feature-14)", () => {
           titulo: "Evacuación de aguas",
           norma: "DB-HS 5",
           parrafos: [["El colector es de ", { v: "Ø110 mm" }, "."]],
-          tabla: { cabecera: ["Elemento", "Ø"], filas: [["Colector", "110"]] },
+          tablas: [{ cabecera: ["Elemento", "Ø"], filas: [["Colector", "110"]] }],
           fuente: "DB-HS · HS 5",
         },
         textoPlano: "Evacuación de aguas",

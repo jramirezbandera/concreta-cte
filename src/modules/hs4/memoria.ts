@@ -4,7 +4,7 @@
 // justificación: se revisa, no se edita. PURA.
 // =============================================================================
 
-import type { MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import type { MemoriaDoc, Trozo, TablaMemoria } from "../../lib/cte/presentacion";
 import { cuantos, listaY } from "../../lib/cte/redaccion";
 import { fmt } from "../../lib/units/format";
 import { ENGINE_VERSION } from "../../lib/version";
@@ -13,7 +13,7 @@ import { NOMBRE_TUBERIA } from "./red";
 import { describirPunto, nombrePlanta, valorCorto } from "./textos";
 
 export interface MemoriaHs4 extends MemoriaDoc {
-  tabla: { cabecera: string[]; filas: string[][] };
+  tablas: [TablaMemoria];
 }
 
 function n0(v: number): string {
@@ -232,7 +232,7 @@ function parrafoOtros(j: JustificacionHs4): Trozo[] {
   return p;
 }
 
-function tablaPresiones(j: JustificacionHs4): MemoriaHs4["tabla"] {
+function tablaPresiones(j: JustificacionHs4): TablaMemoria {
   const filas: string[][] = [];
   for (const el of j.elementos) {
     const det = el.detalle;
@@ -271,7 +271,7 @@ export function memoriaHs4(j: JustificacionHs4): MemoriaHs4 {
     titulo: "Suministro de agua",
     norma: "DB-HS 4",
     parrafos,
-    tabla: tablaPresiones(j),
+    tablas: [tablaPresiones(j)],
     fuente: fuente(j),
   };
 }

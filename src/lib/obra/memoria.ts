@@ -13,8 +13,8 @@
 // que comparten el Word y el PDF: el documento se decide una vez.
 // =============================================================================
 
-import type { MemoriaDoc } from "../cte/presentacion";
-import { textoParrafo } from "../cte/memoria";
+import type { MemoriaDoc, TipoColumna } from "../cte/presentacion";
+import { piezasMemoria, textoParrafo, textoTabla } from "../cte/memoria";
 import type { Aplicabilidad, JustificacionKey, Proyecto, TipoObraExistente } from "../proyecto/tipos";
 import { tiposDeObra } from "../proyecto/alcance";
 import { NOMBRE_FASE } from "../estudio/estudio";
@@ -348,7 +348,17 @@ export type BloqueMemoria =
   | { tipo: "nota"; texto: string }
   /** Lo que falta: se resalta para que no pase desapercibido. */
   | { tipo: "pendiente"; texto: string }
-  | { tipo: "tabla"; cabecera: string[]; filas: string[][] };
+  | {
+      tipo: "tabla";
+      cabecera: string[];
+      filas: string[][];
+      /** Encima, en negrita (feature-31). */
+      rotulo?: string;
+      /** Sin decir, la primera es `texto` y el resto `dato`. */
+      columnas?: TipoColumna[];
+      /** Debajo, numeradas. */
+      notas?: string[];
+    };
 
 /** El párrafo de una externa: con qué se justifica y su documento. */
 function textoExterno(a: Extract<ApartadoMemoria, { tipo: "externo" }>): string {
@@ -419,8 +429,21 @@ export function bloquesMemoria(m: MemoriaCte): BloqueMemoria[] {
     }
     switch (a.tipo) {
       case "redactado":
-        for (const p of a.doc.parrafos) b.push({ tipo: "parrafo", texto: sinSupuestos(textoParrafo(p)) });
-        if (a.doc.tabla) b.push({ tipo: "tabla", cabecera: a.doc.tabla.cabecera, filas: a.doc.tabla.filas.map((f) => f.map(sinSupuestos)) });
+        for (const x of piezasMemoria(a.doc)) {
+          if (x.tipo === "parrafo") {
+            b.push({ tipo: "parrafo", texto: sinSupuestos(textoParrafo(x.p)) });
+            continue;
+          }
+          const t = x.t;
+          b.push({
+            tipo: "tabla",
+            cabecera: t.cabecera,
+            filas: t.filas.map((f) => f.map(sinSupuestos)),
+            ...(t.rotulo ? { rotulo: t.rotulo } : {}),
+            ...(t.columnas ? { columnas: t.columnas } : {}),
+            ...(t.notas && t.notas.length > 0 ? { notas: t.notas.map(sinSupuestos) } : {}),
+          });
+        }
         if (a.doc.fuente) b.push({ tipo: "nota", texto: fuenteCorta(a.doc.fuente) });
         break;
       case "no_cumple":
@@ -460,7 +483,7 @@ export function bloquesMemoria(m: MemoriaCte): BloqueMemoria[] {
 export function textoPlanoMemoriaCte(m: MemoriaCte): string {
   return bloquesMemoria(m)
     .map((bl) => {
-      if (bl.tipo === "tabla") return [bl.cabecera, ...bl.filas].map((f) => f.join("\t")).join("\n");
+      if (bl.tipo === "tabla") return textoTabla(bl);
       return bl.texto;
     })
     .join("\n\n");

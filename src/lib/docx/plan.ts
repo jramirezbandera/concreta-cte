@@ -13,10 +13,14 @@
 // =============================================================================
 
 import type { BloqueMemoria } from "../obra/memoria";
+import type { TipoColumna } from "../cte/presentacion";
+import { columnasDe, esNoCumple, notasNumeradas } from "../cte/memoria";
 
 export interface CeldaPlan {
   texto: string;
   negrita: boolean;
+  /** Las columnas «Norma | Proyecto | Cumple», centradas (feature-31); el resto, a la izquierda. */
+  centrada?: boolean;
 }
 
 export interface FilaPlan {
@@ -27,9 +31,11 @@ export interface FilaPlan {
 /**
  * Estilos INTEGRADOS de Word, que se resuelven contra la plantilla del usuario
  * (índice automático incluido), más `Pendiente`, que es un párrafo normal en
- * negrita: lo que falta tiene que verse al pegarlo.
+ * negrita: lo que falta tiene que verse al pegarlo. `RotuloTabla` (normal en
+ * negrita, pegado a su tabla) y `NotaTabla` (`Caption`, pegada debajo) son los
+ * de las tablas «Norma | Proyecto» (feature-31).
  */
-export type EstiloParrafo = "Heading1" | "Heading2" | "Heading3" | "Normal" | "Caption" | "Pendiente";
+export type EstiloParrafo = "Heading1" | "Heading2" | "Heading3" | "Normal" | "Caption" | "Pendiente" | "RotuloTabla" | "NotaTabla";
 
 export type BloquePlan =
   | { tipo: "parrafo"; estilo: EstiloParrafo; texto: string }
@@ -116,30 +122,53 @@ export function repartirAnchos(pesos: number[]): number[] {
   return [ancho0, ...resto];
 }
 
+interface TrozoTabla {
+  head: string[];
+  filas: string[][];
+  tipos: TipoColumna[];
+}
+
 /** Una tabla más ancha que `MAX_COLUMNAS` se parte repitiendo la columna 0. */
-function trocearTabla(head: string[], filas: string[][]): { head: string[]; filas: string[][] }[] {
-  if (head.length <= MAX_COLUMNAS) return [{ head, filas }];
+function trocearTabla(head: string[], filas: string[][], tipos: TipoColumna[]): TrozoTabla[] {
+  if (head.length <= MAX_COLUMNAS) return [{ head, filas, tipos }];
   const porTrozo = MAX_COLUMNAS - 1;
-  const trozos: { head: string[]; filas: string[][] }[] = [];
+  const trozos: TrozoTabla[] = [];
   for (let desde = 1; desde < head.length; desde += porTrozo) {
     const hasta = Math.min(desde + porTrozo, head.length);
     trozos.push({
       head: [head[0], ...head.slice(desde, hasta)],
       filas: filas.map((fila) => [fila[0] ?? "", ...fila.slice(desde, hasta)]),
+      tipos: [tipos[0], ...tipos.slice(desde, hasta)],
     });
   }
   return trozos;
 }
 
-function planificarTabla(head: string[], filas: string[][]): BloquePlan[] {
-  return trocearTabla(head, filas).map((trozo) => ({
-    tipo: "tabla",
-    filas: [
-      { cabecera: true, celdas: trozo.head.map((texto) => ({ texto, negrita: true })) },
-      ...trozo.filas.map((fila) => ({ cabecera: false, celdas: fila.map((texto, j) => ({ texto, negrita: j === 0 })) })),
-    ],
-    anchos: repartirAnchos(pesosDeColumnas(trozo.head, trozo.filas)),
-  }));
+const CENTRADAS: ReadonlySet<TipoColumna> = new Set(["norma", "proyecto", "cumple"]);
+
+function celdaPlan(texto: string, negrita: boolean, tipo: TipoColumna): CeldaPlan {
+  return CENTRADAS.has(tipo) ? { texto, negrita, centrada: true } : { texto, negrita };
+}
+
+function planificarTabla(b: Extract<BloqueMemoria, { tipo: "tabla" }>): BloquePlan[] {
+  const out: BloquePlan[] = [];
+  if (b.rotulo) out.push({ tipo: "parrafo", estilo: "RotuloTabla", texto: b.rotulo });
+  for (const trozo of trocearTabla(b.cabecera, b.filas, columnasDe(b))) {
+    out.push({
+      tipo: "tabla",
+      filas: [
+        { cabecera: true, celdas: trozo.head.map((texto, j) => celdaPlan(texto, true, trozo.tipos[j])) },
+        ...trozo.filas.map((fila) => ({
+          cabecera: false,
+          // La etiqueta, en negrita; y lo que no cumple, para que se vea.
+          celdas: fila.map((texto, j) => celdaPlan(texto, j === 0 || (trozo.tipos[j] === "cumple" && esNoCumple(texto)), trozo.tipos[j])),
+        })),
+      ],
+      anchos: repartirAnchos(pesosDeColumnas(trozo.head, trozo.filas)),
+    });
+  }
+  for (const n of notasNumeradas(b.notas)) out.push({ tipo: "parrafo", estilo: "NotaTabla", texto: n });
+  return out;
 }
 
 const ESTILO_TITULO: Record<1 | 2 | 3, EstiloParrafo> = { 1: "Heading1", 2: "Heading2", 3: "Heading3" };
@@ -162,7 +191,7 @@ export function planificarDocx(bloques: BloqueMemoria[]): PlanDocx {
         plan.push({ tipo: "parrafo", estilo: "Pendiente", texto: b.texto });
         break;
       case "tabla":
-        plan.push(...planificarTabla(b.cabecera, b.filas));
+        plan.push(...planificarTabla(b));
         break;
     }
   }

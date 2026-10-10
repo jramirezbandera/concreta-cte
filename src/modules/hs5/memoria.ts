@@ -7,7 +7,7 @@
 // pantalla resalta y el texto plano deja tal cual.
 // =============================================================================
 
-import type { MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import type { MemoriaDoc, Trozo, TablaMemoria } from "../../lib/cte/presentacion";
 import { fmt } from "../../lib/units/format";
 import { ENGINE_VERSION } from "../../lib/version";
 import type { ElementoHs5, JustificacionHs5 } from "./justificacion";
@@ -18,7 +18,7 @@ import { VENT_PRIMARIA, type TipoAparato } from "./tablas";
 export type { Trozo } from "../../lib/cte/presentacion";
 
 export interface MemoriaHs5 extends MemoriaDoc {
-  tabla: { cabecera: string[]; filas: string[][] };
+  tablas: [TablaMemoria];
 }
 
 const NOMBRE_CLASE: Record<ClaseBajante, string> = {
@@ -312,7 +312,7 @@ function parrafoEspeciales(j: JustificacionHs5): Trozo[] {
 // Tabla y fuentes
 // -----------------------------------------------------------------------------
 
-function tablaResumen(j: JustificacionHs5): MemoriaHs5["tabla"] {
+function tablaResumen(j: JustificacionHs5): TablaMemoria {
   const filas: string[][] = [];
   const bs = bajantesDe(j);
   const clases = [...new Set(bs.map((b) => b.clase))];
@@ -412,7 +412,7 @@ export function memoriaHs5(j: JustificacionHs5): MemoriaHs5 {
     titulo: "Evacuación de aguas",
     norma: "DB-HS 5",
     parrafos,
-    tabla: tablaResumen(j),
+    tablas: [tablaResumen(j)],
     fuente: fuente(j),
   };
 }
@@ -424,6 +424,6 @@ export function textoParrafo(p: Trozo[]): string {
 
 /** La memoria entera como texto plano, lista para pegar. */
 export function textoPlano(m: MemoriaHs5): string {
-  const tabla = [m.tabla.cabecera, ...m.tabla.filas].map((f) => f.join("\t")).join("\n");
+  const tabla = [m.tablas[0].cabecera, ...m.tablas[0].filas].map((f) => f.join("\t")).join("\n");
   return [m.titulo, ...m.parrafos.map(textoParrafo), tabla, m.fuente].join("\n\n");
 }

@@ -188,7 +188,7 @@ describe("HE4 · con El edificio", () => {
       expect(ficha.edicionDB, c).toBe("DB-HE (consolidado 14-jun-2022)");
       expect(ficha.verificaciones.some((v) => v.concepto === "Contribución renovable al ACS"), c).toBe(true);
       const m = he4.memoria(j);
-      expect(m.tabla!.filas, c).toHaveLength(13);
+      expect(m.tablas![0].filas, c).toHaveLength(13);
       expect(textoPlanoMemoria(m), c).toMatch(/Anejo G/);
       // Cada elemento tiene su etiqueta en el dibujo y su franja.
       for (const el of j.elementos) {

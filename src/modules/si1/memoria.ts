@@ -4,7 +4,8 @@
 // cada cosa con su cita. Se redacta solo a partir de la justificación. PURA.
 // =============================================================================
 
-import type { MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import type { MemoriaDoc, Trozo, TablaMemoria } from "../../lib/cte/presentacion";
+import { soloTablas } from "../../lib/cte/memoria";
 import { listaY } from "../../lib/cte/redaccion";
 import { fmt } from "../../lib/units/format";
 import { ENGINE_VERSION } from "../../lib/version";
@@ -139,7 +140,7 @@ function parrafoReaccion(j: JustificacionSi1): Trozo[] {
   return out;
 }
 
-function tabla(j: JustificacionSi1): MemoriaDoc["tabla"] {
+function tabla(j: JustificacionSi1): TablaMemoria | undefined {
   const filas: string[][] = [];
   const c = j.comp;
   for (const el of j.elementos) {
@@ -160,7 +161,7 @@ export function memoriaSi1(j: JustificacionSi1): MemoriaDoc {
     titulo: "Propagación interior",
     norma: "DB-SI 1",
     parrafos,
-    tabla: tabla(j),
+    tablas: soloTablas(tabla(j)),
     fuente: ["DB-SI · SI 1 (consolidado 4-mar-2025)", "tablas 1.1, 1.2, 2.1, 2.2 y 4.1", "datos de El edificio", `motor ${ENGINE_VERSION}`].join(" · "),
   };
 }

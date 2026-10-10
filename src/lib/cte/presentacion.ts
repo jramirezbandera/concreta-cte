@@ -44,13 +44,34 @@ export interface DetalleElemento {
 /** Un trozo de párrafo de la memoria: texto, o una cifra que se resalta. */
 export type Trozo = string | { v: string };
 
+/**
+ * Cómo se pinta cada columna de una tabla de la memoria (feature-31): `texto`
+ * a la izquierda; `dato`, una cifra, a la derecha; `norma` (lo exigido),
+ * `proyecto` (lo proyectado) y `cumple`, centradas, con «No cumple» resaltado.
+ */
+export type TipoColumna = "texto" | "dato" | "norma" | "proyecto" | "cumple";
+
+/** Una tabla de la memoria: las «Norma | Proyecto» de las memorias del estudio (feature-31). */
+export interface TablaMemoria {
+  /** Encima, en negrita: «Evacuación». */
+  rotulo?: string;
+  cabecera: string[];
+  /** Una por columna; sin decir, la primera es `texto` y el resto `dato`. */
+  columnas?: TipoColumna[];
+  filas: string[][];
+  /** Debajo, numeradas «(1) …», en el orden de las llamadas de las celdas. */
+  notas?: string[];
+  /** Cuántos párrafos van antes; sin decir, todos. */
+  tras?: number;
+}
+
 /** La memoria redactada de una justificación. */
 export interface MemoriaDoc {
   titulo: string;
   /** «DB-HS 5». */
   norma: string;
   parrafos: Trozo[][];
-  tabla?: { cabecera: string[]; filas: string[][] };
+  tablas?: TablaMemoria[];
   /** La línea de fuentes del pie. */
   fuente: string;
 }

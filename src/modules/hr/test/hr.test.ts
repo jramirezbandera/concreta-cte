@@ -202,7 +202,7 @@ describe("HR · el Demo (plurifamiliar con local)", () => {
     expect(t).toContain("Ld = 60 dBA");
     expect(t).toContain("Fila de la tabla 3.2: m ≥ 170 kg/m², RA ≥ 54 dBA, sin trasdosado");
     expect(t).toContain("no le son de aplicación los valores límite de tiempo de reverberación");
-    expect(hr.memoria(j).tabla?.filas.length).toBe(11);
+    expect(hr.memoria(j).tablas?.[0]?.filas.length).toBe(11);
   });
 
   it("en un edificio existente, no se aplica", () => {

@@ -6,6 +6,7 @@
 // =============================================================================
 
 import type { MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import { soloTablas } from "../../lib/cte/memoria";
 import { ENGINE_VERSION } from "../../lib/version";
 import type { DetalleEscalera, DetalleSua1, JustificacionSua1 } from "./justificacion";
 import { SUA1_BARRERAS, SUA1_DISCONTINUIDADES, SUA1_ESCALERA_GENERAL, SUA1_RAMPAS } from "./tablas";
@@ -225,7 +226,7 @@ export function memoriaSua1(j: JustificacionSua1): MemoriaDoc {
     titulo: "Seguridad frente al riesgo de caídas",
     norma: "DB-SUA 1",
     parrafos: parrafos.filter((p) => p.length > 0),
-    tabla:
+    tablas: soloTablas(
       xs.length > 0
         ? {
             cabecera: ["Escalera", "Planta", "Altura", "Peldaños", "Contrahuella", "2C + H"],
@@ -241,6 +242,7 @@ export function memoriaSua1(j: JustificacionSua1): MemoriaDoc {
             ),
           }
         : undefined,
+    ),
     fuente: ["DB-SUA · SUA 1 (consolidado 14-jun-2022)", "ap. 1 a 5", "datos de El edificio", `motor ${ENGINE_VERSION}`].join(" · "),
   };
 }

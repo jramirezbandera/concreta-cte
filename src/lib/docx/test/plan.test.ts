@@ -6,6 +6,8 @@ import { documentoMemoria } from "../render";
 import { bloquesMemoria, memoriaCte, type BloqueMemoria } from "../../obra/memoria";
 import { crearProyectoDemo } from "../../proyecto/demo";
 import { ESTUDIO_VACIO, membreteDe, type Estudio } from "../../estudio/estudio";
+import { piezasMemoria, textoParrafo, textoPlanoMemoria } from "../../cte/memoria";
+import type { MemoriaDoc } from "../../cte/presentacion";
 
 // =============================================================================
 // El Word de la memoria (feature-16 §F): el plan es puro y el render traduce.
@@ -62,6 +64,67 @@ describe("planificarDocx", () => {
       expect(b.filas[1].celdas[1].negrita).toBe(false);
       expect(b.anchos.reduce((x, y) => x + y, 0)).toBe(100);
     }
+  });
+});
+
+describe("tablas «Norma | Proyecto» (feature-31)", () => {
+  const b: BloqueMemoria = {
+    tipo: "tabla",
+    rotulo: "Evacuación",
+    cabecera: ["Parámetro", "Norma", "Proyecto", ""],
+    columnas: ["texto", "norma", "proyecto", "cumple"],
+    filas: [
+      ["Recorrido (1)", "≤ 25 m", "18 m", "Cumple"],
+      ["Anchura", "≥ 1,00 m", "0,90 m", "No cumple"],
+    ],
+    notas: ["Desde la puerta de la vivienda."],
+  };
+
+  it("rótulo encima, columnas centradas por tipo, «No cumple» en negrita y notas debajo", () => {
+    const plan = planificarDocx([b]);
+    expect(plan.bloques.map((x) => (x.tipo === "parrafo" ? x.estilo : x.tipo))).toEqual(["RotuloTabla", "tabla", "NotaTabla"]);
+    expect(plan.bloques[0]).toMatchObject({ texto: "Evacuación" });
+    expect(plan.bloques[2]).toMatchObject({ texto: "(1) Desde la puerta de la vivienda." });
+    const t = plan.bloques[1];
+    if (t.tipo !== "tabla") throw new Error("se esperaba tabla");
+    expect(t.filas[1].celdas[0]).toEqual({ texto: "Recorrido (1)", negrita: true });
+    expect(t.filas[1].celdas[1]).toEqual({ texto: "≤ 25 m", negrita: false, centrada: true });
+    expect(t.filas[1].celdas[3]).toEqual({ texto: "Cumple", negrita: false, centrada: true });
+    expect(t.filas[2].celdas[3]).toEqual({ texto: "No cumple", negrita: true, centrada: true });
+  });
+
+  it("sin tipos, como siempre: nada centrado", () => {
+    const plan = planificarDocx([{ tipo: "tabla", cabecera: ["A", "B"], filas: [["x", "1"]] }]);
+    const t = plan.bloques[0];
+    if (t.tipo !== "tabla") throw new Error("se esperaba tabla");
+    expect(t.filas[1].celdas).toEqual([
+      { texto: "x", negrita: true },
+      { texto: "1", negrita: false },
+    ]);
+  });
+
+  it("cada tabla tras sus párrafos; el texto plano con rótulo y notas", () => {
+    const doc: MemoriaDoc = {
+      titulo: "T",
+      norma: "DB-SI 3",
+      parrafos: [["uno"], ["dos"], ["tres"]],
+      tablas: [
+        { cabecera: ["A"], filas: [["a"]], tras: 1 },
+        { cabecera: ["B"], filas: [["b"]], rotulo: "Rótulo", notas: ["nota"] },
+        { cabecera: ["C"], filas: [["c"]], tras: 0 },
+      ],
+      fuente: "F",
+    };
+    expect(piezasMemoria(doc).map((x) => (x.tipo === "parrafo" ? textoParrafo(x.p) : x.t.cabecera[0]))).toEqual(["C", "uno", "A", "dos", "tres", "B"]);
+    expect(textoPlanoMemoria(doc)).toBe("T\n\nC\nc\n\nuno\n\nA\na\n\ndos\n\ntres\n\nRótulo\nB\nb\n(1) nota\n\nF");
+  });
+
+  it("el .docx se genera con las tablas tipadas", async () => {
+    const blob = await Packer.toBlob(documentoMemoria([{ tipo: "parrafo", texto: "Antes" }, b, { tipo: "parrafo", texto: "Después" }], membreteDe(ESTUDIO_VACIO, crearProyectoDemo("2026-10-11T10:00:00.000Z"))));
+    const xml = await (await JSZip.loadAsync(await blob.arrayBuffer())).file("word/document.xml")!.async("string");
+    expect(xml).toContain("Evacuación");
+    expect(xml).toContain("(1) Desde la puerta de la vivienda.");
+    expect(xml).toContain('w:jc w:val="center"');
   });
 });
 

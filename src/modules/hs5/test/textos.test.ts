@@ -115,7 +115,7 @@ describe("memoria de HS5", () => {
 
   it("resalta las cifras y lleva la tabla resumen y las fuentes", () => {
     expect(m.parrafos.flat()).toContainEqual({ v: "Ø110 mm" });
-    expect(m.tabla.filas[0]).toEqual(["Bajantes de fecales A · B", "42 · 39 UD", "360 UD", "110"]);
+    expect(m.tablas[0].filas[0]).toEqual(["Bajantes de fecales A · B", "42 · 39 UD", "360 UD", "110"]);
     expect(m.fuente).toContain("HS 5 (consolidado 14-06-2022)");
     expect(m.fuente).toContain("apéndice B");
   });

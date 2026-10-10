@@ -1,6 +1,8 @@
 import { useState, type JSX } from "react";
 import { Check, Copy, FileDown } from "lucide-react";
 import type { MemoriaDoc } from "../../lib/cte/presentacion";
+import { piezasMemoria } from "../../lib/cte/memoria";
+import { TablaMemoriaVista } from "./TablaMemoriaVista";
 
 // =============================================================================
 // La pestaña Memoria en texto (REDISENO-V4 §3.3, feature-14 §H): el texto que
@@ -61,49 +63,22 @@ export function MemoriaTexto({ doc, textoPlano, onFichaPdf }: MemoriaTextoProps)
           <h2 className="text-[15px] font-semibold">{doc.titulo}</h2>
           <span className="text-text-disabled font-mono text-[11px]">{doc.norma}</span>
         </div>
-        {doc.parrafos.map((p, i) => (
-          <p key={i} className="mb-3">
-            {p.map((t, j) =>
-              typeof t === "string" ? (
-                <span key={j}>{t}</span>
-              ) : (
-                <span key={j} className="text-accent font-mono text-[12.5px]">
-                  {t.v}
-                </span>
-              ),
-            )}
-          </p>
-        ))}
-        {doc.tabla && (
-          <table className="mt-1.5 mb-1 w-full border-collapse">
-            <thead>
-              <tr>
-                {doc.tabla.cabecera.map((c, i) => (
-                  <th
-                    key={c}
-                    scope="col"
-                    className={`border-border-main text-text-secondary border-b p-1.5 text-[10px] font-semibold tracking-[0.05em] uppercase ${i === 0 ? "text-left" : "text-right"}`}
-                  >
-                    {c}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {doc.tabla.filas.map((f) => (
-                <tr key={f[0]}>
-                  {f.map((c, i) => (
-                    <td
-                      key={i}
-                      className={`border-border-sub border-b p-1.5 ${i === 0 ? "text-left text-[12.5px]" : "text-right font-mono text-[11.5px]"}`}
-                    >
-                      {c}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {piezasMemoria(doc).map((x, i) =>
+          x.tipo === "tabla" ? (
+            <TablaMemoriaVista key={i} tabla={x.t} />
+          ) : (
+            <p key={i} className="mb-3">
+              {x.p.map((t, j) =>
+                typeof t === "string" ? (
+                  <span key={j}>{t}</span>
+                ) : (
+                  <span key={j} className="text-accent font-mono text-[12.5px]">
+                    {t.v}
+                  </span>
+                ),
+              )}
+            </p>
+          ),
         )}
         <div className="border-border-sub text-text-disabled mt-2.5 border-t pt-2.5 font-mono text-[10.5px] leading-relaxed">
           {doc.fuente}

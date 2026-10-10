@@ -4,7 +4,7 @@
 // justificación: se revisa, no se edita. PURA.
 // =============================================================================
 
-import type { MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import type { MemoriaDoc, Trozo, TablaMemoria } from "../../lib/cte/presentacion";
 import { listaY } from "../../lib/cte/redaccion";
 import { fmt } from "../../lib/units/format";
 import { ENGINE_VERSION } from "../../lib/version";
@@ -13,7 +13,7 @@ import type { TipoVentilacion } from "./red";
 import { elLocal, q } from "./textos";
 
 export interface MemoriaHs3 extends MemoriaDoc {
-  tabla: { cabecera: string[]; filas: string[][] };
+  tablas: [TablaMemoria];
 }
 
 const NUM = ["cero", "un", "dos", "tres", "cuatro", "cinco", "seis"];
@@ -173,7 +173,7 @@ function parrafoRite(j: JustificacionHs3): Trozo[] {
   return p.length > 0 ? [p.join(" ")] : [];
 }
 
-function tabla(j: JustificacionHs3): MemoriaHs3["tabla"] {
+function tabla(j: JustificacionHs3): TablaMemoria {
   const t = j.red.tipos[0];
   if (!t) return { cabecera: [], filas: [] };
   const calc = j.porTipo.get(t.tipoId);
@@ -204,7 +204,7 @@ export function memoriaHs3(j: JustificacionHs3): MemoriaHs3 {
       parrafoGaraje(j),
       parrafoRite(j),
     ].filter((p) => p.length > 0),
-    tabla: tabla(j),
+    tablas: [tabla(j)],
     fuente: [
       "DB-HS · HS 3 (consolidado 14-06-2022)",
       `tablas ${listaY(tablas)}`,

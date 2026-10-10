@@ -4,7 +4,8 @@
 // redacta solo a partir de la justificación: se revisa, no se edita. PURA.
 // =============================================================================
 
-import type { MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import type { MemoriaDoc, Trozo, TablaMemoria } from "../../lib/cte/presentacion";
+import { soloTablas } from "../../lib/cte/memoria";
 import { listaY } from "../../lib/cte/redaccion";
 import { designacionEnFrase } from "../../lib/constructivo/textos";
 import { formatoCota } from "../../lib/edificio/derivar";
@@ -269,7 +270,7 @@ function parrafoResto(j: JustificacionHs1): Trozo[] {
   ];
 }
 
-function tablaResumen(j: JustificacionHs1): MemoriaDoc["tabla"] {
+function tablaResumen(j: JustificacionHs1): TablaMemoria | undefined {
   const filas: string[][] = [];
   for (const el of j.elementos) {
     const d = el.detalle;
@@ -309,7 +310,7 @@ export function memoriaHs1(j: JustificacionHs1): MemoriaDoc {
     titulo: "Protección frente a la humedad",
     norma: "DB-HS 1",
     parrafos,
-    tabla: tablaResumen(j),
+    tablas: soloTablas(tablaResumen(j)),
     fuente: [
       "DB-HS · HS 1 (consolidado 14-06-2022)",
       ...(tablas.length > 0 ? [`tablas ${listaY(tablas)}`] : []),

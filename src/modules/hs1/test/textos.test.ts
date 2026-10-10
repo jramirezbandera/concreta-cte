@@ -124,7 +124,7 @@ describe("la memoria", () => {
     expect(t).toContain("El suelo del sótano (470 m²) es una solera sin intervención en el terreno.");
     expect(t).toContain("en un entorno E1 (terreno tipo IV); con esa altura la zona eólica no influye");
     expect(t).toContain("La cubierta es plana no transitable, con grava (CEC C 5.3, p. 41), invertida.");
-    expect(m.tabla?.filas).toEqual([
+    expect(m.tablas?.[0]?.filas).toEqual([
       ["Muros del sótano", "1", "muro flexorresistente impermeabilizado por el exterior", "I2+I3+D1+D5"],
       ["Suelo del sótano", "2", "solera sin intervención en el terreno", "C2+C3+D1"],
       ["Fachadas", "5", "F 3.2 · R3", "R3+C1"],

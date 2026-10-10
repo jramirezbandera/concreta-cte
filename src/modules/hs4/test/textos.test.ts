@@ -140,8 +140,8 @@ describe("memoria de HS4", () => {
   });
 
   it("la tabla de presiones lleva una fila por planta y el punto con más presión", () => {
-    expect(m.tabla.cabecera).toEqual(["Punto", "Altura", "Pérdidas", "Presión"]);
-    expect(m.tabla.filas.map((f) => f[0])).toEqual([
+    expect(m.tablas[0].cabecera).toEqual(["Punto", "Altura", "Pérdidas", "Presión"]);
+    expect(m.tablas[0].filas.map((f) => f[0])).toEqual([
       "El fregadero de A3 · planta 3",
       "El fregadero de A2 · planta 2",
       "El fregadero de A1 · planta 1",

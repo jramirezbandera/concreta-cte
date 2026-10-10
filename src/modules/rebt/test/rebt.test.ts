@@ -244,7 +244,7 @@ describe("REBT · textos, memoria, ficha y dibujo", () => {
     expect(texto).toMatch(/se concentran en un armario/);
     expect(texto).toMatch(/La instalación del aparcamiento precisa proyecto/);
     expect(texto).toMatch(/de uso Aparcamiento no abierto y controla el humo/);
-    expect(m.tabla?.filas.at(-1)).toEqual(["Carga total", "", "", "91.012 W"]);
+    expect(m.tablas?.[0]?.filas.at(-1)).toEqual(["Carga total", "", "", "91.012 W"]);
   });
 
   it("la ficha lleva los datos de partida y la verificación", () => {

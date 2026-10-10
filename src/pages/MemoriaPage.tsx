@@ -19,6 +19,8 @@ import {
   type MemoriaCte,
 } from "../lib/obra/memoria";
 import type { MemoriaDoc } from "../lib/cte/presentacion";
+import { piezasMemoria } from "../lib/cte/memoria";
+import { TablaMemoriaVista } from "../components/justificacion/TablaMemoriaVista";
 import { getJustificacion } from "../data/justificacionRegistry";
 
 // =============================================================================
@@ -31,49 +33,22 @@ import { getJustificacion } from "../data/justificacionRegistry";
 function Parrafos({ doc }: { doc: MemoriaDoc }): JSX.Element {
   return (
     <>
-      {doc.parrafos.map((p, i) => (
-        <p key={i} className="mb-3">
-          {p.map((t, j) =>
-            typeof t === "string" ? (
-              <span key={j}>{sinSupuestos(t)}</span>
-            ) : (
-              <span key={j} className="text-accent font-mono text-[12.5px]">
-                {sinSupuestos(t.v)}
-              </span>
-            ),
-          )}
-        </p>
-      ))}
-      {doc.tabla && (
-        <table className="mt-1.5 mb-2 w-full border-collapse">
-          <thead>
-            <tr>
-              {doc.tabla.cabecera.map((c, i) => (
-                <th
-                  key={c}
-                  scope="col"
-                  className={`border-border-main text-text-secondary border-b p-1.5 text-[10px] font-semibold tracking-[0.05em] uppercase ${i === 0 ? "text-left" : "text-right"}`}
-                >
-                  {c}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {doc.tabla.filas.map((f, k) => (
-              <tr key={k}>
-                {f.map((c, i) => (
-                  <td
-                    key={i}
-                    className={`border-border-sub border-b p-1.5 ${i === 0 ? "text-left text-[12.5px]" : "text-right font-mono text-[11.5px]"}`}
-                  >
-                    {sinSupuestos(c)}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {piezasMemoria(doc).map((x, i) =>
+        x.tipo === "tabla" ? (
+          <TablaMemoriaVista key={i} tabla={x.t} limpiar={sinSupuestos} />
+        ) : (
+          <p key={i} className="mb-3">
+            {x.p.map((t, j) =>
+              typeof t === "string" ? (
+                <span key={j}>{sinSupuestos(t)}</span>
+              ) : (
+                <span key={j} className="text-accent font-mono text-[12.5px]">
+                  {sinSupuestos(t.v)}
+                </span>
+              ),
+            )}
+          </p>
+        ),
       )}
       {doc.fuente && <p className="text-text-disabled mb-1 font-mono text-[10.5px] leading-relaxed">{fuenteCorta(doc.fuente)}</p>}
     </>

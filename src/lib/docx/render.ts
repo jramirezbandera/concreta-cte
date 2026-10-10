@@ -95,13 +95,16 @@ function parrafo(estilo: EstiloParrafo, texto: string): Paragraph {
   if (estilo === "Heading1" || estilo === "Heading2" || estilo === "Heading3") {
     return new Paragraph({ heading: NIVEL[estilo], text: texto });
   }
-  if (estilo === "Caption") return new Paragraph({ style: "Caption", text: texto });
+  // Las notas de una tabla, como las fuentes: a 8 pt (feature-31).
+  if (estilo === "Caption" || estilo === "NotaTabla") return new Paragraph({ style: "Caption", text: texto });
   if (estilo === "Pendiente") return new Paragraph({ children: [new TextRun({ text: texto, bold: true })] });
+  // El rótulo de una tabla no se queda solo al pie de la página.
+  if (estilo === "RotuloTabla") return new Paragraph({ keepNext: true, spacing: { after: 60 }, children: [new TextRun({ text: texto, bold: true })] });
   return new Paragraph({ text: texto });
 }
 
 /** Una celda: Word exige al menos un párrafo, y dentro de la tabla sin espacio debajo. */
-function celda(texto: string, negrita: boolean, ancho: number, cabecera: boolean): TableCell {
+function celda(texto: string, negrita: boolean, ancho: number, cabecera: boolean, centrada: boolean): TableCell {
   return new TableCell({
     width: { size: ancho, type: WidthType.PERCENTAGE },
     shading: cabecera ? { type: ShadingType.CLEAR, color: "auto", fill: GRIS_CABECERA } : undefined,
@@ -109,6 +112,7 @@ function celda(texto: string, negrita: boolean, ancho: number, cabecera: boolean
     children: [
       new Paragraph({
         spacing: { before: 0, after: 0 },
+        ...(centrada ? { alignment: AlignmentType.CENTER } : {}),
         children: [new TextRun({ text: texto, bold: negrita, size: TABLA })],
       }),
     ],
@@ -117,7 +121,7 @@ function celda(texto: string, negrita: boolean, ancho: number, cabecera: boolean
 
 function fila(f: FilaPlan, anchos: number[]): TableRow {
   return new TableRow({
-    children: f.celdas.map((c, j) => celda(c.texto, c.negrita, anchos[j], f.cabecera)),
+    children: f.celdas.map((c, j) => celda(c.texto, c.negrita, anchos[j], f.cabecera, c.centrada === true)),
     // La cabecera se repite en cada página y ninguna fila se parte.
     tableHeader: f.cabecera,
     cantSplit: true,
@@ -194,15 +198,17 @@ function pie(m: Membrete): Footer {
 export function documentoMemoria(bloques: BloqueMemoria[], membrete: Membrete): Document {
   const plan = planificarDocx(bloques);
   const children: (Paragraph | Table)[] = [];
-  for (const b of plan.bloques) {
+  plan.bloques.forEach((b, i) => {
     if (b.tipo === "parrafo") {
       children.push(parrafo(b.estilo, b.texto));
-      continue;
+      return;
     }
     children.push(tabla(b));
-    // Word pega dos tablas consecutivas si no hay nada en medio.
-    children.push(new Paragraph({ text: "" }));
-  }
+    // Word pega dos tablas consecutivas si no hay nada en medio; las notas de
+    // la tabla van pegadas a ella.
+    const sig = plan.bloques[i + 1];
+    if (!(sig?.tipo === "parrafo" && sig.estilo === "NotaTabla")) children.push(new Paragraph({ text: "" }));
+  });
   return new Document({
     styles: ESTILOS,
     title: plan.titulo,

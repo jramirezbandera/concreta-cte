@@ -71,10 +71,12 @@ export function memoriaSi6(j: JustificacionSi6): MemoriaDoc {
     titulo: "Resistencia al fuego de la estructura",
     norma: "DB-SI 6",
     parrafos,
-    tabla: {
-      cabecera: ["Planta", "Uso que manda", "R exigida"],
-      filas: plantas(j).map((p) => [p.plantas, porQueR(p.manda, j.comp.h_m), `R ${p.R}`]),
-    },
+    tablas: [
+      {
+        cabecera: ["Planta", "Uso que manda", "R exigida"],
+        filas: plantas(j).map((p) => [p.plantas, porQueR(p.manda, j.comp.h_m), `R ${p.R}`]),
+      },
+    ],
     fuente: ["DB-SI · SI 6 (consolidado 4-mar-2025)", "tablas 3.1 y 3.2", j.decisiones.material === "hormigon" ? "Anejo C" : "", "datos de El edificio", `motor ${ENGINE_VERSION}`]
       .filter((x) => x)
       .join(" · "),

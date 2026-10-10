@@ -5,7 +5,8 @@
 // del ap. 5.4. PURA.
 // =============================================================================
 
-import type { MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import type { MemoriaDoc, Trozo, TablaMemoria } from "../../lib/cte/presentacion";
+import { soloTablas } from "../../lib/cte/memoria";
 import { ENGINE_VERSION } from "../../lib/version";
 import { lista } from "../sua/colocar";
 import type { DetalleHe4, JustificacionHe4 } from "./justificacion";
@@ -88,7 +89,7 @@ function parrafoContribucion(j: JustificacionHe4): Trozo[] {
 const MEDIDA_Y_MANTENIMIENTO =
   "Los sistemas de medida de la energía suministrada procedente de fuentes renovables se adecuan al RITE (ap. 3.2). El plan de mantenimiento del Libro del Edificio contempla las operaciones y su periodicidad para mantener los parámetros de diseño y las prestaciones de las instalaciones de energía renovable, y en él se documentan todas las intervenciones a lo largo de su vida útil (ap. 5.4).";
 
-function tablaMeses(j: JustificacionHe4): MemoriaDoc["tabla"] {
+function tablaMeses(j: JustificacionHe4): TablaMemoria | undefined {
   const e = detalle(j, "energia");
   if (!e) return undefined;
   const r = (v: number) => Math.round(v).toLocaleString("es-ES");
@@ -106,5 +107,5 @@ export function memoriaHe4(j: JustificacionHe4): MemoriaDoc {
   const titulo = "Contribución mínima de energía renovable para ACS";
   if (!j.aplica) return { titulo, norma: "DB-HE 4", parrafos: [parrafoDemanda(j)], fuente };
   const parrafos = [parrafoDemanda(j), parrafoEnergia(j), parrafoContribucion(j), [MEDIDA_Y_MANTENIMIENTO]];
-  return { titulo, norma: "DB-HE 4", parrafos: parrafos.filter((x) => x.length > 0), tabla: tablaMeses(j), fuente };
+  return { titulo, norma: "DB-HE 4", parrafos: parrafos.filter((x) => x.length > 0), tablas: soloTablas(tablaMeses(j)), fuente };
 }

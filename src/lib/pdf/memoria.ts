@@ -7,6 +7,8 @@
 
 import jsPDF from "jspdf";
 import { repartirAnchos } from "../docx/plan";
+import { columnasDe, esNoCumple, notasNumeradas } from "../cte/memoria";
+import type { TipoColumna } from "../cte/presentacion";
 import { nombreArchivoMemoria, type BloqueMemoria } from "../obra/memoria";
 import type { Membrete } from "../estudio/estudio";
 import {
@@ -35,13 +37,15 @@ interface Estilo {
   despues: number;
 }
 
-const ESTILOS: Record<"h1" | "h2" | "h3" | "parrafo" | "nota" | "pendiente", Estilo> = {
+const ESTILOS: Record<"h1" | "h2" | "h3" | "parrafo" | "nota" | "pendiente" | "rotulo" | "notaTabla", Estilo> = {
   h1: { size: 15, bold: true, gray: 15, lh: 6.5, antes: 0, despues: 2 },
   h2: { size: 11.5, bold: true, gray: 20, lh: 5.2, antes: 5, despues: 1.5 },
   h3: { size: 10, bold: true, gray: 30, lh: 4.6, antes: 3.5, despues: 1 },
   parrafo: { size: 9.5, bold: false, gray: 40, lh: 4.4, antes: 0, despues: 2.2 },
   nota: { size: 7.5, bold: false, gray: 110, lh: 3.4, antes: 0, despues: 2.2 },
   pendiente: { size: 9.5, bold: true, gray: 30, lh: 4.4, antes: 0, despues: 2.2 },
+  rotulo: { size: 9, bold: true, gray: 30, lh: 4.2, antes: 0.5, despues: 1 },
+  notaTabla: { size: 7.5, bold: false, gray: 110, lh: 3.4, antes: 0, despues: 0.8 },
 };
 
 /** Escribe un texto con salto de línea y de página. Devuelve la y siguiente. */
@@ -61,18 +65,31 @@ function texto(doc: jsPDF, t: string, y: number, e: Estilo): number {
   return y + e.despues;
 }
 
-function tabla(doc: jsPDF, cabecera: string[], filas: string[][], y: number): number {
+const ALINEA: Record<TipoColumna, "left" | "right" | "center"> = { texto: "left", dato: "right", norma: "center", proyecto: "center", cumple: "center" };
+
+function tabla(doc: jsPDF, b: Extract<BloqueMemoria, { tipo: "tabla" }>, y: number): number {
+  const { cabecera, filas } = b;
+  const tipos = columnasDe(b);
   const pesos = cabecera.map((c, j) => Math.min(40, filas.reduce((m, f) => Math.max(m, (f[j] ?? "").length), c.length)));
   const anchos = repartirAnchos(pesos);
   const cols: TableCol<string[]>[] = cabecera.map((label, j) => ({
     key: String(j),
     label,
     w: (CW * anchos[j]) / 100,
-    align: j === 0 ? "left" : "right",
+    align: ALINEA[tipos[j]],
     render: (f) => f[j] ?? "",
+    // Lo que no cumple, para que se vea (feature-31).
+    ...(tipos[j] === "cumple" ? { bold: (f: string[]) => esNoCumple(f[j] ?? "") } : {}),
   }));
+  // El rótulo no se queda solo al pie: pide sitio para él y la cabecera.
+  if (b.rotulo) {
+    y = ensureSpace(doc, y, 20, M);
+    y = texto(doc, b.rotulo, y, ESTILOS.rotulo);
+  }
   y = ensureSpace(doc, y, 15, M);
-  return drawTable(doc, { x: M, y, cols, rows: filas, M }) + 2;
+  y = drawTable(doc, { x: M, y, cols, rows: filas, M }) + 2;
+  for (const n of notasNumeradas(b.notas)) y = texto(doc, n, y, ESTILOS.notaTabla);
+  return y;
 }
 
 /**
@@ -136,7 +153,7 @@ export function componerMemoriaPdf(bloques: BloqueMemoria[], membrete: Membrete)
         y = texto(doc, b.texto, y, ESTILOS.pendiente);
         break;
       case "tabla":
-        y = tabla(doc, b.cabecera, b.filas, y);
+        y = tabla(doc, b, y);
         break;
     }
   }

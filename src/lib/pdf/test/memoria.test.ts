@@ -36,4 +36,23 @@ describe("renderMemoriaPdf", () => {
   it("nombre de fichero sin acentos ni símbolos", () => {
     expect(nombreArchivoMemoria("Viviendas y local · C/ Mayor 12", "docx")).toBe("memoria-cte-viviendas-y-local-c-mayor-12.docx");
   });
+
+  it("una tabla «Norma | Proyecto» con su rótulo y sus notas (feature-31)", () => {
+    const crudo = componerMemoriaPdf(
+      [
+        {
+          tipo: "tabla",
+          rotulo: "Evacuación",
+          cabecera: ["Parámetro", "Norma", "Proyecto", ""],
+          columnas: ["texto", "norma", "proyecto", "cumple"],
+          filas: [["Anchura", "1,00 m", "0,90 m", "No cumple"]],
+          notas: ["Medida entre paredes."],
+        },
+      ],
+      membrete,
+    ).output();
+    expect(crudo).toContain("(Evacuación)");
+    expect(crudo).toContain("(No cumple)");
+    expect(crudo).toContain("(\\(1\\) Medida entre paredes.)");
+  });
 });

@@ -5,7 +5,8 @@
 // que pide la instalación (ITC-BT-04), con la tabla de la previsión. PURA.
 // =============================================================================
 
-import type { MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import type { MemoriaDoc, Trozo, TablaMemoria } from "../../lib/cte/presentacion";
+import { soloTablas } from "../../lib/cte/memoria";
 import { ENGINE_VERSION } from "../../lib/version";
 import { lista } from "../sua/colocar";
 import type { DetalleRebt, JustificacionRebt } from "./justificacion";
@@ -178,7 +179,7 @@ function parrafoDocumentacion(j: JustificacionRebt): Trozo[] {
     : ["La instalación no está en ninguno de los grupos que precisan proyecto: se documenta con una memoria técnica de diseño (ITC-BT-04 ap. 4)."];
 }
 
-function tablaPrevision(j: JustificacionRebt): MemoriaDoc["tabla"] {
+function tablaPrevision(j: JustificacionRebt): TablaMemoria | undefined {
   const t = detalle(j, "total")!;
   const filas: string[][] = [];
   for (const v of j.viviendas) filas.push([j.unifamiliar ? "Vivienda" : `Vivienda ${v.nombre}`, `${v.cantidad} × ${m2(v.superficie_m2)}`, NOMBRE_GRADO[v.grado], W(v.potencia_W)]);
@@ -264,7 +265,7 @@ function parrafosExistente(j: JustificacionRebt): Trozo[][] {
   return p;
 }
 
-function tablaExistente(j: JustificacionRebt): MemoriaDoc["tabla"] {
+function tablaExistente(j: JustificacionRebt): TablaMemoria | undefined {
   const ex = j.existente!;
   const filas: string[][] = [];
   for (const v of ex.viviendas) filas.push([`Vivienda ${v.nombre} (nueva)`, `${v.cantidad} × ${m2(v.superficie_m2)}`, NOMBRE_GRADO[v.grado], W(v.potencia_W)]);
@@ -281,7 +282,7 @@ export function memoriaRebt(j: JustificacionRebt): MemoriaDoc {
       titulo: "Grado de electrificación y previsión de cargas",
       norma: "REBT ITC-BT-10",
       parrafos: parrafosExistente(j),
-      tabla: tablaExistente(j),
+      tablas: soloTablas(tablaExistente(j)),
       fuente: ["REBT (RD 842/2002), consolidado BOE 03-09-2025", "art. 2.2", "ITC-BT-04, 10, 13, 14, 15, 16 y 25", "guía técnica BT-10", "datos de El edificio", `motor ${ENGINE_VERSION}`].join(" · "),
     };
   }
@@ -290,7 +291,7 @@ export function memoriaRebt(j: JustificacionRebt): MemoriaDoc {
     titulo: "Grado de electrificación y previsión de cargas",
     norma: "REBT ITC-BT-10",
     parrafos: parrafos.filter((x) => x.length > 0),
-    tabla: tablaPrevision(j),
+    tablas: soloTablas(tablaPrevision(j)),
     fuente,
   };
 }

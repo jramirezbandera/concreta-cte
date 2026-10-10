@@ -6,7 +6,8 @@
 // lo de proyecto y lo exigido. PURA.
 // =============================================================================
 
-import type { MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import type { MemoriaDoc, Trozo, TablaMemoria } from "../../lib/cte/presentacion";
+import { soloTablas } from "../../lib/cte/memoria";
 import { ENGINE_VERSION } from "../../lib/version";
 import type { DetalleHr, JustificacionHr } from "./justificacion";
 import { EDICION_HR, TRAMOS_HUECOS, tramoHuecos } from "./tablas";
@@ -163,7 +164,7 @@ function linea(d: DetalleHr, nombre: string): Trozo[] | null {
   }
 }
 
-function tablaK1(j: JustificacionHr): MemoriaDoc["tabla"] {
+function tablaK1(j: JustificacionHr): TablaMemoria | undefined {
   const filas: string[][] = [];
   for (const el of j.elementos) {
     const d = el.detalle;
@@ -230,5 +231,5 @@ export function memoriaHr(j: JustificacionHr): MemoriaDoc {
   }
   if (j.tipologia !== "otros") parrafos.push([REVERBERACION]);
   parrafos.push([j.medios ? CATALOGO.replace("los mínimos", "los medios") : CATALOGO]);
-  return { titulo, norma: "DB-HR", parrafos, tabla: tablaK1(j), fuente };
+  return { titulo, norma: "DB-HR", parrafos, tablas: soloTablas(tablaK1(j)), fuente };
 }

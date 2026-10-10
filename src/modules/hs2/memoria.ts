@@ -4,7 +4,8 @@
 // almacenamiento inmediato. PURA.
 // =============================================================================
 
-import type { MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import type { MemoriaDoc, Trozo, TablaMemoria } from "../../lib/cte/presentacion";
+import { soloTablas } from "../../lib/cte/memoria";
 import { fmt } from "../../lib/units/format";
 import { ENGINE_VERSION } from "../../lib/version";
 import { lista, metros } from "../sua/colocar";
@@ -111,7 +112,7 @@ function parrafoMantenimiento(j: JustificacionHs2): Trozo[] {
   ];
 }
 
-function tablaInmediato(j: JustificacionHs2): MemoriaDoc["tabla"] {
+function tablaInmediato(j: JustificacionHs2): TablaMemoria | undefined {
   const ins = j.elementos.flatMap((x) => (x.detalle.clase === "inmediato" ? [x.detalle] : []));
   if (ins.length === 0) return undefined;
   return {
@@ -141,7 +142,7 @@ export function memoriaHs2(j: JustificacionHs2): MemoriaDoc {
     titulo: "Recogida y evacuación de residuos",
     norma: "DB-HS 2",
     parrafos: parrafos.filter((x) => x.length > 0),
-    tabla: tablaInmediato(j),
+    tablas: soloTablas(tablaInmediato(j)),
     fuente,
   };
 }
