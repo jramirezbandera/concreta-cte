@@ -5,16 +5,20 @@
 // =============================================================================
 
 import type { FilaQueEntra } from "../../components/justificacion/QueEntra";
-import type { DetalleElemento, EstadoPresentacion, MemoriaDoc, Trozo } from "../../lib/cte/presentacion";
+import type { DetalleElemento, EstadoPresentacion, MemoriaDoc, TablaMemoria, Trozo } from "../../lib/cte/presentacion";
+import { soloTablas } from "../../lib/cte/memoria";
 import { listaY } from "../../lib/cte/redaccion";
 import type { Aviso } from "../../lib/cte/resultado";
+import { NO_SE_EXIGE, tablaNorma, type FilaNorma } from "../../lib/cte/tablaNorma";
 import { USOS } from "../../lib/edificio/usos";
 import { fmt } from "../../lib/units/format";
 import { ENGINE_VERSION } from "../../lib/version";
 import type { TextoSi } from "../si/definicion";
+import type { UsoSi } from "../si/edificio";
+import { m2 } from "../si/textos";
 import type { ElementoSi } from "../si/tipos";
-import type { DetalleSi3, ElementoSi3, JustificacionSi3 } from "./justificacion";
-import { HUMO_SI3, SALIDAS_TABLA_3_1, type ProteccionEscalera } from "./tablas";
+import { proteccionSuficiente, type DetalleSi3, type ElementoSi3, type JustificacionSi3, type OcupacionZona } from "./justificacion";
+import { DISCAPACIDAD_SI3, HUMO_SI3, PROTECCION_TABLA_5_1, SALIDAS_TABLA_3_1, type ProteccionEscalera } from "./tablas";
 
 const H = HUMO_SI3.datos;
 
@@ -391,71 +395,170 @@ export function describirDibujoSi3(j: JustificacionSi3): string {
 // La memoria
 // -----------------------------------------------------------------------------
 
+type Det<C extends DetalleSi3["clase"]> = Extract<DetalleSi3, { clase: C }>;
+
+/** «0,80 m»: las anchuras de paso, con sus dos decimales, como las da la tabla 4.1. */
+function anchura(v: number): string {
+  return `${v.toFixed(2).replace(".", ",")} m`;
+}
+
+/** El uso de la tabla 2.1 de cada zona. El local sin uso, asimilado a Comercial, no entra en la tabla. */
+const NOMBRE_USO_SI: Record<UsoSi, string> = {
+  residencial_vivienda: "Residencial Vivienda",
+  vivienda_unifamiliar: "Residencial Vivienda",
+  administrativo: "Administrativo",
+  aparcamiento: "Aparcamiento",
+  sin_uso: "Comercial",
+};
+
+/** Las zonas que suman ocupación: las de densidad de la tabla 2.1, sin el local (sale por las suyas). */
+function zonasConOcupacion(d: Det<"ocupacion">): OcupacionZona[] {
+  return d.zonas.filter((o) => o.densidad_m2 !== null && o.zona.uso !== "local_sin_uso");
+}
+
+/**
+ * La ocupación de cada zona (feature-31): superficie útil, densidad de la tabla
+ * 2.1 y ocupación; con varias zonas, el total. Una zona que se repite en varias
+ * plantas se cuenta por planta («8 × 3 = 24»), como la calcula el módulo.
+ */
+function tablaOcupacion(d: Det<"ocupacion">, tras: number): TablaMemoria | undefined {
+  const zonas = zonasConOcupacion(d);
+  if (zonas.length === 0) return undefined;
+  const filas = zonas.map((o) => {
+    const n = o.zona.repeticiones;
+    return [
+      `${USOS[o.zona.uso].etiqueta} (${o.zona.plantas})`,
+      NOMBRE_USO_SI[o.zona.usoSi],
+      `${m2(o.zona.util_m2)}${n > 1 ? ` × ${n}` : ""}`,
+      `${o.densidad_m2} m²/persona`,
+      n > 1 ? `${o.porPlanta} × ${n} = ${o.total}` : String(o.total),
+    ];
+  });
+  if (zonas.length > 1) {
+    const usos = [...new Set(zonas.map((o) => NOMBRE_USO_SI[o.zona.usoSi]))];
+    const util = zonas.reduce((a, o) => a + o.zona.util_m2 * o.zona.repeticiones, 0);
+    filas.push(["Total", listaY(usos), m2(util), "según zona", String(zonas.reduce((a, o) => a + o.total, 0))]);
+  }
+  return {
+    rotulo: "Ocupación",
+    cabecera: ["Zona", "Uso", "Superficie útil", "Densidad", "Ocupación (personas)"],
+    columnas: ["texto", "texto", "dato", "dato", "dato"],
+    filas,
+    tras,
+  };
+}
+
+/** Lo que la tabla 5.1 admite como mínimo, con la altura hasta la que lo admite. */
+function normaProteccion(exigida: ProteccionEscalera): string {
+  const t = PROTECCION_TABLA_5_1.datos.residencial;
+  if (exigida === "no_protegida") return `no protegida (h ≤ ${t.noProtegida_m} m)`;
+  if (exigida === "protegida") return `protegida (h ≤ ${t.protegida_m} m)`;
+  return NOMBRE_ESCALERA[exigida];
+}
+
+/** Lo que el módulo comprueba de un elemento de la evacuación, en filas «Norma | Proyecto». */
+function filasEvacuacion(el: ElementoSi3): FilaNorma[] {
+  const d = el.detalle;
+  const T = SALIDAS_TABLA_3_1.datos.unaSalida;
+  const veredicto = el.veredicto === "fail" ? "fail" : "ok";
+  // Un recorrido sin medir se declara: «≤ 25 m» (el texto lo declaraba «no excede de 25 m»).
+  const recorrido = (r: number | null, limite: number): string => (r !== null ? m(r, 1) : `≤ ${limite} m`);
+  switch (d.clase) {
+    case "salidas": {
+      const ok = (f: Det<"salidas">["fallos"][number]): boolean => !d.fallos.includes(f);
+      return [
+        [`Ocupación de la planta (${d.plantaMayor}, la mayor)`, `≤ ${T.ocupacionMax} personas`, personas(d.pPlanta), ok("ocupacion")],
+        ...(d.residencial ? [["Ocupación de la salida del edificio", `≤ ${T.ocupacionEdificioViviendasMax} personas`, personas(d.pSalida), ok("ocupacion_edificio")] as FilaNorma] : []),
+        ["Altura de evacuación", `≤ ${T.alturaDescendenteMax_m} m`, m(d.h_m), ok("altura")],
+        ["Recorrido de evacuación", `≤ ${d.limite_m} m`, recorrido(d.recorrido_m, d.limite_m), ok("recorrido")],
+      ];
+    }
+    case "escalera":
+      return [
+        ["Protección de la escalera", normaProteccion(d.exigida), NOMBRE_ESCALERA[d.proteccion], proteccionSuficiente(d.proteccion, d.exigida)],
+        ["Capacidad de la escalera", d.p > 0 ? `≥ ${personas(d.p)}` : NO_SE_EXIGE, `${personas(d.capacidad)} (A = ${anchura(d.anchura_m)})`, d.capacidad >= d.p],
+      ];
+    case "puertas":
+      // La anchura de proyecto es la que se declara: la mínima que resulta de la tabla 4.1.
+      return [[`Anchura de la puerta de salida (${personas(d.pSalida)})`, "A ≥ P/200 ≥ 0,80 m", `≥ ${anchura(d.anchura_m)}`, veredicto]];
+    case "garaje": {
+      const ok = (f: Det<"garaje">["fallos"][number]): boolean => !d.fallos.includes(f);
+      return [
+        ["Ocupación del garaje", `≤ ${T.ocupacionMax} personas`, personas(d.pPlanta), ok("ocupacion")],
+        ["Altura de evacuación ascendente del garaje", `≤ ${T.alturaAscendenteMax_m} m`, m(d.hAsc_m), ok("altura")],
+        ["Recorrido del garaje", `≤ ${d.limite_m} m`, recorrido(d.recorrido_m, d.limite_m), ok("recorrido")],
+      ];
+    }
+    case "escalera_garaje":
+      return [["Protección de la escalera del garaje", NOMBRE_ESCALERA.especialmente_protegida, NOMBRE_ESCALERA.especialmente_protegida, veredicto]];
+    default:
+      return [];
+  }
+}
+
+/** Las clases de la evacuación que van a la tabla, en el orden de los párrafos. */
+const DE_LA_EVACUACION: ReadonlySet<DetalleSi3["clase"]> = new Set(["salidas", "escalera", "puertas", "garaje", "escalera_garaje"]);
+
 export function memoriaSi3(j: JustificacionSi3): MemoriaDoc {
   const parrafos: Trozo[][] = [];
   const ex = j.existente;
+  const sal = j.elementos.find((el) => el.detalle.clase === "salidas")?.detalle;
+  const residencial = sal?.clase === "salidas" ? sal.residencial : true;
+  const uso = residencial ? "Residencial Vivienda" : "Administrativo";
+  const D = DISCAPACIDAD_SI3.datos;
+  // Las tablas van tras su grupo de párrafos (feature-31): la ocupación, tras el
+  // suyo; la evacuación, tras las salidas, la escalera, la puerta y el garaje.
+  let ocupacion: TablaMemoria | undefined;
+  const evacuacion: FilaNorma[] = [];
+  let trasEvacuacion = 0;
   for (const el of j.elementos) {
     const d = el.detalle;
     switch (d.clase) {
       case "ocupacion":
         if (ex) {
           // Criterio 8 (feature-30): la ocupación de lo intervenido y su salida por los comunes existentes.
-          const viv = d.zonas.filter((o) => o.densidad_m2 !== null && o.zona.uso !== "local_sin_uso");
           parrafos.push([
-            `La ocupación de la zona que se transforma en vivienda, con ${listaY([...new Set(viv.map((o) => `${o.densidad_m2} m²/persona`))])} de la tabla 2.1, es de `,
-            { v: personas(d.total) },
-            ". Sus ocupantes evacúan desde la puerta de la vivienda por los elementos comunes de evacuación del edificio existente hasta su salida. Al tratarse de transformar en uso Residencial Vivienda una zona de otro uso en un edificio de ese uso, no es preciso aplicar este DB a los elementos comunes de evacuación (DB-SI, Introducción III, criterio 8).",
+            "La ocupación de la zona que se transforma en vivienda se calcula con la densidad de la tabla 2.1. Sus ocupantes evacúan desde la puerta de la vivienda por los elementos comunes de evacuación del edificio existente hasta su salida. Al tratarse de transformar en uso Residencial Vivienda una zona de otro uso en un edificio de ese uso, no es preciso aplicar este DB a los elementos comunes de evacuación (DB-SI, Introducción III, criterio 8).",
           ]);
+          ocupacion = tablaOcupacion(d, parrafos.length);
           if (ex.comunesReformados) {
-            parrafos.push([
-              `En las zonas comunes que se reforman, el DB se aplica a los elementos que modifica la reforma (criterio 9), con la ocupación del edificio entero: `,
-              { v: personas(ex.ocupacionEdificio) },
-              ".",
-            ]);
+            // La ocupación del edificio entero va en la fila de la puerta.
+            parrafos.push(["En las zonas comunes que se reforman, el DB se aplica a los elementos que modifica la reforma (criterio 9), con la ocupación del edificio entero."]);
           }
         } else if (d.unifamiliar) {
           parrafos.push(["El edificio es una vivienda unifamiliar. El interior de una vivienda no es origen de evacuación (Anejo SI A), por lo que no hay recorridos de evacuación que limitar ni escaleras que proteger conforme a SI 3."]);
         } else {
+          // Las superficies, las densidades y las ocupaciones van en la tabla (feature-31).
           parrafos.push([
-            "La ocupación se calcula con las densidades de la tabla 2.1 sobre la superficie útil de cada zona: ",
-            listaY(d.zonas.filter((o) => o.densidad_m2 !== null && o.zona.uso !== "local_sin_uso").map((o) => `${USOS[o.zona.uso].etiqueta.toLowerCase()} (${o.zona.plantas}), ${o.total} personas a ${o.densidad_m2} m²/persona`)),
-            "; en total, ",
-            { v: personas(d.total) },
-            ". Los trasteros de las viviendas y los cuartos de instalaciones son zonas de ocupación nula, y el portal y la escalera no aportan ocupación propia. Las ocupaciones y usos previstos son únicamente los característicos de la actividad (tabla 2.1, nota 1).",
+            "La ocupación se calcula con las densidades de la tabla 2.1 sobre la superficie útil de cada zona. Los trasteros de las viviendas y los cuartos de instalaciones son zonas de ocupación nula, y el portal y la escalera no aportan ocupación propia. Las ocupaciones y usos previstos son únicamente los característicos de la actividad (tabla 2.1, nota 1).",
           ]);
+          ocupacion = tablaOcupacion(d, parrafos.length);
         }
         break;
       case "salidas":
+        // Las ocupaciones, la altura y el recorrido van en la tabla: aquí, el criterio y cómo se mide.
         parrafos.push([
-          `Cada planta dispone de una única salida de planta (tabla 3.1): su ocupación no excede de 100 personas (la mayor, ${d.plantaMayor}, ${d.pPlanta})${d.residencial ? `, la de la salida del edificio de viviendas no excede de 500 (${d.pSalida})` : ""}, la altura de evacuación (${m(d.h_m)}) no excede de 28 m y el recorrido más desfavorable, medido ${tramoRecorrido(d)}, `,
-          { v: d.recorrido_m !== null ? `es de ${m(d.recorrido_m, 1)}` : `no excede de ${d.limite_m} m` },
-          d.recorrido_m !== null ? `, no mayor que ${d.limite_m} m.` : ".",
+          `Cada planta dispone de una única salida de planta, que la tabla 3.1 admite si se cumplen a la vez las condiciones de ocupación, altura de evacuación y recorrido. El recorrido más desfavorable se mide ${tramoRecorrido(d)}${d.hastaEdificio ? ", ya que una escalera no protegida no es salida de planta" : ""}.`,
         ]);
         break;
       case "garaje":
         parrafos.push([
-          `El garaje, de uso Aparcamiento, dispone de una salida de planta: su ocupación (${d.pPlanta} personas) no excede de 100, la altura de evacuación ascendente (${m(d.hAsc_m)}) no excede de 10 m y el recorrido desde el punto más alejado hasta la puerta del vestíbulo de la escalera `,
-          { v: d.recorrido_m !== null ? `es de ${m(d.recorrido_m, 1)}` : `no excede de ${d.limite_m} m` },
-          ".",
+          "El garaje, de uso Aparcamiento, dispone de una salida de planta, que la tabla 3.1 admite si se cumplen a la vez las condiciones de ocupación, altura de evacuación ascendente y recorrido; el recorrido se mide desde el punto más alejado hasta la puerta del vestíbulo de la escalera.",
         ]);
         break;
       case "escalera":
         parrafos.push([
-          `La escalera es `,
-          { v: NOMBRE_ESCALERA[d.proteccion] },
-          `, lo que admite la tabla 5.1 para una altura de evacuación de ${m(d.h_m)} en uso Residencial Vivienda. Con una anchura de ${m(d.anchura_m)} tiene capacidad para ${d.capacidad} personas (tablas 4.1 y 4.2)${d.p > 0 ? `, más que las ${d.p} que la usan; la anchura mínima es la del DB SUA 1, tabla 4.1.` : ", y ningún ocupante de la zona a la que se aplica la Sección evacua por ella. La anchura mínima es la del DB SUA 1, tabla 4.1."}`,
+          `La protección exigida a la escalera es la de la tabla 5.1 para su altura de evacuación en uso ${uso}, y su capacidad, la de las tablas 4.1 y 4.2 para su anchura${d.p > 0 ? "" : "; ningún ocupante de la zona a la que se aplica la Sección evacua por ella"}. La anchura mínima es la del DB SUA 1, tabla 4.1.`,
         ]);
         break;
       case "escalera_garaje":
         parrafos.push([
-          "La escalera que sirve al garaje es especialmente protegida, con vestíbulo de independencia (paredes EI 120 y dos puertas EI2 30-C5) en cada acceso desde el garaje, como exige la tabla 5.1 para el uso Aparcamiento.",
+          "En cada acceso desde el garaje, la escalera que le sirve tiene vestíbulo de independencia (paredes EI 120 y dos puertas EI2 30-C5), como exige la tabla 5.1 para el uso Aparcamiento.",
         ]);
         break;
       case "puertas":
         parrafos.push([
-          `La puerta de salida del edificio, para ${d.pSalida} personas, tiene una anchura de paso de al menos `,
-          { v: m(d.anchura_m) },
-          ` (A ≥ P/200 ≥ 0,80 m), con hojas de entre 0,60 y 1,23 m, abatible de eje vertical y con apertura sin llave desde el lado de la evacuación${d.sentidoEvacuacion ? "; abre en el sentido de la evacuación" : ""} (SI 3, tabla 4.1 y ap. 6).${d.garaje ? " Las puertas de salida del garaje no tienen bloqueo y el portón de vehículos no se considera salida." : ""}`,
+          `La puerta de salida del edificio tiene hojas de entre 0,60 y 1,23 m, es abatible de eje vertical, con apertura sin llave desde el lado de la evacuación${d.sentidoEvacuacion ? ", y abre en el sentido de la evacuación" : ""} (SI 3, tabla 4.1 y ap. 6).${d.garaje ? " Las puertas de salida del garaje no tienen bloqueo y el portón de vehículos no se considera salida." : ""}`,
         ]);
         break;
       case "senalizacion":
@@ -480,7 +583,7 @@ export function memoriaSi3(j: JustificacionSi3): MemoriaDoc {
         parrafos.push([
           d.exige
             ? `Por ${d.motivo}, las plantas sin salida accesible disponen de paso a un sector alternativo o de zona de refugio (SI 3, ap. 9).`
-            : "No se exigen zonas de refugio (altura de evacuación no mayor que 28 m en uso Residencial Vivienda); la planta de salida dispone de un itinerario accesible hasta una salida del edificio accesible (SI 3, ap. 9).",
+            : `No se exigen zonas de refugio (altura de evacuación no mayor que ${residencial ? D.residencialH_m : D.administrativoH_m} m en uso ${uso}${j.conGaraje ? ` y plantas de garaje de no más de ${fmt(D.plantaAparcamiento_m2, "m²", 0)}` : ""}); la planta de salida dispone de un itinerario accesible hasta una salida del edificio accesible (SI 3, ap. 9).`,
         ]);
         break;
       case "local":
@@ -489,11 +592,16 @@ export function memoriaSi3(j: JustificacionSi3): MemoriaDoc {
       default:
         break;
     }
+    if (DE_LA_EVACUACION.has(d.clase)) {
+      evacuacion.push(...filasEvacuacion(el));
+      trasEvacuacion = parrafos.length;
+    }
   }
   return {
     titulo: "Evacuación de ocupantes",
     norma: "DB-SI 3",
     parrafos,
+    tablas: soloTablas(ocupacion, tablaNorma(evacuacion, { rotulo: "Evacuación", tras: trasEvacuacion })),
     fuente: [
       "DB-SI · SI 3 (consolidado 4-mar-2025)",
       ex ? (ex.comunesReformados ? "tablas 2.1 y 4.1 · ap. 6 y 7" : "tabla 2.1") : "tablas 2.1, 3.1, 4.1, 4.2 y 5.1",

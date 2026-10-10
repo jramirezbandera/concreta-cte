@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { textoPlanoMemoria } from "../../../lib/cte/memoria";
+import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
 import type { Edificio } from "../../../lib/edificio/tipos";
+import { obraDeCaso, proyectoParaModulo } from "../../../lib/proyecto/alcance";
 import { crearProyectoDemo } from "../../../lib/proyecto/demo";
+import type { Proyecto } from "../../../lib/proyecto/tipos";
 import { cambiarZonaSi } from "../../si/editar";
 import { si4 } from "../definicion";
 import { si4EstadoDefaults } from "../estado";
@@ -59,8 +61,42 @@ describe("SI4", () => {
     expect(exige(con(hondo), "hidrantes")).toBe(true);
   });
 
-  it("la memoria enumera lo que no se exige", () => {
-    const t = textoPlanoMemoria(si4.memoria(caso("plurifamiliar")));
-    expect(t).toMatch(/Conforme a la tabla 1\.1, no se requieren columna seca, hidrantes exteriores y extinción automática\./);
+  it("la memoria pone lo que no se exige en la tabla, no en una frase", () => {
+    const m = si4.memoria(caso("plurifamiliar"));
+    expect(m.tablas![0].filas).toContainEqual(["Columna seca", "no se exige", "no se dispone", "Cumple"]);
+    expect(m.tablas![0].filas).toContainEqual(["Hidrantes exteriores", "no se exige", "no se disponen", "Cumple"]);
+    expect(textoPlanoMemoria(m)).not.toMatch(/no se requieren/);
+  });
+});
+
+describe("SI4 · tabla de la memoria (feature-31)", () => {
+  it("«Instalación | Norma | Proyecto | Cumple»: lo exigido con su porqué y lo dispuesto; el texto no lo repite", () => {
+    const m = si4.memoria(caso("plurifamiliar_locales"));
+    const t = m.tablas![0];
+    expect(t.cabecera).toEqual(["Instalación", "Norma", "Proyecto", "Cumple"]);
+    expect(t.filas[0]).toEqual(["Extintores portátiles", "21A-113B, ≤ 15 m desde todo origen", "21A-113B, ≤ 15 m: P3, P2, P1, PB y S1", "Cumple"]);
+    expect(t.filas).toContainEqual(["Bocas de incendio equipadas", "garaje > 500 m² construidos: se exigen", "BIE de 25 mm en el garaje", "Cumple"]);
+    // Tras el párrafo de dónde sale la dotación.
+    expect(t.tras).toBe(1);
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).not.toContain("504 m²");
+    expect(texto).not.toContain("21A-113B");
+    expect(texto).not.toMatch(/Se dispone (bocas|detección)/);
+  });
+
+  it("en la reforma, lo exigido que ya existía: «existente, no se modifica»", () => {
+    const p: Proyecto = { ...crearProyectoDemo("2026-10-10T10:00:00.000Z"), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
+    p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso("reforma_local_vivienda") ?? {}) };
+    const m = si4.memoria(justificarSi4(si4EstadoDefaults, proyectoParaModulo(p, "si4")));
+    const t = m.tablas![0];
+    expect(t.filas).toEqual([
+      ["Extintores portátiles", "21A-113B, ≤ 15 m desde todo origen", "existentes, no se modifican", "Cumple"],
+      ["Bocas de incendio equipadas", "garaje > 500 m² construidos: se exigen", "existentes, no se modifican", "Cumple"],
+      ["Detección de incendio", "garaje > 500 m² construidos: se exige", "existente, no se modifica", "Cumple"],
+    ]);
+    // La lista de las existentes la dice la tabla; el texto se queda con el criterio 10.
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).toContain("criterio 10");
+    expect(texto).not.toContain("las bocas de incendio equipadas del garaje");
   });
 });

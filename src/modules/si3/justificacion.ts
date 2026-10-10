@@ -155,6 +155,11 @@ export function proteccionExigida(h_m: number): ProteccionEscalera {
   return "especialmente_protegida";
 }
 
+/** ¿Vale la protección proyectada para la exigida? La compartimentada solo donde basta la no protegida. */
+export function proteccionSuficiente(proteccion: ProteccionEscalera, exigida: ProteccionEscalera): boolean {
+  return RANGO[proteccion] >= RANGO[exigida] && !(proteccion === "compartimentada" && exigida !== "no_protegida");
+}
+
 function ocupacionDe(e: EdificioSi, z: ZonaSi): OcupacionZona {
   const d = DENSIDADES_SI3.datos;
   let densidad: number | null = null;
@@ -285,7 +290,7 @@ function justificarSi3Edificio(estado: Si3Estado, p: ProyectoSi): JustificacionS
         d.escalera === "protegida" || d.escalera === "especialmente_protegida"
           ? capacidadProtegida(d.anchuraEscalera_m, plantasArriba.length)
           : Math.floor(DIMENSIONADO_TABLA_4_1.datos.escaleraDescendenteDivisor * d.anchuraEscalera_m);
-      const insuficiente = RANGO[d.escalera] < RANGO[exigida] || (d.escalera === "compartimentada" && exigida !== "no_protegida");
+      const insuficiente = !proteccionSuficiente(d.escalera, exigida);
       elementos.push({
         id: "escalera",
         nombre: "Escalera",

@@ -138,9 +138,9 @@ describe("SI y SUA (paso 4)", () => {
 
   it("SI 3: la ocupación de lo intervenido y, en el portal que se reforma, la del edificio entero", () => {
     const si3 = apartado(t, "3.2.3. SI 3 Evacuación de ocupantes");
-    expect(si3).toContain("es de 5 personas");
+    expect(si3).toContain("Viviendas (PB)\tResidencial Vivienda\t90 m²\t20 m²/persona\t5");
     expect(si3).toContain("no es preciso aplicar este DB a los elementos comunes de evacuación (DB-SI, Introducción III, criterio 8)");
-    expect(si3).toContain("La puerta de salida del edificio, para 40 personas");
+    expect(si3).toContain("Anchura de la puerta de salida (40 personas)");
     expect(si3).not.toContain("La escalera es");
     expect(si3).not.toContain("garaje");
   });
@@ -148,7 +148,7 @@ describe("SI y SUA (paso 4)", () => {
   it("SI 4: sin dotación propia; lo existente no se modifica", () => {
     const si4 = apartado(t, "3.2.4. SI 4 Instalaciones de protección contra incendios");
     expect(si4).toContain("El interior de la vivienda no es origen de evacuación");
-    expect(si4).toContain("las bocas de incendio equipadas del garaje");
+    expect(si4).toContain("Bocas de incendio equipadas\tgaraje > 500 m² construidos: se exigen\texistentes, no se modifican");
     expect(si4).toContain("criterio 10");
     expect(si4).not.toContain("Se dispone bocas de incendio");
   });

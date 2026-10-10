@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { textoPlanoMemoria } from "../../../lib/cte/memoria";
+import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
 import type { Edificio } from "../../../lib/edificio/tipos";
+import { obraDeCaso, proyectoParaModulo } from "../../../lib/proyecto/alcance";
 import { crearProyectoDemo } from "../../../lib/proyecto/demo";
+import type { Proyecto } from "../../../lib/proyecto/tipos";
 import { si3 } from "../definicion";
 import { si3EstadoDefaults, type Si3Estado } from "../estado";
 import { justificarSi3, proteccionExigida } from "../justificacion";
@@ -80,7 +82,64 @@ describe("SI3 · justificación", () => {
 
   it("la memoria dice desde dónde y hasta dónde se mide el recorrido", () => {
     const t = textoPlanoMemoria(si3.memoria(caso("plurifamiliar_locales", { recorrido_m: 21.5 })));
-    expect(t).toMatch(/medido desde la puerta de la vivienda más alejada hasta la salida del edificio, bajando por la escalera, es de 21,5 m/);
-    expect(t).toMatch(/especialmente protegida, con vestíbulo de independencia/);
+    expect(t).toMatch(/se mide desde la puerta de la vivienda más alejada hasta la salida del edificio, bajando por la escalera, ya que una escalera no protegida no es salida de planta/);
+    expect(t).toMatch(/la escalera que le sirve tiene vestíbulo de independencia/);
+  });
+});
+
+describe("SI3 · tablas de la memoria (feature-31)", () => {
+  it("la ocupación: zona, uso, superficie útil, densidad y ocupación, con el total; el texto no la repite", () => {
+    const m = si3.memoria(caso("plurifamiliar_locales"));
+    const t = m.tablas![0];
+    expect(t.cabecera).toEqual(["Zona", "Uso", "Superficie útil", "Densidad", "Ocupación (personas)"]);
+    expect(t.filas).toContainEqual(["Viviendas (P1–P3)", "Residencial Vivienda", "158 m² × 3", "20 m²/persona", "8 × 3 = 24"]);
+    expect(t.filas.at(-1)).toEqual(["Total", "Residencial Vivienda y Aparcamiento", "894 m²", "según zona", "35"]);
+    // Tras el párrafo de la ocupación; el local sale por las suyas y no entra.
+    expect(t.tras).toBe(1);
+    expect(t.filas.some((f) => f[0].startsWith("Local"))).toBe(false);
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).not.toContain("24 personas");
+    expect(texto).not.toContain("35 personas");
+  });
+
+  it("la evacuación: «Parámetro | Norma | Proyecto | Cumple», con el garaje; el texto no repite las cifras", () => {
+    const m = si3.memoria(caso("plurifamiliar_locales", { recorrido_m: 21.5 }));
+    const t = m.tablas![1];
+    expect(t.rotulo).toBe("Evacuación");
+    expect(t.cabecera).toEqual(["Parámetro", "Norma", "Proyecto", "Cumple"]);
+    expect(t.filas).toContainEqual(["Recorrido de evacuación", "≤ 25 m", "21,5 m", "Cumple"]);
+    expect(t.filas).toContainEqual(["Capacidad de la escalera", "≥ 24 personas", "160 personas (A = 1,00 m)", "Cumple"]);
+    expect(t.filas).toContainEqual(["Anchura de la puerta de salida (35 personas)", "A ≥ P/200 ≥ 0,80 m", "≥ 0,80 m", "Cumple"]);
+    // Sin medir, el recorrido del garaje se declara con su límite.
+    expect(t.filas).toContainEqual(["Recorrido del garaje", "≤ 35 m", "≤ 35 m", "Cumple"]);
+    // Antes del humo del garaje, que se queda en el texto.
+    expect(textoParrafo(m.parrafos[t.tras!])).toMatch(/^El garaje, que no tiene la consideración de aparcamiento abierto/);
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).not.toContain("21,5 m");
+    expect(texto).not.toContain("0,8 m");
+    expect(texto).not.toMatch(/no excede de (100|500|28 m)/);
+  });
+
+  it("lo que no cumple sale en su fila: el recorrido medido de 28 m y la escalera no protegida de más de 14 m", () => {
+    const largo = si3.memoria(caso("plurifamiliar_locales", { recorrido_m: 28 })).tablas![1];
+    expect(largo.filas).toContainEqual(["Recorrido de evacuación", "≤ 25 m", "28 m", "No cumple"]);
+    expect(largo.filas.find((f) => f[0] === "Altura de evacuación")![3]).toBe("Cumple");
+    const e = edificioDeCaso("plurifamiliar");
+    const alto: Edificio = { ...e, grupos: e.grupos.map((g) => (g.id === "g1" ? { ...g, repeticiones: 5 } : g)) };
+    const t = si3.memoria(con(alto, { escalera: "no_protegida" })).tablas![1];
+    expect(t.filas.find((f) => f[0] === "Protección de la escalera")).toEqual(["Protección de la escalera", "protegida (h ≤ 28 m)", "no protegida", "No cumple"]);
+  });
+
+  it("la unifamiliar no lleva tablas; la reforma, la ocupación de lo intervenido y la puerta de los comunes", () => {
+    expect(si3.memoria(caso("unifamiliar")).tablas).toEqual([]);
+    const p: Proyecto = { ...crearProyectoDemo("2026-10-10T10:00:00.000Z"), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
+    p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso("reforma_local_vivienda") ?? {}) };
+    const m = si3.memoria(justificarSi3(si3EstadoDefaults, proyectoParaModulo(p, "si3")));
+    const [oc, ev] = m.tablas!;
+    expect(oc.filas).toEqual([["Viviendas (PB)", "Residencial Vivienda", "90 m²", "20 m²/persona", "5"]]);
+    // Con el criterio 9, la puerta del portal, con la ocupación del edificio entero.
+    expect(ev.filas).toEqual([["Anchura de la puerta de salida (40 personas)", "A ≥ P/200 ≥ 0,80 m", "≥ 0,80 m", "Cumple"]]);
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).not.toMatch(/5 personas|40 personas/);
   });
 });

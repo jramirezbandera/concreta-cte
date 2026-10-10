@@ -31,6 +31,8 @@ export type Instalacion = "bie" | "columna" | "deteccion" | "alarma" | "hidrante
 export interface ReglaSi4 {
   /** «Aparcamiento: superficie construida > 500 m²». */
   regla: string;
+  /** Lo mismo, corto, para la columna «Norma» de la memoria: «garaje > 500 m²» (feature-31). */
+  corta: string;
   /** «504 m² (supuestos)». */
   valor: string;
   exige: boolean;
@@ -163,6 +165,7 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
     const s = { util_m2: garaje.util_m2, construida_m2: garaje.construida_m2, supuesta: garaje.zonas.some((z) => z.construida.supuesto) };
     reglasBie.push({
       regla: `Aparcamiento: superficie construida > ${T.aparcamiento.bieS_m2} m²`,
+      corta: `garaje > ${T.aparcamiento.bieS_m2} m² construidos`,
       valor: m2s(s),
       exige: s.construida_m2 > T.aparcamiento.bieS_m2,
       dependeDeConstruida: dependeDeConstruida(s, (m) => m > T.aparcamiento.bieS_m2),
@@ -174,6 +177,7 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
     const s = c.principal.superficie;
     reglasBie.push({
       regla: `Administrativo: superficie construida > ${T.administrativo.bieS_m2} m²`,
+      corta: `oficinas > ${T.administrativo.bieS_m2} m² construidos`,
       valor: m2s(s),
       exige: s.construida_m2 > T.administrativo.bieS_m2,
       dependeDeConstruida: dependeDeConstruida(s, (m) => m > T.administrativo.bieS_m2),
@@ -183,7 +187,7 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
   }
   const altos = c.riesgo.locales.filter((l) => l.clase === "alto" && (l.tipo === "trasteros" || l.tipo === "residuos"));
   if (altos.length > 0) {
-    reglasBie.push({ regla: "Zonas de riesgo especial alto por combustibles sólidos", valor: `${altos.length}`, exige: true, dependeDeConstruida: false, donde: "en los locales de riesgo alto" });
+    reglasBie.push({ regla: "Zonas de riesgo especial alto por combustibles sólidos", corta: "locales de riesgo alto", valor: `${altos.length}`, exige: true, dependeDeConstruida: false, donde: "en los locales de riesgo alto" });
   }
   dotacion("bie", "Bocas de incendio equipadas", reglasBie);
 
@@ -192,6 +196,7 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
   if (!unifamiliar) {
     reglasColumna.push({
       regla: `${residencial ? "Residencial Vivienda" : "Administrativo"}: altura de evacuación > ${T.residencialVivienda.columnaSecaH_m} m`,
+      corta: `h > ${T.residencialVivienda.columnaSecaH_m} m`,
       valor: `${h} m`,
       exige: h > T.residencialVivienda.columnaSecaH_m,
       dependeDeConstruida: false,
@@ -202,6 +207,7 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
     const bajo = Math.max(0, ...garaje.zonas.flatMap((z) => z.niveles.map((n) => -n)));
     reglasColumna.push({
       regla: `Aparcamiento: más de ${T.aparcamiento.columnaSecaPlantasBajo} plantas bajo rasante`,
+      corta: `garaje de más de ${T.aparcamiento.columnaSecaPlantasBajo} sótanos`,
       valor: `${bajo}`,
       exige: bajo > T.aparcamiento.columnaSecaPlantasBajo,
       dependeDeConstruida: false,
@@ -213,12 +219,13 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
   // ── Detección y alarma ────────────────────────────────────────────────────
   const reglasDeteccion: ReglaSi4[] = [];
   if (residencial && !unifamiliar) {
-    reglasDeteccion.push({ regla: `Residencial Vivienda: altura de evacuación > ${T.residencialVivienda.deteccionAlarmaH_m} m`, valor: `${h} m`, exige: h > T.residencialVivienda.deteccionAlarmaH_m, dependeDeConstruida: false, donde: "en el edificio, con alarma" });
+    reglasDeteccion.push({ regla: `Residencial Vivienda: altura de evacuación > ${T.residencialVivienda.deteccionAlarmaH_m} m`, corta: `h > ${T.residencialVivienda.deteccionAlarmaH_m} m`, valor: `${h} m`, exige: h > T.residencialVivienda.deteccionAlarmaH_m, dependeDeConstruida: false, donde: "en el edificio, con alarma" });
   }
   if (e.usoPrincipal === "administrativo") {
     const s = c.principal.superficie;
     reglasDeteccion.push({
       regla: `Administrativo: superficie construida > ${T.administrativo.deteccionRiesgoAltoS_m2} m²`,
+      corta: `oficinas > ${T.administrativo.deteccionRiesgoAltoS_m2} m² construidos`,
       valor: m2s(s),
       exige: s.construida_m2 > T.administrativo.deteccionRiesgoAltoS_m2,
       dependeDeConstruida: dependeDeConstruida(s, (m) => m > T.administrativo.deteccionRiesgoAltoS_m2),
@@ -231,6 +238,7 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
     const s = { util_m2: garaje.util_m2, construida_m2: garaje.construida_m2, supuesta: garaje.zonas.some((z) => z.construida.supuesto) };
     reglasDeteccion.push({
       regla: `Aparcamiento: superficie construida > ${T.aparcamiento.deteccionS_m2} m²`,
+      corta: `garaje > ${T.aparcamiento.deteccionS_m2} m² construidos`,
       valor: m2s(s),
       exige: s.construida_m2 > T.aparcamiento.deteccionS_m2,
       dependeDeConstruida: dependeDeConstruida(s, (m) => m > T.aparcamiento.deteccionS_m2),
@@ -248,6 +256,7 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
     dotacion("alarma", "Sistema de alarma", [
       {
         regla: `Administrativo: superficie construida > ${T.administrativo.alarmaS_m2} m²`,
+        corta: `oficinas > ${T.administrativo.alarmaS_m2} m² construidos`,
         valor: m2s(s),
         exige: s.construida_m2 > T.administrativo.alarmaS_m2,
         dependeDeConstruida: dependeDeConstruida(s, (m) => m > T.administrativo.alarmaS_m2),
@@ -259,13 +268,14 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
 
   // ── Hidrantes ─────────────────────────────────────────────────────────────
   const reglasHidrantes: ReglaSi4[] = [
-    { regla: `Altura de evacuación descendente > ${T.enGeneral.hidrantesHDescendente_m} m`, valor: `${h} m`, exige: h > T.enGeneral.hidrantesHDescendente_m, dependeDeConstruida: false, donde: "" },
-    { regla: `Altura de evacuación ascendente > ${T.enGeneral.hidrantesHAscendente_m} m`, valor: `${e.alturaAscendente_m} m`, exige: e.alturaAscendente_m > T.enGeneral.hidrantesHAscendente_m, dependeDeConstruida: false, donde: "" },
+    { regla: `Altura de evacuación descendente > ${T.enGeneral.hidrantesHDescendente_m} m`, corta: `h > ${T.enGeneral.hidrantesHDescendente_m} m`, valor: `${h} m`, exige: h > T.enGeneral.hidrantesHDescendente_m, dependeDeConstruida: false, donde: "" },
+    { regla: `Altura de evacuación ascendente > ${T.enGeneral.hidrantesHAscendente_m} m`, corta: `h ascendente > ${T.enGeneral.hidrantesHAscendente_m} m`, valor: `${e.alturaAscendente_m} m`, exige: e.alturaAscendente_m > T.enGeneral.hidrantesHAscendente_m, dependeDeConstruida: false, donde: "" },
   ];
   const resto = superficies(e.zonas.filter((z) => !(garaje?.zonas ?? []).some((g) => g.id === z.id)));
   const umbralUso = residencial ? T.residencialVivienda.hidrantesDesde_m2 : T.administrativo.hidrantesDesde_m2;
   reglasHidrantes.push({
     regla: `${residencial ? "Residencial Vivienda" : "Administrativo"}: superficie total construida desde ${umbralUso} m²`,
+    corta: `≥ ${umbralUso} m² construidos sin el garaje`,
     valor: m2s(resto),
     exige: resto.construida_m2 >= umbralUso,
     dependeDeConstruida: dependeDeConstruida(resto, (m) => m >= umbralUso),
@@ -277,6 +287,7 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
     const s = { util_m2: garaje.util_m2, construida_m2: garaje.construida_m2, supuesta: garaje.zonas.some((z) => z.construida.supuesto) };
     reglasHidrantes.push({
       regla: `Aparcamiento: superficie construida desde ${T.aparcamiento.hidrantesDesde_m2} m²`,
+      corta: `garaje ≥ ${T.aparcamiento.hidrantesDesde_m2} m² construidos`,
       valor: m2s(s),
       exige: s.construida_m2 >= T.aparcamiento.hidrantesDesde_m2,
       dependeDeConstruida: dependeDeConstruida(s, (m) => m >= T.aparcamiento.hidrantesDesde_m2),
@@ -300,12 +311,12 @@ function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionS
 
   // ── Extinción automática y ascensor de emergencia ─────────────────────────
   dotacion("extincion", "Extinción automática", [
-    { regla: `Altura de evacuación > ${T.enGeneral.extincionH_m} m`, valor: `${h} m`, exige: h > T.enGeneral.extincionH_m, dependeDeConstruida: false, donde: "en todo el edificio" },
+    { regla: `Altura de evacuación > ${T.enGeneral.extincionH_m} m`, corta: `h > ${T.enGeneral.extincionH_m} m`, valor: `${h} m`, exige: h > T.enGeneral.extincionH_m, dependeDeConstruida: false, donde: "en todo el edificio" },
   ]);
   const altas = e.plantas.filter((pl) => pl.nivel >= 0 && pl.cota_m > T.enGeneral.ascensorEmergenciaH_m);
   if (altas.length > 0) {
     dotacion("ascensor", "Ascensor de emergencia", [
-      { regla: `Plantas con altura de evacuación > ${T.enGeneral.ascensorEmergenciaH_m} m`, valor: altas.map((x) => x.etiqueta).join(", "), exige: true, dependeDeConstruida: false, donde: "en esas plantas" },
+      { regla: `Plantas con altura de evacuación > ${T.enGeneral.ascensorEmergenciaH_m} m`, corta: `plantas con h > ${T.enGeneral.ascensorEmergenciaH_m} m`, valor: altas.map((x) => x.etiqueta).join(", "), exige: true, dependeDeConstruida: false, donde: "en esas plantas" },
     ]);
   }
 
