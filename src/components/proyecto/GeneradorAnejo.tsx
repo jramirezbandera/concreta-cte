@@ -12,6 +12,8 @@ import type { JustificacionKey, Proyecto } from "../../lib/proyecto/tipos";
 import { PdfPreviewModal } from "../ui/PdfPreviewModal";
 import { showToast } from "../ui/Toast";
 import { formatearFecha } from "../../lib/ui/fecha";
+import { firmantesDe } from "../../lib/estudio/estudio";
+import { useEstudio } from "../../lib/estudio/useEstudio";
 import type { DefinicionSi } from "../../modules/si/definicion";
 import type { JustificacionSiBase } from "../../modules/si/tipos";
 
@@ -289,6 +291,7 @@ interface GeneradorAnejoProps {
 
 export function GeneradorAnejo({ children }: GeneradorAnejoProps): JSX.Element {
   const { proyecto, derivados } = useProyecto();
+  const [estudio] = useEstudio();
   const [fase, setFase] = useState<"idle" | "calculando" | "rasterizando">("idle");
   const [preparados, setPreparados] = useState<ModuloPreparado[]>([]);
   const [pdf, setPdf] = useState<PdfResult | null>(null);
@@ -385,6 +388,7 @@ export function GeneradorAnejo({ children }: GeneradorAnejoProps): JSX.Element {
               fecha: formatearFecha(proyecto.modificado),
               estados,
               fichas: preparados.map((p) => ({ key: p.key, data: p.data })),
+              firmantes: firmantesDe(estudio, proyecto),
             });
             if (cancelado) {
               URL.revokeObjectURL(resultado.blobUrl);
@@ -407,7 +411,7 @@ export function GeneradorAnejo({ children }: GeneradorAnejoProps): JSX.Element {
       cancelado = true;
       cancelAnimationFrame(id);
     };
-  }, [fase, preparados, proyecto, derivados]);
+  }, [fase, preparados, proyecto, derivados, estudio]);
 
   const ocupado = fase !== "idle";
 

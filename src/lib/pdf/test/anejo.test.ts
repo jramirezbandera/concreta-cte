@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import jsPDF from "jspdf";
-import { renderAnejo, estadoLegible, type EntradaAnejo } from "../anejo";
+import { renderAnejo, estadoLegible, normativaAplicada, type EntradaAnejo } from "../anejo";
 import { renderFicha, renderFichaEnDoc, type FichaData } from "../renderFicha";
 import type {
   ContextoDerivado,
@@ -228,5 +228,53 @@ describe("EntradaAnejo — claves", () => {
     };
     const r = await renderAnejo(entrada);
     expect(r.pageCount).toBeGreaterThanOrEqual(3);
+  });
+});
+
+// ─── feature-29: portada con el documento y quién firma; normativa aplicada ───
+
+describe("renderAnejo — documento y firmantes (feature-29)", () => {
+  it("con los datos del documento y dos firmantes, la portada no añade páginas", async () => {
+    const base = await renderAnejo(entradaBase());
+    const conDoc: EntradaAnejo = {
+      ...entradaBase(),
+      proyecto: {
+        ...proyecto,
+        datosGenerales: {
+          ...datosGenerales,
+          documento: { titulo: "PROYECTO DE EJECUCIÓN PARA VIVIENDA", fase: "ejecucion", emplazamiento: "C/ Larios 1, Málaga", promotor: "Eva Sanz" },
+        },
+      },
+      firmantes: [
+        { id: "a", nombre: "Ana Pérez", titulacion: "Arquitecta", colegiacion: "Colegiada nº 1 del COA Málaga" },
+        { id: "b", nombre: "Luis Gil", titulacion: "Arquitecto" },
+      ],
+    };
+    const r = await renderAnejo(conDoc);
+    expect(r.pageCount).toBe(base.pageCount);
+    expect(r.paginasFichas).toEqual(base.paginasFichas);
+  });
+});
+
+describe("normativaAplicada", () => {
+  it("agrupa por documento y edición, con dónde se usa, sin repetir", () => {
+    const a = { ...fichaMin("a", "A"), normativa: [{ db: "DB-HS", edicion: "consolidado 14-06-2022" }, { db: "CEC", edicion: "marzo 2010" }] };
+    const b = { ...fichaMin("b", "B"), normativa: [{ db: "DB-HS", edicion: "consolidado 14-06-2022" }, { db: "DB-HS", edicion: "consolidado 14-06-2022" }] };
+    const c = { ...fichaMin("c", "C"), normativa: [], edicionDB: "REBT (RD 842/2002)" };
+    const codigo = (k: JustificacionKey) => k.toUpperCase();
+    expect(
+      normativaAplicada(
+        [
+          { key: "hs4", data: a },
+          { key: "hs5", data: b },
+          { key: "rebt", data: c },
+        ],
+        codigo,
+      ),
+    ).toEqual([
+      { documento: "CEC", edicion: "marzo 2010", en: ["HS4"] },
+      { documento: "DB-HS", edicion: "consolidado 14-06-2022", en: ["HS4", "HS5"] },
+      { documento: "REBT (RD 842/2002)", edicion: "", en: ["REBT"] },
+    ]);
   });
 });

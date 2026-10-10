@@ -36,6 +36,7 @@ import { etiquetaEdificio, procedenciaEdificio } from "../edificio/derivar";
 import { justificacionRegistry, type JustificacionEntry } from "../../data/justificacionRegistry";
 import { ENGINE_VERSION } from "../version";
 import { CLAVES_ENERGIA, programaEnergia, referenciaExterna, resultadosDe } from "../energia/verificacion";
+import { NOMBRE_FASE, type Firmante } from "../estudio/estudio";
 
 const M = 18; // margen del anejo (mm) — el mismo que renderFicha
 const CW = PAGE_W - 2 * M;
@@ -59,6 +60,36 @@ export interface EntradaAnejo {
   estados: { key: JustificacionKey; estado: EstadoJustificacion }[];
   /** Fichas listas de las justificaciones que se calculan (ya con proyecto/fecha/observaciones). */
   fichas: { key: JustificacionKey; data: FichaData }[];
+  /** Quién firma, de «Tu estudio» (feature-29): va a la portada. */
+  firmantes?: Firmante[];
+}
+
+/** Una fila de «Normativa aplicada»: un documento, su edición y dónde se ha usado. */
+export interface FilaNormativa {
+  documento: string;
+  edicion: string;
+  /** Códigos de las justificaciones que la citan: «HS4», «SI1»… */
+  en: string[];
+}
+
+/**
+ * La normativa aplicada (feature-29): lo que citan las fichas del anejo,
+ * agrupado por documento y edición, con dónde se usa. PURA. Las fichas sin
+ * citas aportan su `edicionDB`.
+ */
+export function normativaAplicada(fichas: { key: JustificacionKey; data: FichaData }[], codigoDe: (k: JustificacionKey) => string): FilaNormativa[] {
+  const filas = new Map<string, FilaNormativa>();
+  for (const { key, data } of fichas) {
+    const citas = data.normativa.length > 0 ? data.normativa : [{ db: data.edicionDB, edicion: "" }];
+    for (const c of citas) {
+      const clave = `${c.db}\u0000${c.edicion}`;
+      const f = filas.get(clave) ?? { documento: c.db, edicion: c.edicion, en: [] };
+      const codigo = codigoDe(key);
+      if (!f.en.includes(codigo)) f.en.push(codigo);
+      filas.set(clave, f);
+    }
+  }
+  return [...filas.values()].sort((a, b) => a.documento.localeCompare(b.documento, "es") || a.edicion.localeCompare(b.edicion, "es"));
 }
 
 /**
@@ -170,7 +201,7 @@ function drawPortada(doc: jsPDF, entrada: EntradaAnejo, fingerprint: string): vo
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   setGray(doc, 140);
-  doc.text("CONCRETA INSTALACIONES", cx, 40, { align: "center" });
+  doc.text("CONCRETA MEMORIAS", cx, 40, { align: "center" });
 
   // Título del documento.
   doc.setFont("helvetica", "bold");
@@ -193,6 +224,26 @@ function drawPortada(doc: jsPDF, entrada: EntradaAnejo, fingerprint: string): vo
     94,
     { align: "center" },
   );
+
+  // Lo que el documento dice de sí mismo (feature-29): título, fase,
+  // emplazamiento, promotor y referencia catastral, si se han dado.
+  const d = dg.documento;
+  const lineasDoc = [
+    d?.titulo?.trim(),
+    d?.fase ? NOMBRE_FASE[d.fase] : undefined,
+    d?.emplazamiento?.trim(),
+    d?.promotor?.trim() ? `Promotor: ${d.promotor.trim()}` : undefined,
+    d?.refCatastral?.trim() ? `Referencia catastral: ${d.refCatastral.trim()}` : undefined,
+  ].filter((x): x is string => !!x);
+  let yDoc = 101;
+  doc.setFontSize(9);
+  setGray(doc, 70);
+  for (const l of lineasDoc) {
+    for (const ln of doc.splitTextToSize(pdfStr(l), CW - 30) as string[]) {
+      doc.text(ln, cx, yDoc, { align: "center" });
+      yDoc += 4.6;
+    }
+  }
 
   // Bloque de datos derivados CON PROCEDENCIA (trazabilidad hasta la portada).
   const filas: { etiqueta: string; valor: string; procedencia: string }[] = [
@@ -218,7 +269,7 @@ function drawPortada(doc: jsPDF, entrada: EntradaAnejo, fingerprint: string): vo
       procedencia: procedenciaEdificio(proyecto.edificio),
     },
   ];
-  let y = 116;
+  let y = Math.max(116, yDoc + 12);
   setGray(doc, 200);
   doc.setLineWidth(0.3);
   doc.line(M + 20, y - 8, PAGE_W - M - 20, y - 8);
@@ -244,6 +295,22 @@ function drawPortada(doc: jsPDF, entrada: EntradaAnejo, fingerprint: string): vo
   doc.setFontSize(10);
   setGray(doc, 90);
   doc.text(pdfStr(fecha), cx, y + 8, { align: "center" });
+
+  // Quién firma (feature-29).
+  let yFirma = y + 22;
+  for (const f of entrada.firmantes ?? []) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    setGray(doc, 40);
+    doc.text(pdfStr(f.titulacion ? `${f.nombre}, ${f.titulacion}` : f.nombre), cx, yFirma, { align: "center" });
+    if (f.colegiacion) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      setGray(doc, 100);
+      doc.text(pdfStr(f.colegiacion), cx, yFirma + 4.5, { align: "center" });
+    }
+    yFirma += 12;
+  }
 
   // Sello de generación: motor + fingerprint del PROYECTO completo. No
   // sustituye a la firma del técnico — es procedencia verificable (SPEC §4).
@@ -504,6 +571,18 @@ export async function renderAnejo(entrada: EntradaAnejo): Promise<AnejoResult> {
       { size: 7.5, gray: 120, italic: true },
     );
   }
+
+  // 7. Normativa aplicada (feature-29): la edición de cada documento citado
+  // por las fichas, y dónde se usa. La memoria cita sin versión; aquí, con ella.
+  y += 6;
+  y = tituloSeccion(doc, "NORMATIVA APLICADA", y);
+  const codigoDe = (k: JustificacionKey) => registry.get(k)?.codigo ?? k;
+  for (const f of normativaAplicada(fichasOrdenadas, codigoDe)) {
+    y = ensureSpace(doc, y, 6, M);
+    y = parrafo(doc, `${f.documento}${f.edicion ? ` · ${f.edicion}` : ""} — ${f.en.join(", ")}`, y, { size: 8, gray: 50 });
+  }
+  y += 2;
+  parrafo(doc, `Cálculo con el motor de Concreta Memorias v${ENGINE_VERSION}.`, y, { size: 7.5, gray: 120, italic: true });
 
   // ── 2 (bis). Rellenar el índice con las páginas ya conocidas ─────────────
   drawIndice(doc, PAGINA_INDICE, entrada, paginasFichas);
