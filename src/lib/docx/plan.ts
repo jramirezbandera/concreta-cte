@@ -122,6 +122,41 @@ export function repartirAnchos(pesos: number[]): number[] {
   return [ancho0, ...resto];
 }
 
+/** El ancho útil del A4 [mm] y lo que ocupa cada carácter a 8 pt, con los márgenes de la celda. */
+const ANCHO_UTIL_MM = 174;
+const MM_POR_CARACTER = 1.5;
+const MARGEN_CELDA_MM = 3;
+
+/**
+ * Lo que pide la palabra más larga de una columna para no partirse [%]: una
+ * columna estrecha («Cumple») partiría la palabra por la mitad (feature-31).
+ */
+function minimoDeColumna(head: string[], filas: string[][], j: number): number {
+  const larga = Math.max(0, ...[head[j] ?? "", ...filas.map((f) => f[j] ?? "")].flatMap((t) => t.split(/\s+/)).map((p) => p.length));
+  return Math.min(30, Math.ceil(((larga * MM_POR_CARACTER + MARGEN_CELDA_MM) * 100) / ANCHO_UTIL_MM));
+}
+
+/**
+ * Los anchos de una tabla [%]: el reparto por contenido y, si a una columna no
+ * le cabe su palabra más larga, se lo dan las que más holgura tienen. Si los
+ * mínimos no caben, el reparto se queda como está.
+ */
+export function anchosDeTabla(head: string[], filas: string[][]): number[] {
+  const a = repartirAnchos(pesosDeColumnas(head, filas));
+  const min = head.map((_, j) => minimoDeColumna(head, filas, j));
+  if (min.reduce((x, y) => x + y, 0) > 100) return a;
+  for (let j = 0; j < a.length; j++) {
+    while (a[j] < min[j]) {
+      let donante = -1;
+      for (let k = 0; k < a.length; k++) if (k !== j && a[k] > min[k] && (donante < 0 || a[k] - min[k] > a[donante] - min[donante])) donante = k;
+      if (donante < 0) break;
+      a[donante] -= 1;
+      a[j] += 1;
+    }
+  }
+  return a;
+}
+
 interface TrozoTabla {
   head: string[];
   filas: string[][];
@@ -164,7 +199,7 @@ function planificarTabla(b: Extract<BloqueMemoria, { tipo: "tabla" }>): BloquePl
           celdas: fila.map((texto, j) => celdaPlan(texto, j === 0 || (trozo.tipos[j] === "cumple" && esNoCumple(texto)), trozo.tipos[j])),
         })),
       ],
-      anchos: repartirAnchos(pesosDeColumnas(trozo.head, trozo.filas)),
+      anchos: anchosDeTabla(trozo.head, trozo.filas),
     });
   }
   for (const n of notasNumeradas(b.notas)) out.push({ tipo: "parrafo", estilo: "NotaTabla", texto: n });

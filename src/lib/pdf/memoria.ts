@@ -1,27 +1,17 @@
 // =============================================================================
 // La memoria CTE en PDF (feature-16 §F). Los mismos bloques que el Word
 // (`bloquesMemoria`), maquetados con jsPDF: A4, márgenes del anejo, tablas con
-// `drawTable`, y en todas las hojas la cabecera del estudio y el pie con el
+// celdas que parten el texto, y en todas las hojas la cabecera del estudio y el pie con el
 // título del proyecto y la página, como las memorias del estudio (feature-29).
 // =============================================================================
 
 import jsPDF from "jspdf";
-import { repartirAnchos } from "../docx/plan";
+import { anchosDeTabla } from "../docx/plan";
 import { columnasDe, esNoCumple, notasNumeradas } from "../cte/memoria";
 import type { TipoColumna } from "../cte/presentacion";
 import { nombreArchivoMemoria, type BloqueMemoria } from "../obra/memoria";
 import type { Membrete } from "../estudio/estudio";
-import {
-  drawTable,
-  ensureSpace,
-  FOOTER_RESERVE,
-  PAGE_H,
-  PAGE_W,
-  pdfStr,
-  setGray,
-  type PdfResult,
-  type TableCol,
-} from "./utils";
+import { ensureSpace, FOOTER_RESERVE, PAGE_H, PAGE_W, pdfStr, setGray, type PdfResult } from "./utils";
 
 const M = 18;
 const CW = PAGE_W - 2 * M;
@@ -67,27 +57,73 @@ function texto(doc: jsPDF, t: string, y: number, e: Estilo): number {
 
 const ALINEA: Record<TipoColumna, "left" | "right" | "center"> = { texto: "left", dato: "right", norma: "center", proyecto: "center", cumple: "center" };
 
+/** Las celdas de las tablas: 7,5 pt, con su margen y su interlineado [mm]. */
+const CELDA = { size: 7.5, pad: 1.5, lh: 3.2, arriba: 3.1, abajo: 1.4 };
+
+/**
+ * Una tabla de la memoria. A diferencia de `drawTable` (las fichas), cada celda
+ * parte su texto en líneas y la fila crece con la más alta: las tablas «Norma |
+ * Proyecto» tienen celdas largas en columnas estrechas (feature-31). La
+ * cabecera se repite al cambiar de hoja y ninguna fila se parte.
+ */
 function tabla(doc: jsPDF, b: Extract<BloqueMemoria, { tipo: "tabla" }>, y: number): number {
   const { cabecera, filas } = b;
   const tipos = columnasDe(b);
-  const pesos = cabecera.map((c, j) => Math.min(40, filas.reduce((m, f) => Math.max(m, (f[j] ?? "").length), c.length)));
-  const anchos = repartirAnchos(pesos);
-  const cols: TableCol<string[]>[] = cabecera.map((label, j) => ({
-    key: String(j),
-    label,
-    w: (CW * anchos[j]) / 100,
-    align: ALINEA[tipos[j]],
-    render: (f) => f[j] ?? "",
-    // Lo que no cumple, para que se vea (feature-31).
-    ...(tipos[j] === "cumple" ? { bold: (f: string[]) => esNoCumple(f[j] ?? "") } : {}),
-  }));
-  // El rótulo no se queda solo al pie: pide sitio para él y la cabecera.
+  const anchos = anchosDeTabla(cabecera, filas).map((a) => (CW * a) / 100);
+  doc.setFontSize(CELDA.size);
+  const partir = (celdas: string[], negrita: (j: number) => boolean): string[][] =>
+    anchos.map((w, j) => {
+      doc.setFont("helvetica", negrita(j) ? "bold" : "normal");
+      return doc.splitTextToSize(pdfStr(celdas[j] ?? ""), Math.max(4, w - 2 * CELDA.pad)) as string[];
+    });
+  const alto = (ls: string[][]): number => Math.max(1, ...ls.map((l) => l.length)) * CELDA.lh + CELDA.abajo;
+  const pintar = (ls: string[][], arriba: number, negrita: (j: number) => boolean, gris: number): void => {
+    let x = M;
+    ls.forEach((lineas, j) => {
+      const w = anchos[j];
+      const al = ALINEA[tipos[j]];
+      const tx = al === "right" ? x + w - CELDA.pad : al === "center" ? x + w / 2 : x + CELDA.pad;
+      doc.setFont("helvetica", negrita(j) ? "bold" : "normal");
+      setGray(doc, gris);
+      lineas.forEach((l, k) => doc.text(l, tx, arriba + CELDA.arriba + k * CELDA.lh, al === "left" ? undefined : { align: al }));
+      x += w;
+    });
+  };
+  const negritaCab = () => true;
+  const cab = partir(cabecera, negritaCab);
+  const altoCab = alto(cab);
+  const pintarCabecera = (arriba: number): number => {
+    doc.setFontSize(CELDA.size);
+    pintar(cab, arriba, negritaCab, 60);
+    setGray(doc, 160);
+    doc.setLineWidth(0.2);
+    doc.line(M, arriba + altoCab, M + CW, arriba + altoCab);
+    return arriba + altoCab + 0.6;
+  };
+  // El rótulo no se queda solo al pie: pide sitio para él, la cabecera y una fila.
   if (b.rotulo) {
     y = ensureSpace(doc, y, 20, M);
     y = texto(doc, b.rotulo, y, ESTILOS.rotulo);
   }
-  y = ensureSpace(doc, y, 15, M);
-  y = drawTable(doc, { x: M, y, cols, rows: filas, M }) + 2;
+  y = ensureSpace(doc, y, altoCab + 8, M);
+  y = pintarCabecera(y);
+  filas.forEach((f, i) => {
+    // Lo que no cumple, para que se vea (feature-31).
+    const negrita = (j: number) => tipos[j] === "cumple" && esNoCumple(f[j] ?? "");
+    doc.setFontSize(CELDA.size);
+    const ls = partir(f, negrita);
+    const h = alto(ls);
+    y = ensureSpace(doc, y, h, M, (ny) => pintarCabecera(ny));
+    if (i % 2 === 1) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(M, y, CW, h, "F");
+    }
+    doc.setFontSize(CELDA.size);
+    pintar(ls, y, negrita, 80);
+    y += h;
+  });
+  // De la raya de abajo a la línea base de lo siguiente; las notas, más pegadas.
+  y += b.notas?.length ? 3.5 : 5;
   for (const n of notasNumeradas(b.notas)) y = texto(doc, n, y, ESTILOS.notaTabla);
   return y;
 }

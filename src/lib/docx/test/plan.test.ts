@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Packer } from "docx";
 import JSZip from "jszip";
-import { MAX_COLUMNAS, planificarDocx, repartirAnchos } from "../plan";
+import { anchosDeTabla, MAX_COLUMNAS, planificarDocx, repartirAnchos } from "../plan";
 import { documentoMemoria } from "../render";
 import { bloquesMemoria, memoriaCte, type BloqueMemoria } from "../../obra/memoria";
 import { crearProyectoDemo } from "../../proyecto/demo";
@@ -91,6 +91,16 @@ describe("tablas «Norma | Proyecto» (feature-31)", () => {
     expect(t.filas[1].celdas[1]).toEqual({ texto: "≤ 25 m", negrita: false, centrada: true });
     expect(t.filas[1].celdas[3]).toEqual({ texto: "Cumple", negrita: false, centrada: true });
     expect(t.filas[2].celdas[3]).toEqual({ texto: "No cumple", negrita: true, centrada: true });
+  });
+
+  it("ninguna columna se queda sin sitio para su palabra más larga", () => {
+    const head = ["Sector o local", "Uso o riesgo", "Superficie norma", "Superficie proyecto", "Resistencia norma", "Resistencia proyecto", "Cumple"];
+    const filas = [["Cuarto de instalaciones (S1)", "riesgo bajo", "no se exige", "no interviene", "R 120 · EI 120 · puerta EI2 45-C5", "R 120 · EI 120 · puerta EI2 45-C5", "Cumple"]];
+    const a = anchosDeTabla(head, filas);
+    expect(a.reduce((x, y) => x + y, 0)).toBe(100);
+    // «Cumple»: 6 caracteres a 1,5 mm más 3 mm de márgenes, sobre 174 mm.
+    expect(a[6]).toBeGreaterThanOrEqual(Math.ceil(((6 * 1.5 + 3) * 100) / 174));
+    expect(repartirAnchos([40, 12, 16, 19, 33, 33, 6])[6]).toBeLessThan(a[6]);
   });
 
   it("sin tipos, como siempre: nada centrado", () => {
