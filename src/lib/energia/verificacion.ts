@@ -8,7 +8,8 @@
 // para que La obra, la memoria y el anejo los citen con su veredicto.
 //
 // Formato leído: el informe «Verificación de requisitos de CTE-HE0 y HE1» de
-// CE3X v2.3 (caso PEDREGAL 41). Las tablas salen como «nombre | U | Ulim | Sí».
+// CE3X v2.3, en terciario (PEDREGAL 41) y en vivienda unifamiliar (CAMELIA,
+// con n50). Las tablas salen como «nombre | U | Ulim | Sí».
 // Los informes de HULC aún no se reconocen: falta un ejemplo con que probarlo.
 // =============================================================================
 
@@ -56,6 +57,8 @@ export interface VerificacionEnergetica {
   /** HE1: coeficiente global [W/m²K] y control solar [kWh/m²·mes]. */
   K?: Comprobacion;
   qsolJul?: Comprobacion;
+  /** Relación de cambio de aire a 50 Pa [1/h] (residencial privado de más de 120 m²). */
+  n50?: Comprobacion;
   transmitancias: TransmitanciaElemento[];
   /** Q100 de los huecos [m³/h·m²]. */
   permeabilidad: ComprobacionElemento[];
@@ -145,6 +148,11 @@ export function leerVerificacion(paginas: readonly { texto: string }[], archivo:
     new RegExp(String.raw`qsol;jul lim\s*${NUM}`).exec(texto)?.[1],
   );
 
+  const n50 = comprobacion(
+    new RegExp(String.raw`^N50 ${NUM}`, "mi").exec(texto)?.[1],
+    new RegExp(String.raw`^N50 lim ${NUM}`, "mi").exec(texto)?.[1],
+  );
+
   // HE1, por elementos.
   const transmitancias: TransmitanciaElemento[] = [];
   const secU = seccion(texto, /Transmitancia de la envolvente térmica/, [/Coeficiente global de transmisión/, /Control solar/]);
@@ -185,6 +193,7 @@ export function leerVerificacion(paginas: readonly { texto: string }[], archivo:
       ...(cepTot ? { cepTot } : {}),
       ...(K ? { K } : {}),
       ...(qsolJul ? { qsolJul } : {}),
+      ...(n50 ? { n50 } : {}),
       transmitancias,
       permeabilidad,
       condensaciones,
@@ -241,6 +250,7 @@ export function resultadosDe(v: VerificacionEnergetica, key: JustificacionKey): 
       ...resultado("HE0 · Energía primaria total (Cep,tot)", v.cepTot, "kWh/m²·año"),
       ...resultado("HE1 · Coeficiente global de transmisión de calor (K)", v.K, "W/m²K"),
       ...resultado("HE1 · Control solar (qsol;jul)", v.qsolJul, "kWh/m²·mes"),
+      ...resultado("HE1 · Relación de cambio de aire a 50 Pa (n50)", v.n50, "h⁻¹"),
     ];
   }
   if (key === "he1") {

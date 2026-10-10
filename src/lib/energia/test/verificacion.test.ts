@@ -23,9 +23,14 @@ describe("leerVerificacion — informe de CE3X", () => {
     expect(v.cepTot).toEqual({ valor: 95.4, limite: 167, cumple: true });
   });
 
-  it("K y control solar", () => {
+  it("K, control solar y n50", () => {
     expect(v.K).toEqual({ valor: 0.52, limite: 0.66, cumple: true });
     expect(v.qsolJul).toEqual({ valor: 2.4, limite: 4, cumple: true });
+    expect(v.n50).toEqual({ valor: 2.1, limite: 6, cumple: true });
+  });
+
+  it("sin el apartado de n50 (terciario), no lo inventa", () => {
+    expect(leido(PAGINAS.filter((p) => !p.texto.includes("N50"))).n50).toBeUndefined();
   });
 
   it("transmitancias por elemento, opacos y huecos", () => {
@@ -89,6 +94,7 @@ describe("resultadosDe y avisosVerificacion", () => {
       { exigencia: "HE0 · Energía primaria total (Cep,tot)", proyecto: "95,4 kWh/m²·año", limite: "≤ 167 kWh/m²·año", cumple: true },
       { exigencia: "HE1 · Coeficiente global de transmisión de calor (K)", proyecto: "0,52 W/m²K", limite: "≤ 0,66 W/m²K", cumple: true },
       { exigencia: "HE1 · Control solar (qsol;jul)", proyecto: "2,4 kWh/m²·mes", limite: "≤ 4 kWh/m²·mes", cumple: true },
+      { exigencia: "HE1 · Relación de cambio de aire a 50 Pa (n50)", proyecto: "2,1 h⁻¹", limite: "≤ 6 h⁻¹", cumple: true },
     ]);
   });
 

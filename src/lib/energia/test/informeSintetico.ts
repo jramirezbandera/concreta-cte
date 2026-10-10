@@ -71,6 +71,12 @@ límite(m /hm )
 V1 | 9.0 | 9.0 | Sí
 PUERTA | 9.0 | 9.0 | Sí`,
   `Verificación de requisitos de CTE-HE0 y HE1
+1.5 Relación al cambio de aire
+N50 2.1 h-1
+N50 lim 6.0 h-1
+Cumple
+n50 = 0.629 (C0 A0 + Ch Ah)/V`,
+  `Verificación de requisitos de CTE-HE0 y HE1
 1.6 Limitación de condensaciones intersticiales
 Nombre | Capas | Cumple
 FACHADA PRINCIPAL | Fachada ladrillo con | Cumple
