@@ -744,8 +744,13 @@ Las UD de la vivienda nueva (tabla 4.1, uso privado) se **suman** a las que ya r
 
 ## Pendiente de cotejo en imagen antes de imprimir citas
 
+**Cotejado en imagen el 2026-10-10 (feature-30, PyMuPDF):**
+- [HS22] pp. 139–141: HS 6 ap. 3 ptos 3 y 4, 3.1.1 ptos 2 a 4, 3.2 ptos 6 a 8, 3.3 ptos 1 a 7. Coinciden con
+  K-INT.2 a K-INT.6. Se imprimen en la memoria de HS 6.
+- [HS22] p. 26: HS 1 ap. 2.3.3.6 ptos 1 a 5 (encuentro de la fachada con la carpintería), para la
+  memoria de HS 1 cuando solo se sustituyen los huecos.
+
 Cuando haya renderizador (PyMuPDF con shell):
-- [HS22] pp. 139–141 (HS 6 ap. 3 ptos 3–4, 3.1.1 pto 4, 3.2 ptos 6–8, 3.3 ptos 1–6);
 - p. 144 (definición de local no habitable);
 - p. 181 (Apéndice C 2.1);
 - pp. 86, 90–91, 100, 104, 116, 118 (HS 4 y HS 5);

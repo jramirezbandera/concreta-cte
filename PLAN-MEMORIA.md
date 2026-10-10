@@ -1,7 +1,7 @@
 # Memoria como la del estudio — plan por fases
 
-> Estado: **fases 0, 1 y 2 hechas** · 2026-10-10 (fase 1 en [feature-28.md](feature-28.md), fase 2
-> en [feature-29.md](feature-29.md)). Siguiente: fase 3.
+> Estado: **fases 0 a 3 hechas** · 2026-10-10 (fase 1 en [feature-28.md](feature-28.md), fase 2
+> en [feature-29.md](feature-29.md), fase 3 en [feature-30.md](feature-30.md)). Siguiente: fase 4.
 > Origen: comparación de la memoria de la app con tres memorias de ejecución reales del estudio,
 > en `ejemplos/` (ignorada por git: son datos de clientes):
 > - plurifamiliar de 6 viviendas (`01_MEM_26_05_2025.docx`);
@@ -73,7 +73,7 @@ HR y HE 0/HE 1 van pegados como imagen.
 | **0 · Verificación y decisiones** | Preguntas de normativa al agente `cte-normativa` (§4) y decisiones del usuario (§6). Sin código. | Verificación hecha el 2026-10-10 en [research/verificacion-memoria.md](research/verificacion-memoria.md) (K-MEM.1–16; resumen en §4.1). Falta: el §6 y cotejar en PDF lo marcado «LEÍDO (web)». |
 | **1 · Errores de la app** ✅ | Lo del §5.1: HR que contradice su alcance, notas de alcance duplicadas, rótulos y erratas, REBT frente a HE 6. | El caso de reforma sin contradicciones; la foto del expediente cambia solo en los textos tocados. |
 | **2 · Esqueleto del documento** ✅ | Orden y numeración del CTE, cabecera y pie, datos del estudio y del proyecto, título, apartado inicial con cuadro de aplicabilidad, línea de fuentes limpia y «Normativa aplicada» al final (§5.2). | La memoria de la unifamiliar se pega en la plantilla del estudio sin retocar; el índice de Word la recoge. |
-| **3 · Obra existente redactada como intervención** | Cada módulo dice qué existe y no se toca, y qué se proyecta; lo existente lo cubre el no empeoramiento (§5.3). | En el caso de reforma ningún apartado describe el edificio entero; SUA 1 redactado. |
+| **3 · Obra existente redactada como intervención** ✅ | Cada módulo dice qué existe y no se toca, y qué se proyecta; lo existente lo cubre el no empeoramiento (§5.3). | En el caso de reforma ningún apartado describe el edificio entero; SUA 1 redactado. |
 | **4 · Tablas «Norma \| Proyecto»** | `MemoriaDoc` con varias tablas y notas; tablas en SI 1, SI 3, SI 4, SI 6, SUA 1–4 y SUA 8; HR con la maqueta de la ficha K.1 (§5.4). | Cada apartado de SI y SUA se lee en diagonal por su tabla; el texto no repite la tabla. |
 | **5 · Habitabilidad (municipal y autonómica)** | Iluminación y ventilación por estancia, densidad de viviendas, con la norma declarada por el proyectista (§5.5). | El caso de reforma justifica huecos y densidad con la norma que el usuario declara, citada en cada fila. |
 | **6 · Anejo de cálculo de instalaciones** | Anejo 5.3: HS 4 por tramos, HS 5 por aparato y arquetas, REBT con circuitos, derivación individual y tierra; la memoria remite a él y a los planos (§5.6). | El anejo sustituye al de CYPE en la unifamiliar del ejemplo, sin contradecir la memoria. |

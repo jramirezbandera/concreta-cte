@@ -104,3 +104,101 @@ HS 4/HS 5 con instalaciones existentes, REBT art. 2.2.
 
 - Las tablas «Norma | Proyecto» (fase 4).
 - El anejo de cálculo con circuitos y derivación individual dimensionada (fase 6).
+
+## Hecho (2026-10-10)
+
+1568 tests en verde. La foto del expediente no cambia: sus 40 proyectos no tienen el asistente
+respondido. Obra nueva sale idéntica (volcado de la unifamiliar y la plurifamiliar antes y
+después). El Word de la reforma se abre en Word: 14 páginas, con cabecera y pie. Commits: a091e04
+(pasos 0 a 2), a5d5375 (paso 3), 23776d7 (paso 4), aea2ae9 (paso 5) y cfe8ddd (SI 1).
+
+- **Paso 0.** [research/verificacion-intervencion.md](research/verificacion-intervencion.md),
+  K-INT.1 a 20. En esta fase se cotejaron en imagen HS 6 (pp. 139–141) y HS 1 ap. 2.3.3.6 (p. 26).
+- **Paso 1.** En [alcance.ts](src/lib/proyecto/alcance.ts):
+  - `ObraExistente`, `obraExistenteDe` y `ProyectoModulo`; `proyectoParaModulo` la añade;
+  - `edificioAntes`: lo nuevo fuera y lo que cambia de uso con su uso anterior; la parte que se
+    segrega de un local vuelve a él.
+
+  La llevan `ProyectoSi.existente` y el `obra` de HS 1, HS 3 a HS 6. Las pantallas la pasan igual
+  que La obra y el anejo.
+- **Paso 2.**
+  - HS 4: contador en la batería existente («pasa a tener 9 contadores»); acometida y tubo de
+    alimentación sin modificar.
+  - HS 5: decisión «Colector existente al que acomete» (Ø y pendiente). Sin el dato, la memoria
+    da el mínimo para las UD del colector general del edificio entero (158 UD, ≥ Ø110) y hay
+    aviso. Con un Ø que no las admite, no cumple. Pluviales «no se modifican» si el asistente lo
+    dice.
+  - REBT: vivienda nueva, derivación y contador en la centralización existente. La carga del
+    edificio pasa de 85,9 a 84,2 kW: no aumenta, así que la LGA y la CGP no se modifican. Memoria
+    técnica de diseño.
+- **Paso 3.**
+  - HS 1: solo lo que el asistente marca de la envolvente; con solo huecos, los encuentros del
+    ap. 2.3.3.6.
+  - HS 3: decisión «Dónde expulsan los conductos». En fachada: mecánica y párrafo de flexibilidad;
+    avisos de híbrida y de ordenanza municipal. En cubierta con plantas existentes encima: aviso.
+  - HS 6: geometría del edificio entero y protección de lo intervenido. En la reforma, la vivienda
+    está sobre el garaje, que no se toca: el garaje es la contención y la barrera va en el forjado.
+    Sobre solera existente: lámina encima o solera sellada, y cámara interior de 5 cm o
+    despresurización, con medición posterior.
+- **Paso 4.**
+  - SI 3: con el criterio 8, la ocupación de lo intervenido (5 personas). En el portal que se
+    reforma, puerta y señales con la del edificio (40). Sin escalera ni garaje.
+  - SI 4: la tabla 1.1 antes y después. Lo existente, con el criterio 10 en condicional.
+  - SUA 1: elemento «Discontinuidades del pavimento» y textos de lo intervenido. Ya no queda
+    ningún apartado pendiente.
+  - SUA 8: Ne igual y Na que no baja: «la evaluación es la del edificio preexistente».
+- **Paso 5.**
+  - HE 4, HE 5 y HE 6: «En esta obra, …», con la demanda de ACS antes y después (700 l/d) y los
+    m² construidos (1368).
+  - HR: separaciones del edificio entero, solo las que tocan lo que cambia de uso. Sale el
+    «Forjado con la vivienda de arriba»: aéreo con el techo de la vivienda nueva y el suelo de
+    arriba a ΔRA 0; impactos por flexibilidad, con aviso. Entran el local de al lado y el garaje
+    de abajo; salen la cubierta y el portal.
+- **SI 1, fuera de la tabla del plan.** Decía «el edificio se compartimenta en un único sector de
+  150 m²», que solo era lo intervenido. Ahora la vivienda se integra en el sector de viviendas del
+  edificio (763 m²) y se separa del local con EI 90, que antes no salía.
+
+## Decisiones a validar
+
+1. **Todo esto solo actúa con el asistente de alcance respondido.** Una reforma sin él se redacta
+   como hasta feature-29.
+2. **HS 4.** La acometida y el tubo de alimentación existentes «no se modifican», sin comprobar
+   que admiten el caudal añadido. HS 4 no lo pide para existentes (K-INT.16).
+3. **HS 5.**
+   - El colector existente es una decisión del módulo; sin ella, la memoria da el Ø mínimo y hay
+     aviso.
+   - La ventilación «a través de la red existente» supone sus bajantes prolongadas sobre la
+     cubierta.
+4. **REBT.** Si la carga del edificio no aumenta, la LGA y la CGP no se modifican
+   (INTERPRETACIÓN, K-INT.19). Si aumenta, se pide comprobarlas.
+5. **HS 3.** La expulsión en fachada es un párrafo del módulo; no cambia la aplicabilidad a «con
+   flexibilidad» en La obra.
+6. **HS 6.**
+   - Si el sótano no se toca, la barrera va siempre en el forjado de planta baja.
+   - La rebaja por medición previa (K-INT.6) no entra.
+7. **SI 3.** Con el criterio 8 se dejan de justificar escalera, salidas de planta y garaje; solo
+   la ocupación propia y, si se reforman zonas comunes, puerta y señales.
+8. **SI 4.** No se pregunta si la obra toca el soporte de las instalaciones existentes. El
+   criterio 10 se dice en condicional.
+9. **SUA 8.** Sin variación no bloquea, aunque el edificio necesitara pararrayos: esa necesidad es
+   del edificio, no de la obra (INTERPRETACIÓN, K-INT.9). La nota de alcance sigue diciendo «se
+   evalúa para el edificio completo».
+10. **HR.**
+    - En un cambio de uso parcial, el ámbito es lo que cambia de uso: lo que solo se reforma (el
+      portal) no entra.
+    - Los impactos de la vivienda de arriba van por flexibilidad con el párrafo de la Guía.
+    - El techo del garaje existente sigue siendo una decisión del módulo («techo bajo»), aunque
+      el garaje no se toca.
+11. **SI 1.** Lindan con lo intervenido los sectores de su planta y de la de debajo, no los de
+    encima.
+
+## Pendiente
+
+- **HS 1 con el terreno tocado.** HS 1 tiene el mismo fallo de geometría que tenía HS 6: con el
+  sótano quitado, la planta baja parece apoyar en el terreno. No sale en la reforma, porque no se
+  toca el terreno.
+- **HS 3** dice «Las viviendas se ventilan» con una sola vivienda nueva.
+- **SI 2, SUA 2 a SUA 4 y SUA 9** siguen con frases del edificio (altura de fachada, rellanos de
+  cada planta). Son condiciones de los elementos y no describen la obra como el edificio entero.
+- **Cotejo en imagen** de lo que la verificación deja pendiente (DB-HR p. 31, REBT, HS 4 y HS 5)
+  antes de citarlo literalmente.
