@@ -100,6 +100,19 @@ function linea(d: DetalleHr, nombre: string): Trozo[] | null {
     }
     case "horizontal": {
       const f = d.r.fila;
+      if (d.sueloExistente) {
+        // La vivienda nueva bajo una existente (feature-30; K-INT.11 y K-INT.13).
+        return [
+          `Forjado entre la vivienda y la vivienda superior existente (${d.separa.join(", ")}): forjado ${solucionEnFrase(d.forjado)}, `,
+          { v: `m = ${kg(d.forjado.m)}, RA = ${dBA(d.forjado.RA)}` },
+          d.techo ? `; en la vivienda se dispone techo suspendido ${solucionEnFrase(d.techo)}, ΔRA = ${dBA(d.techo.dRA)}` : "; sin techo suspendido",
+          "; el suelo de la vivienda superior no es objeto de la intervención y se toma ΔRA = 0",
+          f && d.r.comb
+            ? `. Tabla 3.3, forjado ${f.m} kg/m², ${COLUMNA_H[d.columna]}: combinación de suelo ΔRA ≥ ${d.r.comb.sf} dBA y techo ΔRA ≥ ${d.r.comb.ts} dBA (ap. 3.1.2.3.5 ptos 2 y 3). ${d.r.cumple ? "CUMPLE en lo relativo al ruido aéreo." : "NO CUMPLE en lo relativo al ruido aéreo."}`
+            : `. Ninguna combinación de la tabla 3.3 sin mejora del suelo para este forjado: NO CUMPLE en lo relativo al ruido aéreo.`,
+          " El aislamiento a ruido de impactos procedente de la vivienda superior depende de su suelo, que no es objeto de la intervención: la opción simplificada exige un suelo flotante en el recinto emisor (ap. 3.1.2.3.5 pto 2), que no puede disponerse desde la vivienda. Por inviabilidad técnica de intervenir fuera de la vivienda generada, se aplica el criterio de flexibilidad de la Parte I del CTE (art. 2.3): la solución adoptada mejora las prestaciones acústicas en la medida de lo posible, conforme a la recomendación de la Guía de aplicación del DB-HR (ap. 2.0.2, cambios de uso) para las intervenciones que solo pueden realizarse por el interior de la vivienda generada. En la documentación final de la obra quedará constancia del nivel de prestación alcanzado.",
+        ];
+      }
       return [
         `Elemento de separación horizontal ${{ viviendas: "entre viviendas", comun: "sobre la zona común", actividad: "sobre recintos de actividad o de instalaciones", encima: "bajo recintos de actividad o de instalaciones" }[d.caso]} (${d.separa.join(", ")}): forjado ${solucionEnFrase(d.forjado)}, `,
         { v: `m = ${kg(d.forjado.m)}, RA = ${dBA(d.forjado.RA)}` },
@@ -163,6 +176,10 @@ function tablaK1(j: JustificacionHr): MemoriaDoc["tabla"] {
         filas.push([el.nombre, `${textoSolucion(d.sol)}${d.trasdosado ? ` + ${d.trasdosado.codigo}` : ""}`, `m ${d.m} · RA ${d.RA}${d.trasdosado ? ` · ΔRA ${d.trasdosado.dRA}` : ""}`, d.r.fila ? `m ≥ ${d.r.fila.m} · RA ≥ ${d.r.fila.RA}${d.r.dRAExigido !== null ? ` · ΔRA ≥ ${d.r.dRAExigido}` : ""}` : "—", ok]);
         break;
       case "horizontal":
+        if (d.sueloExistente) {
+          filas.push([el.nombre, `${d.forjado.nombre}${d.techo ? ` + ${d.techo.codigo}` : ""} · suelo de arriba existente`, `m ${d.forjado.m} · ΔRA 0/${d.techo?.dRA ?? 0}`, d.r.comb ? `ΔRA ≥ ${d.r.comb.sf}/${d.r.comb.ts} · impactos por flexibilidad` : "—", d.r.cumple ? "Cumple (aéreo)" : "No cumple"]);
+          break;
+        }
         filas.push([el.nombre, `${d.forjado.nombre} + ${d.suelo.codigo}${d.techo ? ` + ${d.techo.codigo}` : ""}`, `m ${d.forjado.m} · ΔLw ${d.suelo.dLw} · ΔRA ${d.suelo.dRA}/${d.techo?.dRA ?? 0}`, d.r.fila ? `m ≥ ${d.r.fila.m}${d.r.dLwExigido !== null ? ` · ΔLw ≥ ${d.r.dLwExigido}` : ""}${d.r.comb ? ` · ΔRA ≥ ${d.r.comb.sf}/${d.r.comb.ts}` : ""}` : "—", ok]);
         break;
       case "exterior":

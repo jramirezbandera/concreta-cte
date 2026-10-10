@@ -96,6 +96,12 @@ export interface SeparacionesHr {
   conActividad: Colindante[];
   /** Plantas de viviendas con viviendas debajo. */
   sobreViviendas: string[];
+  /**
+   * En un edificio existente (feature-30): de las anteriores, las de viviendas que
+   * no se tocan sobre una vivienda intervenida. El forjado es el techo de la
+   * vivienda nueva y su suelo, el de la vivienda de arriba, no se puede tocar.
+   */
+  sobreViviendasExistentes: string[];
   /** Viviendas sobre la zona común o los trasteros. */
   sobreComun: Colindante[];
   /** Viviendas sobre un recinto de actividad o de instalaciones. */
@@ -127,7 +133,13 @@ export function medianerasDe(p: ProyectoSi, unifamiliar: boolean): boolean {
   return resolverSi2({ ...si2EstadoDefaults, ...(guardado ?? {}) }, unifamiliar).medianeras === "si";
 }
 
-export function separacionesHr(p: ProyectoSi, dichas: Colindancias = {}): SeparacionesHr {
+/**
+ * `intervenida`: en un edificio existente (feature-30), qué zonas toca la obra.
+ * Con ella, `p.edificio` es el edificio entero y solo cuentan las separaciones en
+ * las que uno de los dos lados es intervenido (la vivienda nueva con la de
+ * arriba, con el local de al lado…).
+ */
+export function separacionesHr(p: ProyectoSi, dichas: Colindancias = {}, intervenida?: (z: Zona) => boolean): SeparacionesHr {
   const e = renumerar(p.edificio);
   const r = resumenEdificio(e);
   const plantas = plantasDe(e);
@@ -145,6 +157,7 @@ export function separacionesHr(p: ProyectoSi, dichas: Colindancias = {}): Separa
     conComun: [],
     conActividad: [],
     sobreViviendas: [],
+    sobreViviendasExistentes: [],
     sobreComun: [],
     sobreActividad: [],
     actividadEncima: [],
@@ -171,32 +184,43 @@ export function separacionesHr(p: ProyectoSi, dichas: Colindancias = {}): Separa
     }
     return c.linda;
   };
-  const colindantes = (pl: (typeof plantas)[number], relacion: RelacionHr, clases: readonly ClaseRecinto[]): Colindante[] =>
+  const toca = intervenida ?? (() => true);
+  /** Hay viviendas intervenidas en estas zonas (sin `intervenida`, viviendas). */
+  const vivTocadas = (zs: readonly Zona[]) => zs.some((z) => claseRecinto(z) === "vivienda" && toca(z));
+  const colindantes = (pl: (typeof plantas)[number], relacion: RelacionHr, clases: readonly ClaseRecinto[], cuenta: (z: Zona) => boolean = () => true): Colindante[] =>
     pl.zonas
-      .filter((z) => clases.includes(claseRecinto(z)) && linda(`${relacion}:${z.id}`, relacion, `${USOS[z.uso].etiqueta} (${grupoDe.get(pl.grupoId) ?? pl.etiqueta})`))
+      .filter((z) => clases.includes(claseRecinto(z)) && cuenta(z) && linda(`${relacion}:${z.id}`, relacion, `${USOS[z.uso].etiqueta} (${grupoDe.get(pl.grupoId) ?? pl.etiqueta})`))
       .map((z) => ({ nombre: `${USOS[z.uso].etiqueta} (${pl.etiqueta})`, clase: claseRecinto(z), garaje: z.uso === "garaje" }));
 
   plantas.forEach((pl, i) => {
+    const abajo = plantas[i + 1];
     if (!conViviendas(pl.zonas)) {
       // Un recinto de actividad o de instalaciones sobre viviendas.
-      const abajo = plantas[i + 1];
-      if (abajo && conViviendas(abajo.zonas)) s.actividadEncima.push(...colindantes(pl, "encima", ["actividad", "instalaciones"]));
+      if (abajo && conViviendas(abajo.zonas)) {
+        const tocadasAbajo = vivTocadas(abajo.zonas);
+        s.actividadEncima.push(...colindantes(pl, "encima", ["actividad", "instalaciones"], (z) => tocadasAbajo || toca(z)));
+      }
       return;
     }
-    if (unidades(pl.zonas) > 1 && linda(`entre:${pl.grupoId}`, "entre", `Viviendas (${grupoDe.get(pl.grupoId) ?? pl.etiqueta})`)) s.entreViviendas.push(pl.etiqueta);
-    s.conComun.push(...colindantes(pl, "lado", ["comun", "no_habitable"]));
-    s.conActividad.push(...colindantes(pl, "lado", ["actividad", "instalaciones"]));
-    const abajo = plantas[i + 1];
+    // Lo que linda con las viviendas de la planta: con `intervenida`, si la vivienda o el recinto se tocan.
+    const tocadas = vivTocadas(pl.zonas);
+    if (unidades(pl.zonas) > 1 && tocadas && linda(`entre:${pl.grupoId}`, "entre", `Viviendas (${grupoDe.get(pl.grupoId) ?? pl.etiqueta})`)) s.entreViviendas.push(pl.etiqueta);
+    s.conComun.push(...colindantes(pl, "lado", ["comun", "no_habitable"], (z) => tocadas || toca(z)));
+    s.conActividad.push(...colindantes(pl, "lado", ["actividad", "instalaciones"], (z) => tocadas || toca(z)));
     if (abajo) {
       if (conViviendas(abajo.zonas)) {
-        s.sobreViviendas.push(pl.etiqueta);
+        const tocadasAbajo = vivTocadas(abajo.zonas);
+        if (tocadas || tocadasAbajo) s.sobreViviendas.push(pl.etiqueta);
+        if (intervenida && !tocadas && tocadasAbajo) s.sobreViviendasExistentes.push(pl.etiqueta);
         // Un local u oficinas en una planta de viviendas también pisa las de abajo.
-        s.actividadEncima.push(...colindantes(pl, "encima", ["actividad", "instalaciones"]));
+        s.actividadEncima.push(...colindantes(pl, "encima", ["actividad", "instalaciones"], (z) => tocadasAbajo || toca(z)));
       }
-      s.sobreComun.push(...colindantes(abajo, "debajo", ["comun", "no_habitable"]));
-      s.sobreActividad.push(...colindantes(abajo, "debajo", ["actividad", "instalaciones"]));
+      s.sobreComun.push(...colindantes(abajo, "debajo", ["comun", "no_habitable"], (z) => tocadas || toca(z)));
+      s.sobreActividad.push(...colindantes(abajo, "debajo", ["actividad", "instalaciones"], (z) => tocadas || toca(z)));
     }
   });
+  // La cubierta, solo si lo intervenido está debajo (feature-30).
+  if (intervenida && plantas.length > 0) s.cubierta = s.cubierta && vivTocadas(plantas[0].zonas);
   s.conComun = unicos(s.conComun);
   s.conActividad = unicos(s.conActividad);
   s.sobreComun = unicos(s.sobreComun);

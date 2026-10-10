@@ -179,6 +179,7 @@ export function textoEtiquetaHr(el: ElementoSi<unknown>): string {
     case "ascensor":
       return `Ascensor ${dBA(d.RA)}`;
     case "horizontal":
+      if (d.sueloExistente) return d.techo ? `techo ΔRA ${d.techo.dRA}` : "sin techo";
       return `ΔLw ${dB(d.suelo.dLw)}${d.techo ? ` · techo ${d.techo.dRA}` : ""}`;
     case "medianeria":
       return `Medianería ${dBA(d.RA)}`;
@@ -448,6 +449,12 @@ export function textoAvisoHr(a: Aviso): TextoSi {
       return {
         titulo: "Edificio existente: el DB-HR solo se aplica a la rehabilitación integral.",
         detalle: "Las ampliaciones, modificaciones, reformas o rehabilitaciones quedan fuera (Introducción II d). Si es una rehabilitación integral, marca en La obra que se aplica.",
+      };
+    case "impactos-existente":
+      return {
+        titulo: "Los impactos de la vivienda de arriba no se justifican por la opción simplificada.",
+        detalle:
+          "La tabla 3.3 pide un suelo flotante en la vivienda de arriba, que no es objeto de la obra. La memoria lo justifica por flexibilidad (CTE Parte I art. 2.3, con la recomendación de la Guía DB-HR para cambios de uso); también se puede acreditar su suelo, ir por la opción general o medir L'nT,w en obra.",
       };
     case "local":
       return {

@@ -169,3 +169,26 @@ describe("SI y SUA (paso 4)", () => {
     expect(evaluarExpediente(p).porClave.sua8?.estado).not.toBe("no_cumple");
   });
 });
+
+describe("HE y HR (paso 5)", () => {
+  const p = reforma();
+  const t = texto(p);
+
+  it("HE 4, HE 5 y HE 6: el no aplica dice por qué en esta obra, con la cifra", () => {
+    expect(apartado(t, "3.6.3. HE 4")).toContain("En esta obra, el uso característico del edificio no cambia");
+    expect(apartado(t, "3.6.3. HE 4")).toMatch(/de \d+ l\/d antes de la obra y \d+ l\/d después/);
+    expect(apartado(t, "3.6.4. HE 5")).toMatch(/de \d+ m² construidos/);
+    expect(apartado(t, "3.6.5. HE 6")).toContain("la obra no actúa sobre el aparcamiento");
+  });
+
+  it("HR: el forjado con la vivienda de arriba y el local de al lado, leídos del edificio entero", () => {
+    const hr = apartado(t, "3.5. Protección frente al ruido DB HR");
+    expect(hr).toContain("Forjado entre la vivienda y la vivienda superior existente (viviendas existentes de P1)");
+    expect(hr).toContain("se aplica el criterio de flexibilidad de la Parte I del CTE (art. 2.3)");
+    expect(hr).toContain("Local sin uso (PB)");
+    // La cubierta no está sobre la vivienda nueva, ni el portal reformado es del ámbito del DB-HR.
+    expect(hr).not.toContain("Cubierta: plana");
+    expect(hr).not.toContain("Portal y escalera (PB), bajo viviendas");
+    expect(evaluarExpediente(p).porClave.hr?.avisos.map((a) => a.id)).toContain("impactos-existente");
+  });
+});

@@ -490,8 +490,15 @@ function he4(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
     a.generacionTermica === "parcial"
       ? " La sustitución de generadores en solo una parte de las unidades de uso de una instalación descentralizada no supone la aplicación de la Sección."
       : "";
+  // Por qué no, caso a caso y con la cifra de la demanda (feature-30).
+  const porque = [
+    caso === "cambio_uso_parcial" ? "el uso característico del edificio no cambia, porque el cambio de uso afecta solo a una parte" : "",
+    caso === "reforma" ? "la reforma no es íntegra ni renueva íntegramente la instalación de generación térmica" : "",
+    caso === "ampliacion" ? "es una ampliación" : "",
+  ].filter(Boolean);
+  const demanda = `la demanda de ACS de referencia del edificio, de ${Math.round(inicial_l_d).toLocaleString("es-ES")} l/d antes de la obra y ${Math.round(final_l_d).toLocaleString("es-ES")} l/d después, ${inicial_l_d > 5000 ? "no aumenta más del 50 %" : "no supera 5.000 l/d"} (c)`;
   return noAplica(
-    `${HE4}: no es de aplicación — en edificios existentes la Sección se aplica cuando se reforma íntegramente el edificio o la instalación de generación térmica, o cuando cambia el uso característico (HE 4 ap. 1 pto 1 b), o en ampliaciones e intervenciones con demanda inicial superior a 5.000 l/día que la aumenten más del 50 % (c), y la intervención no está en ninguno de esos casos.${parcial}`,
+    `${HE4}: no es de aplicación — en edificios existentes la Sección se aplica cuando se reforma íntegramente el edificio o la instalación de generación térmica, o cuando cambia el uso característico (HE 4 ap. 1 pto 1 b), o en ampliaciones e intervenciones con demanda inicial superior a 5.000 l/día que la aumenten más del 50 % (c). ${porque.length > 0 ? `En esta obra, ${porque.join(" y ")} (b), y ${demanda}.` : `En esta obra, ${demanda}.`}${parcial}`,
     CITA_HE4,
   );
 }
@@ -512,10 +519,11 @@ function he5(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
     const que = caso === "cambio_uso_caracteristico" ? "cambia su uso característico" : a.integral === true ? "se reforma íntegramente" : "se reforma (se propone mientras no se precise si la reforma es íntegra)";
     return aplica(`${HE5}: es de aplicación — el edificio, de más de 1.000 m² construidos, ${que} (HE 5 ap. 1 pto 1 c).`, CITA_HE5);
   }
+  const m2 = c.superficieConstruida_m2 !== undefined ? `, de ${Math.round(c.superficieConstruida_m2).toLocaleString("es-ES")} m²,` : "";
   return noAplica(
     grande
-      ? `${HE5}: no es de aplicación — la intervención no es una reforma íntegra ni un cambio de uso característico del edificio (HE 5 ap. 1 pto 1 c).`
-      : `${HE5}: no es de aplicación — la superficie construida del edificio, incluida la de las zonas de aparcamiento en su interior, no supera 1.000 m² (HE 5 ap. 1 pto 1 c).`,
+      ? `${HE5}: no es de aplicación — la intervención no es una reforma íntegra ni un cambio de uso característico del edificio${m2 ? `, de ${Math.round(c.superficieConstruida_m2!).toLocaleString("es-ES")} m² construidos` : ""} (HE 5 ap. 1 pto 1 c)${caso === "cambio_uso_parcial" ? ": el cambio de uso afecta solo a una parte y el uso característico no cambia" : ""}.`
+      : `${HE5}: no es de aplicación — la superficie construida del edificio${m2} incluida la de las zonas de aparcamiento en su interior, no supera 1.000 m² (HE 5 ap. 1 pto 1 c).`,
     CITA_HE5,
   );
 }
@@ -538,8 +546,15 @@ function he6(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
   if (caso === "reforma" && enAparcamiento && a.envolventeMas25 !== false) {
     return aplica(`${HE6}: es de aplicación — reforma con intervención en el aparcamiento que renueva más del 25 % de la superficie total de la envolvente térmica final (HE 6 ap. 1 pto 1 b).`, CITA_HE6);
   }
+  // Qué supuesto falla en esta obra (feature-30).
+  const porque = [
+    "el uso característico del edificio no cambia",
+    caso !== "cambio_uso_parcial" && !enAparcamiento ? "" : a.aparcamiento === false ? "la obra no actúa sobre el aparcamiento" : "",
+    caso === "reforma" && a.envolventeMas25 === false ? "no renueva más del 25 % de la envolvente térmica final" : "",
+    a.electrica50 === false ? "la intervención en la instalación eléctrica no afecta a más del 50 % de su potencia instalada" : "",
+  ].filter(Boolean);
   return noAplica(
-    `${HE6}: no es de aplicación — la intervención no está en ninguno de los supuestos de edificios existentes de la Sección: cambio de uso característico; ampliación con intervención en el aparcamiento que incremente más del 10 % la superficie o el volumen de las unidades intervenidas con más de 50 m² útiles ampliados; reforma con intervención en el aparcamiento que renueve más del 25 % de la envolvente térmica final; o intervención en la instalación eléctrica que afecte a más del 50 % de la potencia instalada del edificio o del aparcamiento (HE 6 ap. 1 pto 1 b).`,
+    `${HE6}: no es de aplicación — la intervención no está en ninguno de los supuestos de edificios existentes de la Sección: cambio de uso característico; ampliación con intervención en el aparcamiento que incremente más del 10 % la superficie o el volumen de las unidades intervenidas con más de 50 m² útiles ampliados; reforma con intervención en el aparcamiento que renueve más del 25 % de la envolvente térmica final; o intervención en la instalación eléctrica que afecte a más del 50 % de la potencia instalada del edificio o del aparcamiento (HE 6 ap. 1 pto 1 b). En esta obra, ${porque.join(", ").replace(/, ([^,]*)$/, " y $1")}.`,
     CITA_HE6,
   );
 }

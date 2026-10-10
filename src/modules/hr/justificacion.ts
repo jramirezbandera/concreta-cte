@@ -27,6 +27,7 @@ import type { ProyectoSi } from "../si/definicion";
 import type { ElementoSi, JustificacionSiBase } from "../si/tipos";
 import { cerramientosDe } from "../../lib/constructivo/cerramientos";
 import { plantasDe } from "../../lib/edificio/derivar";
+import { obraDeZona } from "../../lib/proyecto/alcance";
 import { seAplicaEnLaObra } from "../../lib/proyecto/aplicabilidad";
 import {
   CAPIALZADOS,
@@ -103,6 +104,12 @@ export type DetalleHr =
       garaje: boolean;
       r: ResultadoHorizontal;
       flancos: Condicion[];
+      /**
+       * En un edificio existente (feature-30): el suelo es el de la vivienda de
+       * arriba, que no se toca. Se comprueba el ruido aéreo con el techo de la
+       * vivienda nueva y ΔRA 0 en el suelo; los impactos, por flexibilidad (K-INT.11 a 13).
+       */
+      sueloExistente?: boolean;
     }
   | { clase: "medianeria"; sol: SolucionUsada; RA: number; exige: number }
   | { clase: "adosada"; sol: SolucionUsada; RA: number; exige: number }
@@ -242,7 +249,15 @@ const nombres = (cs: readonly Colindante[]) => cs.map((c) => c.nombre);
 export function justificarHr(estado: HrEstado, p: ProyectoSi, comparar = true): JustificacionHr {
   const st: HrEstado = { ...hrEstadoDefaults, ...estado };
   const medios = st.medios === true;
-  const sep = separacionesHr(p, st.colindancias ?? {});
+  // En un edificio existente, lo que linda con lo intervenido se lee del edificio entero (feature-30).
+  const ex = p.existente;
+  // En un cambio de uso parcial el DB-HR se aplica a lo que cambia de uso, no a lo que solo se reforma (K-REF.4).
+  const soloCambio = ex !== undefined && ex.deduccion.cambiosUso.length > 0 && ex.respuestas.integral !== true;
+  const sep = ex
+    ? separacionesHr({ ...p, edificio: ex.edificio }, st.colindancias ?? {}, (z) =>
+        soloCambio ? obraDeZona(z, ex.intervencion) === "cambia_uso" : obraDeZona(z, ex.intervencion) !== "existente",
+      )
+    : separacionesHr(p, st.colindancias ?? {});
   const tipologia = sep.tipologia;
   const elementos: ElementoHr[] = [];
   const avisos: Aviso[] = [];
@@ -339,7 +354,9 @@ export function justificarHr(estado: HrEstado, p: ProyectoSi, comparar = true): 
     return r;
   };
 
-  const horizontal = (id: string, nombre: string, caso: CasoHorizontal, separa: string[], garaje: boolean, t: ReturnType<typeof techo>) => {
+  const horizontal = (id: string, nombre: string, caso: CasoHorizontal, separa: string[], garaje: boolean, t: ReturnType<typeof techo>, sueloExistente = false) => {
+    // El suelo de la vivienda de arriba, si no se toca: sin mejora conocida (K-INT.11).
+    const suelo = sueloExistente ? { ...sf, nombre: "suelo existente de la vivienda superior", codigo: "existente", pagina: 0, propios: false, industrial: false, dLw: 0, dRA: 0 } : sf;
     const { r, colH, flancos, cumple: ok } = peor((fl) => {
       const colH = columnaHorizontal(tab, fl);
       const r = comprobarHorizontal({
@@ -348,10 +365,11 @@ export function justificarHr(estado: HrEstado, p: ProyectoSi, comparar = true): 
         caso: caso === "actividad" || caso === "encima" ? "paren" : "normal",
         // Bajo la vivienda: el suelo flotante de la vivienda, con el ΔLw sin paréntesis (Guía R.2).
         // Encima de la vivienda, un recinto de actividad: el ΔLw entre paréntesis (2.1.2 a.ii).
-        dLw: caso === "encima" ? "paren" : "normal",
+        // Con el suelo de arriba existente, solo el ruido aéreo: los impactos van por flexibilidad.
+        dLw: sueloExistente ? null : caso === "encima" ? "paren" : "normal",
         garaje,
-        sueloDLw: sf.dLw,
-        sueloDRA: sf.dRA,
+        sueloDLw: suelo.dLw,
+        sueloDRA: suelo.dRA,
         techoDRA: t?.dRA ?? 0,
       });
       const flancos = flancosHorizontal(colH, tab, fl);
@@ -362,7 +380,7 @@ export function justificarHr(estado: HrEstado, p: ProyectoSi, comparar = true): 
       nombre,
       tipo: "ruido",
       veredicto: ok ? "ok" : "fail",
-      valor: { valor: sf.dLw, unidad: "dB" },
+      valor: sueloExistente ? { valor: t?.dRA ?? 0, unidad: "dBA" } : { valor: sf.dLw, unidad: "dB" },
       ...(r.dLwExigido !== null ? { limite: { valor: r.dLwExigido, unidad: "dB" } } : {}),
       manda: {
         tipo: "grado_tabla",
@@ -374,8 +392,9 @@ export function justificarHr(estado: HrEstado, p: ProyectoSi, comparar = true): 
         ],
       },
       cita: ["HR · tabla 3.3", caso === "actividad" || caso === "comun" ? "HR · ap. 3.1.2.3.5 pto 3" : "HR · ap. 3.1.2.3.5 pto 2"],
-      detalle: { clase: "horizontal", caso, separa, forjado: fj, suelo: sf, techo: t, columna: colH, garaje, r, flancos },
+      detalle: { clase: "horizontal", caso, separa, forjado: fj, suelo, techo: t, columna: colH, garaje, r, flancos, ...(sueloExistente ? { sueloExistente } : {}) },
     });
+    if (sueloExistente) avisos.push({ id: "impactos-existente", tipo: "caso_especial", elementoId: id, datos: {} });
   };
 
   // ── Plurifamiliar ──────────────────────────────────────────────────────────
@@ -433,7 +452,12 @@ export function justificarHr(estado: HrEstado, p: ProyectoSi, comparar = true): 
       });
     }
 
-    if (sep.sobreViviendas.length > 0) horizontal("forjado-viviendas", "Forjado entre viviendas", "viviendas", sep.sobreViviendas.map((x) => `viviendas de ${x}`), false, ts);
+    // La vivienda nueva bajo una existente: su techo es el forjado y el suelo de arriba no se toca (feature-30).
+    const nuevas = sep.sobreViviendas.filter((x) => !sep.sobreViviendasExistentes.includes(x));
+    if (nuevas.length > 0) horizontal("forjado-viviendas", "Forjado entre viviendas", "viviendas", nuevas.map((x) => `viviendas de ${x}`), false, ts);
+    if (sep.sobreViviendasExistentes.length > 0) {
+      horizontal("forjado-superior", "Forjado con la vivienda de arriba", "viviendas", sep.sobreViviendasExistentes.map((x) => `viviendas existentes de ${x}`), false, ts, true);
+    }
     if (sep.sobreComun.length > 0) horizontal("forjado-comun", "Forjado sobre la zona común", "comun", nombres(sep.sobreComun), false, tsBajo);
     if (sep.sobreActividad.length > 0) {
       horizontal("forjado-actividad", "Forjado sobre locales, garaje e instalaciones", "actividad", nombres(sep.sobreActividad), sep.sobreActividad.every((c) => c.garaje), tsBajo);
