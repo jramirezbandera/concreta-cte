@@ -92,3 +92,95 @@ memoria de los casos antes y después, con el diff revisado; el Word abierto.
 
 - Habitabilidad (fase 5) y el anejo de instalaciones (fase 6).
 - Las tablas de HS y HE: sus módulos ya tienen la suya y el plan no las toca.
+
+## Hecho (2026-10-11)
+
+1612 tests en verde (44 más que al empezar), tipos y lint limpios. La foto del expediente cambia
+solo en la huella de la memoria de los 40 proyectos. El Word de plurifamiliar con locales y el de
+la reforma se abren en Word: 19 y 16 páginas, con 39 y 34 tablas, sin palabras partidas en las
+celdas. Commits: df93b90 (paso 1), f098e5c (SI 1), 7738226 (PDF), 13e287e (SUA 3 y SUA 4),
+9cf53ea (SI 6 y SUA 8), 3e295d1 (SUA 1 y SUA 2), 5a9b014 (SI 3 y SI 4), 7e6afec (HR) y 234e0c7
+(foto).
+
+- **Paso 1.**
+  - `TablaMemoria` y `MemoriaDoc.tablas`; `piezasMemoria` coloca cada tabla tras sus párrafos.
+  - [tablaNorma.ts](src/lib/cte/tablaNorma.ts): «no se exige», «Cumple» / «No cumple» y la
+    tabla de cuatro columnas.
+  - El Word centra las columnas tipadas, pone «No cumple» en negrita y las notas en `Caption`,
+    pegadas a la tabla. La pantalla usa un solo componente,
+    [TablaMemoriaVista](src/components/justificacion/TablaMemoriaVista.tsx).
+  - **Fuera del plan, en el PDF:** `drawTable` escribía una línea por celda, y las celdas largas
+    se solapaban. La memoria en PDF pinta ahora sus tablas con salto de línea y filas de alto
+    variable. Las fichas siguen con `drawTable`.
+  - **Fuera del plan, en el Word y el PDF:** cada columna recibe al menos el ancho de su palabra
+    más larga (`anchosDeTabla`, medido en Word: 1,8 mm por carácter). Antes «Cumple» salía
+    partido.
+- **Paso 2 (SI).**
+  - SI 1: una tabla de sectores y locales, con superficie y resistencia, norma y proyecto.
+  - SI 3: «Ocupación» por zona y «Evacuación» (Parámetro · Norma · Proyecto · Cumple). Con el
+    criterio 8, solo la ocupación propia y la puerta del portal.
+  - SI 4: una fila por instalación de la tabla 1.1; «no se exige / no se dispone» sustituye a la
+    frase final. En obra existente, «existentes, no se modifican».
+  - SI 6: R exigida y R de proyecto por planta y local, y las dimensiones del Anejo C en una
+    segunda tabla.
+- **Paso 3 (SUA).**
+  - SUA 1: discontinuidades, barreras por planta y una tabla por escalera; se mantiene la de
+    peldaños, con «no se exige» en vez de «—».
+  - SUA 2: alturas libres y vuelos, vidrios por planta, y señalización y correderas.
+  - SUA 3: desbloqueo, luz, llamada y fuerzas de apertura.
+  - SUA 4: alumbrado normal, la dotación de emergencia como tabla «Zona | Exige | Por qué»,
+    alumbrado de emergencia y señales.
+  - SUA 8: «Parámetro | Valor | Referencia» de Ng a nivel; en obra existente, antes y después.
+- **Paso 4 (HR).** La ficha K.1, una tabla por bloque con una fila por parámetro: tabiquería,
+  verticales por recinto colindante, medianerías, horizontales por caso, fachadas y cubierta por
+  recinto receptor (Ld y D2m,nT,Atr en el rótulo) y condicionantes. Sustituye a la tabla
+  resumen.
+- **De paso.**
+  - En oficinas, SI 3 decía «uso Residencial Vivienda» en la escalera y en las zonas de refugio.
+  - SUA 2 decía «de el garaje» y «de el vestíbulo».
+  - SI 6 da por primera vez, en nota, el porqué de los nervios del garaje sin revestir.
+  - HR da por primera vez, en nota, la combinación de ventana y caja de persiana (Anejo G).
+
+## Decisiones a validar
+
+1. **«Proyecto» cuando el proyecto solo declara.** Repite el valor con su signo («≤ 140 N»,
+   «≥ 100 lux», «≤ 25 m» si el recorrido no se ha medido, «EI 120»). Norma y Proyecto coinciden
+   en muchas filas de SI 1, SUA 2 a SUA 4 y SI 4. Lo que decide el módulo va sin signo (alturas
+   libres, barreras, huella, anchura). La alternativa es una columna «Proyecto» con «se declara».
+2. **Texto y tabla** (decisión 1 de PLAN-MEMORIA §6): se ha aplicado la propuesta, tabla más el
+   texto que la tabla no dice.
+3. **Ficha K.1** (decisión 2 de §6): sustituye a la tabla resumen y acompaña al texto. Una fila
+   por parámetro, con el elemento y la solución solo en la primera fila. Con columnas por
+   parámetro, la vertical necesitaría 9 columnas.
+4. **HR.**
+   - El «Cumple» es por parámetro. Si un elemento falla por una nota o un flanco, el «No cumple»
+     sale en la tabla de condicionantes.
+   - Los condicionantes que solo se declaran dicen «Se declara».
+   - Los bloques verticales siguen lo que agrupa el motor (viviendas con zona común; actividad
+     con instalaciones), no un bloque por tipo de recinto.
+5. **SI 1.**
+   - La resistencia del sector principal es «EI 60 entre viviendas» o «la de cada colindante».
+   - La superficie de los locales de riesgo especial dice «no se exige» en Norma, porque la
+     tabla 2.1 clasifica, no limita.
+6. **SI 3.**
+   - El local sin uso no entra en la tabla de ocupación: sale por sus puertas.
+   - Las zonas repetidas en varias plantas salen por planta («158 m² × 3»).
+7. **SI 4.**
+   - La «Norma» no repite la superficie del garaje, que ya está en SI 1.
+   - La detección que la tabla 1.1 no exige y SI 3 sí dice «según SI 3, ap. 8».
+8. **SI 6.**
+   - La R de proyecto es la exigida, con su anejo («R 60 (Anejo C)»).
+   - El Anejo C va en una tabla sin «Proyecto» ni «Cumple»: el módulo solo conoce los mínimos.
+9. **SUA 4.**
+   - La dotación de emergencia es una tabla sin «Cumple».
+   - Lleva una fila nueva, «Interior de las viviendas | no».
+   - Los trasteros de 50 m² o menos salen «por criterio».
+10. **SUA 8.** La tabla abre el apartado y el texto se queda con la conclusión. En obra
+    existente, la tabla «antes / después» de Ne, C4 y Na.
+
+## Pendiente
+
+- La tabla de la pantalla (`TablaMemoriaVista`) no se ha mirado en el navegador. Solo la
+  comprueban los tests.
+- Las celdas vacías de la primera columna de HR (filas de continuación) se pintan en negrita.
+  No se ve, pero si el usuario prefiere celdas combinadas, el Word lo admite.
