@@ -6,10 +6,9 @@ import { useDrawer } from "../components/layout/AppShell";
 import { useExportarMemoria } from "../components/obra/useExportarMemoria";
 import { useProyecto } from "../lib/proyecto/ProyectoContext";
 import { entregables } from "../lib/obra/entrega";
-import { memoriaCte, textoPlanoMemoriaCte, type ApartadoMemoria } from "../lib/obra/memoria";
+import { CAPITULOS, fuenteCorta, memoriaCte, textoPlanoMemoriaCte, type ApartadoMemoria, type Capitulo } from "../lib/obra/memoria";
 import type { MemoriaDoc } from "../lib/cte/presentacion";
 import { getJustificacion } from "../data/justificacionRegistry";
-import { formatearFecha } from "../lib/ui/fecha";
 
 // =============================================================================
 // La memoria CTE (feature-16 §E): todos los apartados del expediente, como
@@ -65,7 +64,7 @@ function Parrafos({ doc }: { doc: MemoriaDoc }): JSX.Element {
           </tbody>
         </table>
       )}
-      {doc.fuente && <p className="text-text-disabled mb-1 font-mono text-[10.5px] leading-relaxed">{doc.fuente}</p>}
+      {doc.fuente && <p className="text-text-disabled mb-1 font-mono text-[10.5px] leading-relaxed">{fuenteCorta(doc.fuente)}</p>}
     </>
   );
 }
@@ -74,15 +73,15 @@ function Apartado({ a, base }: { a: ApartadoMemoria; base: string }): JSX.Elemen
   const ruta = getJustificacion(a.key)?.route;
   return (
     <section aria-label={a.encabezado} className="border-border-sub border-t pt-4 pb-2 first-of-type:border-t-0 first-of-type:pt-0">
-      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h3 className="text-[14px] font-semibold">{a.encabezado}</h3>
+      <div className={`mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 ${a.sinTitulo ? "justify-end" : "justify-between"}`}>
+        {!a.sinTitulo && <h3 className="text-[14px] font-semibold">{a.encabezado}</h3>}
         {ruta && (
           <Link to={`${base}/${ruta}`} className="text-accent hover:text-accent-hover text-[11.5px] hover:underline">
             Abrir {a.codigo}
           </Link>
         )}
       </div>
-      {(a.tipo === "redactado" || a.tipo === "no_cumple") && a.alcance && (
+      {(a.tipo === "redactado" || a.tipo === "no_cumple" || a.tipo === "externo") && a.alcance && (
         <div className="border-accent/40 mb-2 border-l-2 pl-2.5">
           <p className="text-[12.5px]">{a.alcance.parrafo}</p>
           {a.alcance.cita && <p className="text-text-disabled mt-0.5 font-mono text-[10.5px]">{a.alcance.cita}</p>}
@@ -141,19 +140,19 @@ export function MemoriaPage(): JSX.Element {
 
   const copiar = async () => {
     try {
-      await navigator.clipboard.writeText(textoPlanoMemoriaCte(m, formatearFecha(proyecto.modificado)));
+      await navigator.clipboard.writeText(textoPlanoMemoriaCte(m));
       setCopiado("si");
     } catch {
       setCopiado("error");
     }
   };
 
-  // Los apartados, agrupados por DB como en el documento.
-  const grupos: { grupo: string; apartados: ApartadoMemoria[] }[] = [];
+  // Los apartados, agrupados por capítulo y por DB como en el documento.
+  const grupos: { capitulo: Capitulo; grupo: string; apartados: ApartadoMemoria[] }[] = [];
   for (const a of m.apartados) {
     const g = grupos.at(-1);
     if (g?.grupo === a.grupo) g.apartados.push(a);
-    else grupos.push({ grupo: a.grupo, apartados: [a] });
+    else grupos.push({ capitulo: a.capitulo, grupo: a.grupo, apartados: [a] });
   }
 
   const BOTON =
@@ -200,8 +199,13 @@ export function MemoriaPage(): JSX.Element {
           </header>
 
           <article className="border-border-main bg-bg-primary text-text-primary rounded-md border px-5 pt-6 pb-5 text-[13.5px] leading-[1.65] sm:px-8">
-            {grupos.map((g) => (
+            {grupos.map((g, i) => (
               <div key={g.grupo} className="mb-6 last:mb-2">
+                {g.capitulo !== grupos[i - 1]?.capitulo && (
+                  <p className="text-text-primary mb-4 text-[15px] font-semibold">
+                    {g.capitulo}. {CAPITULOS[g.capitulo]}
+                  </p>
+                )}
                 <h2 className="text-text-disabled border-border-main mb-4 border-b pb-1.5 text-[10.5px] font-semibold tracking-[0.09em] uppercase">
                   {g.grupo}
                 </h2>

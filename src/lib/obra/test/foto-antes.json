@@ -29,7 +29,7 @@
   "he6": "aplica|revisar|warn|811c9dc5|",
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "5c590d72"
+  "memoria": "4a9c142d"
  },
  "demo|obra_nueva|piscina": {
   "hs1": "aplica|revisar|warn|811c9dc5|",
@@ -61,7 +61,7 @@
   "he6": "aplica|revisar|warn|811c9dc5|",
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "d9ecd170"
+  "memoria": "824b79aa"
  },
  "demo|reforma|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -93,7 +93,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "cdbf096c"
+  "memoria": "ddc8a19d"
  },
  "demo|reforma|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -125,7 +125,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "92970fe2"
+  "memoria": "df775b2a"
  },
  "demo|ampliacion|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -157,7 +157,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "cdbf096c"
+  "memoria": "ddc8a19d"
  },
  "demo|ampliacion|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -189,7 +189,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "92970fe2"
+  "memoria": "df775b2a"
  },
  "demo|cambio_uso|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -221,7 +221,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "cdbf096c"
+  "memoria": "ddc8a19d"
  },
  "demo|cambio_uso|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -253,7 +253,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "92970fe2"
+  "memoria": "df775b2a"
  },
  "unifamiliar|obra_nueva|sin": {
   "hs1": "aplica|revisar|warn|811c9dc5|",
@@ -285,7 +285,7 @@
   "he6": "aplica|cumple|ok|811c9dc5|",
   "rebt": "aplica|cumple|ok|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "92d73764"
+  "memoria": "2e2d9977"
  },
  "unifamiliar|obra_nueva|piscina": {
   "hs1": "aplica|revisar|warn|811c9dc5|",
@@ -317,7 +317,7 @@
   "he6": "aplica|cumple|ok|811c9dc5|",
   "rebt": "aplica|cumple|ok|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "17528b5b"
+  "memoria": "e82d02da"
  },
  "unifamiliar|reforma|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -349,7 +349,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "e6cbe9c7"
+  "memoria": "7c31757a"
  },
  "unifamiliar|reforma|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -381,7 +381,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "db0edbc4"
+  "memoria": "daacfee7"
  },
  "unifamiliar|ampliacion|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -413,7 +413,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "e6cbe9c7"
+  "memoria": "7c31757a"
  },
  "unifamiliar|ampliacion|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -445,7 +445,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "db0edbc4"
+  "memoria": "daacfee7"
  },
  "unifamiliar|cambio_uso|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -477,7 +477,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "e6cbe9c7"
+  "memoria": "7c31757a"
  },
  "unifamiliar|cambio_uso|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -509,7 +509,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "db0edbc4"
+  "memoria": "daacfee7"
  },
  "plurifamiliar|obra_nueva|sin": {
   "hs1": "aplica|revisar|warn|811c9dc5|",
@@ -541,7 +541,7 @@
   "he6": "aplica|cumple|ok|811c9dc5|",
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "8adb8934"
+  "memoria": "bf8364bd"
  },
  "plurifamiliar|obra_nueva|piscina": {
   "hs1": "aplica|revisar|warn|811c9dc5|",
@@ -573,7 +573,7 @@
   "he6": "aplica|cumple|ok|811c9dc5|",
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "f173dd94"
+  "memoria": "ab6d1656"
  },
  "plurifamiliar|reforma|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -605,7 +605,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "c0450e91"
+  "memoria": "79a73fc2"
  },
  "plurifamiliar|reforma|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -637,7 +637,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "e49f2e71"
+  "memoria": "8b8e9217"
  },
  "plurifamiliar|ampliacion|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -669,7 +669,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "c0450e91"
+  "memoria": "79a73fc2"
  },
  "plurifamiliar|ampliacion|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -701,7 +701,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "e49f2e71"
+  "memoria": "8b8e9217"
  },
  "plurifamiliar|cambio_uso|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -733,7 +733,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "c0450e91"
+  "memoria": "79a73fc2"
  },
  "plurifamiliar|cambio_uso|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -765,7 +765,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "e49f2e71"
+  "memoria": "8b8e9217"
  },
  "plurifamiliar_locales|obra_nueva|sin": {
   "hs1": "aplica|revisar|warn|811c9dc5|",
@@ -797,7 +797,7 @@
   "he6": "aplica|revisar|warn|811c9dc5|",
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "5c590d72"
+  "memoria": "4a9c142d"
  },
  "plurifamiliar_locales|obra_nueva|piscina": {
   "hs1": "aplica|revisar|warn|811c9dc5|",
@@ -829,7 +829,7 @@
   "he6": "aplica|revisar|warn|811c9dc5|",
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "d9ecd170"
+  "memoria": "824b79aa"
  },
  "plurifamiliar_locales|reforma|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -861,7 +861,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "cdbf096c"
+  "memoria": "ddc8a19d"
  },
  "plurifamiliar_locales|reforma|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -893,7 +893,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "92970fe2"
+  "memoria": "df775b2a"
  },
  "plurifamiliar_locales|ampliacion|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -925,7 +925,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "cdbf096c"
+  "memoria": "ddc8a19d"
  },
  "plurifamiliar_locales|ampliacion|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -957,7 +957,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "92970fe2"
+  "memoria": "df775b2a"
  },
  "plurifamiliar_locales|cambio_uso|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -989,7 +989,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "cdbf096c"
+  "memoria": "ddc8a19d"
  },
  "plurifamiliar_locales|cambio_uso|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -1021,7 +1021,7 @@
   "he6": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "92970fe2"
+  "memoria": "df775b2a"
  },
  "oficinas|obra_nueva|sin": {
   "hs1": "aplica|revisar|warn|811c9dc5|",
@@ -1053,7 +1053,7 @@
   "he6": "no_aplica|no_aplica||de8bbbca|DB-HE 6, ámbito de aplicación",
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "9d58fe02"
+  "memoria": "8e534b27"
  },
  "oficinas|obra_nueva|piscina": {
   "hs1": "aplica|revisar|warn|811c9dc5|",
@@ -1085,7 +1085,7 @@
   "he6": "no_aplica|no_aplica||de8bbbca|DB-HE 6, ámbito de aplicación",
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "17675f1e"
+  "memoria": "c0945a14"
  },
  "oficinas|reforma|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -1117,7 +1117,7 @@
   "he6": "no_aplica|no_aplica||de8bbbca|DB-HE 6, ámbito de aplicación",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "a663283c"
+  "memoria": "d9f6df2f"
  },
  "oficinas|reforma|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -1149,7 +1149,7 @@
   "he6": "no_aplica|no_aplica||de8bbbca|DB-HE 6, ámbito de aplicación",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "545b24e0"
+  "memoria": "ff36c030"
  },
  "oficinas|ampliacion|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -1181,7 +1181,7 @@
   "he6": "no_aplica|no_aplica||de8bbbca|DB-HE 6, ámbito de aplicación",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "a663283c"
+  "memoria": "d9f6df2f"
  },
  "oficinas|ampliacion|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -1213,7 +1213,7 @@
   "he6": "no_aplica|no_aplica||de8bbbca|DB-HE 6, ámbito de aplicación",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "545b24e0"
+  "memoria": "ff36c030"
  },
  "oficinas|cambio_uso|sin": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -1245,7 +1245,7 @@
   "he6": "no_aplica|no_aplica||de8bbbca|DB-HE 6, ámbito de aplicación",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "a663283c"
+  "memoria": "d9f6df2f"
  },
  "oficinas|cambio_uso|piscina": {
   "hs1": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
@@ -1277,6 +1277,6 @@
   "he6": "no_aplica|no_aplica||de8bbbca|DB-HE 6, ámbito de aplicación",
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "545b24e0"
+  "memoria": "ff36c030"
  }
 }

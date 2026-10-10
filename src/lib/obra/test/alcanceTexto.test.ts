@@ -45,7 +45,7 @@ describe("notaAlcance", () => {
 
 describe("la memoria y la ficha", () => {
   it("el párrafo de alcance va justo después del título del apartado", () => {
-    const b = bloquesMemoria(memoriaCte(reforma({})), "9 de octubre de 2026");
+    const b = bloquesMemoria(memoriaCte(reforma({})));
     const i = b.findIndex((x) => x.tipo === "titulo" && x.texto.includes("Suministro de agua"));
     expect(i).toBeGreaterThan(0);
     expect(b[i + 1]).toMatchObject({ tipo: "parrafo" });
@@ -53,7 +53,7 @@ describe("la memoria y la ficha", () => {
   });
 
   it("obra nueva: la memoria no cambia", () => {
-    const sin = bloquesMemoria(memoriaCte(demo()), "x");
+    const sin = bloquesMemoria(memoriaCte(demo()));
     expect(sin.some((x) => "texto" in x && x.texto.startsWith("Alcance"))).toBe(false);
   });
 

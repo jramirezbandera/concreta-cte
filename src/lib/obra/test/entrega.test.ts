@@ -114,15 +114,10 @@ describe("entregables", () => {
 });
 
 describe("memoriaCte", () => {
-  it("los apartados en el orden del registry, sin nada pendiente", () => {
+  it("los apartados en el orden del documento (feature-29), sin nada pendiente", () => {
     const m = memoriaCte(demo());
     expect(m.apartados.map((a) => `${a.codigo}:${a.tipo}`)).toEqual([
-      "HS1:redactado",
-      "HS2:redactado",
-      "HS3:redactado",
-      "HS4:redactado",
-      "HS5:redactado",
-      "HS6:redactado",
+      "DB-SE:externo",
       "SI1:redactado",
       "SI2:redactado",
       "SI3:redactado",
@@ -138,30 +133,39 @@ describe("memoriaCte", () => {
       "SUA7:redactado",
       "SUA8:redactado",
       "SUA9:redactado",
+      "HS1:redactado",
+      "HS2:redactado",
+      "HS3:redactado",
+      "HS4:redactado",
+      "HS5:redactado",
+      "HS6:redactado",
       "HR:redactado",
-      "HE1:externo",
       "HE0:externo",
+      "HE1:externo",
       "HE4:redactado",
       "HE5:redactado",
       "HE6:redactado",
       "REBT:redactado",
-      "DB-SE:externo",
     ]);
-    expect(m.apartados[4].encabezado).toBe("DB-HS 5 · Evacuación de aguas");
-    expect(m.apartados[1].encabezado).toBe("DB-HS 2 · Recogida y evacuación de residuos");
-    expect(m.apartados[0].encabezado).toBe("DB-HS 1 · Protección frente a la humedad");
+    const enc = (k: string) => m.apartados.find((a) => a.key === k)!.encabezado;
+    expect(enc("hs5")).toBe("3.4.5. HS 5 Evacuación de aguas");
+    expect(enc("hs1")).toBe("3.4.1. HS 1 Protección frente a la humedad");
+    expect(enc("sua6")).toBe("3.3.6. SUA 6 Seguridad frente al riesgo de ahogamiento");
     // Desde feature-25 (HR) no queda ningún apartado por redactar.
     expect(m.pendientes).toEqual([]);
-    expect(m.apartados.find((a) => a.key === "he4")!.encabezado).toBe("DB-HE 4 · Contribución mínima de energía renovable para ACS");
-    expect(m.apartados.find((a) => a.key === "rebt")!.encabezado).toBe("REBT ITC-BT-10 · Grado de electrificación y previsión de cargas");
+    expect(enc("he4")).toBe("3.6.3. HE 4 Contribución mínima de energía renovable para cubrir la demanda de agua caliente sanitaria");
+    expect(enc("rebt")).toBe("4.1.1. ITC-BT-10 Grado de electrificación y previsión de cargas");
+    // SE y HR son la sección entera: sin título propio.
+    expect(m.apartados.find((a) => a.key === "hr")).toMatchObject({ sinTitulo: true, encabezado: "3.5. Protección frente al ruido DB HR" });
+    expect(m.apartados.find((a) => a.key === "dbse")).toMatchObject({ sinTitulo: true, encabezado: "3.1. Seguridad estructural DB SE" });
   });
 
   it("lo que no cumple sale como pendiente, sin su texto", () => {
     const m = memoriaCte(conHs4Fallando());
     const hs4 = m.apartados.find((a) => a.key === "hs4")!;
     expect(hs4.tipo).toBe("no_cumple");
-    const b = bloquesMemoria(m, "4 oct 2026");
-    const i = b.findIndex((x) => x.tipo === "titulo" && x.texto === "DB-HS 4 · Suministro de agua");
+    const b = bloquesMemoria(m);
+    const i = b.findIndex((x) => x.tipo === "titulo" && x.texto === "3.4.4. HS 4 Suministro de agua");
     expect(b[i + 1].tipo).toBe("pendiente");
     // Un motivo por línea —los que enseña HS4— y ni una frase de su memoria.
     const j = b.findIndex((x, k) => k > i && x.tipo === "titulo");
@@ -171,26 +175,32 @@ describe("memoriaCte", () => {
     expect(motivos.map((x) => (x.tipo === "parrafo" ? x.texto : ""))).toContain("– No llega presión a las plantas 1, 2 y 3.");
   });
 
-  it("bloques: título, grupos por DB y el párrafo del «no aplica» con su cita", () => {
-    const b = bloquesMemoria(memoriaCte(demo()), "4 oct 2026");
-    expect(b[0]).toEqual({ tipo: "titulo", nivel: 1, texto: "Memoria CTE de instalaciones" });
-    expect(b[1]).toEqual({ tipo: "parrafo", texto: "Demo — Vivienda C/ Mayor 12 · 4 oct 2026" });
-    expect(b.flatMap((x) => (x.tipo === "titulo" && x.nivel === 2 ? [x.texto] : []))).toEqual([
-      "Salubridad (DB-HS)",
-      "Seguridad en caso de incendio (DB-SI)",
-      "Utilización y accesibilidad (DB-SUA)",
-      "Ruido (DB-HR)",
-      "Ahorro de energía (DB-HE)",
-      "Electricidad (REBT)",
-      "Externas",
+  it("bloques: capítulos, DB numerados y el párrafo del «no aplica» con su cita", () => {
+    const b = bloquesMemoria(memoriaCte(demo()));
+    expect(b[0]).toEqual({ tipo: "titulo", nivel: 1, texto: "3. Cumplimiento del CTE" });
+    expect(b.flatMap((x) => (x.tipo === "titulo" && x.nivel === 1 ? [x.texto] : []))).toEqual([
+      "3. Cumplimiento del CTE",
+      "4. Cumplimiento de otros reglamentos",
     ]);
+    expect(b.flatMap((x) => (x.tipo === "titulo" && x.nivel === 2 ? [x.texto] : []))).toEqual([
+      "3.1. Seguridad estructural DB SE",
+      "3.2. Seguridad en caso de incendio DB SI",
+      "3.3. Seguridad de utilización y accesibilidad DB SUA",
+      "3.4. Salubridad DB HS",
+      "3.5. Protección frente al ruido DB HR",
+      "3.6. Ahorro de energía DB HE",
+      "4.1. Reglamento electrotécnico para baja tensión (REBT)",
+    ]);
+    // Ni el proyecto en el cuerpo, ni la jerga de la ficha en las fuentes.
+    expect(b.some((x) => x.tipo === "parrafo" && x.texto.startsWith("Demo — "))).toBe(false);
+    expect(b.some((x) => x.tipo === "nota" && /motor \d|datos de El edificio|consolidado/.test(x.texto))).toBe(false);
     expect(b.some((x) => x.tipo === "nota" && x.texto === "DB-SUA 6, ámbito de aplicación")).toBe(true);
     expect(b.some((x) => x.tipo === "tabla")).toBe(true);
   });
 
   it("el texto plano lleva todo, con las tablas por tabuladores", () => {
-    const t = textoPlanoMemoriaCte(memoriaCte(demo()), "4 oct 2026");
-    expect(t).toMatch(/^Memoria CTE de instalaciones\n\n/);
+    const t = textoPlanoMemoriaCte(memoriaCte(demo()));
+    expect(t).toMatch(/^3\. Cumplimiento del CTE\n\n/);
     expect(t).toContain("SUA 6 Seguridad frente al riesgo de ahogamiento");
     expect(t).toContain("Se justifica con HULC o CE3X. Pendiente de adjuntar el documento.");
     expect(t).toContain("\t");
@@ -204,8 +214,8 @@ describe("la verificación energética con el informe leído", () => {
   };
 
   it("en la memoria: el programa, el informe y la tabla de resultados de cada apartado", () => {
-    const b = bloquesMemoria(memoriaCte(conInforme()), "4 oct 2026");
-    const i = b.findIndex((x) => x.tipo === "titulo" && x.texto === "DB-HE 0 / DB-HE 1 · Verificación energética global");
+    const b = bloquesMemoria(memoriaCte(conInforme()));
+    const i = b.findIndex((x) => x.tipo === "titulo" && x.texto.startsWith("3.6.1. HE 0 y HE 1 "));
     expect(b[i + 1]).toEqual({
       tipo: "parrafo",
       texto: "Se justifica con CE3X v2.3, según su informe de verificación de los requisitos de HE0 y HE1 de 3/5/2026, que se adjunta. Documento de referencia: HE-01. Resultados:",
@@ -213,13 +223,13 @@ describe("la verificación energética con el informe leído", () => {
     expect(b[i + 2]).toMatchObject({ tipo: "tabla", cabecera: ["Exigencia", "Proyecto", "Límite", "Cumple"] });
     const tabla = (x: (typeof b)[number] | undefined) => (x?.tipo === "tabla" ? x.filas : []);
     expect(tabla(b[i + 2])[0]).toEqual(["HE0 · Energía primaria no renovable (Cep,nren)", "48,07 kWh/m²·año", "≤ 60,21 kWh/m²·año", "Sí"]);
-    const he1 = b.findIndex((x) => x.tipo === "titulo" && x.texto === "DB-HE 1 · Envolvente térmica");
+    const he1 = b.findIndex((x) => x.tipo === "titulo" && x.texto === "3.6.2. HE 1 Condiciones para el control de la demanda energética");
     expect(tabla(b[he1 + 2]).map((f) => f[0])).toContain("HE1 · Condensaciones intersticiales");
   });
 
   it("lo que no cumple sale como pendiente y en «Antes de entregar»", () => {
     const v = { ...verificacionDePrueba(), cepNren: { valor: 70, limite: 60.21, cumple: false } };
-    const b = bloquesMemoria(memoriaCte(conInforme(v)), "4 oct 2026");
+    const b = bloquesMemoria(memoriaCte(conInforme(v)));
     expect(b).toContainEqual({ tipo: "pendiente", texto: "Pendiente: según el informe, el edificio no cumple todas las exigencias." });
     const fallo = antesDeEntregar(conInforme(v)).find((x) => x.key === "he0he1_global" && x.tipo === "no_cumple");
     expect(fallo).toMatchObject({ titulo: "HE0 · Energía primaria no renovable (Cep,nren): no cumple", detalle: "70 kWh/m²·año (límite ≤ 60,21 kWh/m²·año), según el informe de CE3X v2.3." });

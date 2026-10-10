@@ -11,7 +11,8 @@ import antes from "./foto-antes.json";
 // Regenerada al llevar HE1 al programa de la verificación global y al nombrar
 // el programa «HULC o CE3X»: solo cambiaron las filas de HE1 y HE0 y la huella
 // de la memoria de los 40 proyectos.
-// Regenerada en feature-28 (rótulos «DB-HS 2» con espacio): solo cambió la
+// Regenerada en feature-28 (rótulos «DB-HS 2» con espacio) y en feature-29
+// (capítulos, numeración y fuentes cortas): solo cambió la
 // huella de la memoria de los 40 proyectos.
 // =============================================================================
 

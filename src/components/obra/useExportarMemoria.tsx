@@ -2,7 +2,6 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
 import { bloquesMemoria, memoriaCte, nombreArchivoMemoria } from "../../lib/obra/memoria";
 import { descargarBlob, descargarUrl } from "../../lib/export/descargar";
-import { formatearFecha } from "../../lib/ui/fecha";
 import type { PdfResult } from "../../lib/pdf/utils";
 import { PdfPreviewModal } from "../ui/PdfPreviewModal";
 import { showToast } from "../ui/Toast";
@@ -34,7 +33,7 @@ export function useExportarMemoria(): ExportarMemoria {
     };
   }, [pdf]);
 
-  const bloques = () => bloquesMemoria(memoriaCte(proyecto), formatearFecha(proyecto.modificado));
+  const bloques = () => bloquesMemoria(memoriaCte(proyecto));
 
   const word = async () => {
     setOcupado("word");

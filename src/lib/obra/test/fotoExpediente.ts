@@ -64,7 +64,7 @@ export function fotoExpedientes(): FotoExpediente {
       if (!j) continue;
       fila[e.key] = [j.aplicabilidad, j.estado, j.veredicto ?? "", huella(j.nota ?? ""), j.cita ?? ""].join("|");
     }
-    fila.memoria = huella(textoPlanoMemoriaCte(memoriaCte(p), "9 de octubre de 2026"));
+    fila.memoria = huella(textoPlanoMemoriaCte(memoriaCte(p)));
     foto[id] = fila;
   }
   return foto;

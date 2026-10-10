@@ -67,10 +67,10 @@ describe("planificarDocx", () => {
 describe("documentoMemoria", () => {
   it("el Demo sale como un .docx con su texto y en A4", async () => {
     const p = crearProyectoDemo("2026-10-04T10:00:00.000Z");
-    const doc = documentoMemoria(bloquesMemoria(memoriaCte(p), "4 oct 2026"), p.nombre);
+    const doc = documentoMemoria(bloquesMemoria(memoriaCte(p)), p.nombre);
     const zip = await JSZip.loadAsync(await Packer.toBuffer(doc));
     const xml = await zip.file("word/document.xml")!.async("string");
-    expect(xml).toContain("Memoria CTE de instalaciones");
+    expect(xml).toContain("3. Cumplimiento del CTE");
     expect(xml).toContain("Evacuación de aguas");
     expect(xml).toContain("Ø");
     expect(xml).toContain('w:w="11906"'); // A4

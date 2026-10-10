@@ -19,7 +19,7 @@ function deCaso(caso: CasoEdificio): Proyecto {
   return p;
 }
 
-const texto = (p: Proyecto): string => textoPlanoMemoriaCte(memoriaCte(p), "10 de octubre de 2026");
+const texto = (p: Proyecto): string => textoPlanoMemoriaCte(memoriaCte(p));
 
 describe("la reforma de local a vivienda", () => {
   const p = deCaso("reforma_local_vivienda");

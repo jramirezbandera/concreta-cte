@@ -9,7 +9,7 @@ import { crearProyectoDemo } from "../../proyecto/demo";
 
 describe("renderMemoriaPdf", () => {
   const p = crearProyectoDemo("2026-10-04T10:00:00.000Z");
-  const bloques = bloquesMemoria(memoriaCte(p), "4 oct 2026");
+  const bloques = bloquesMemoria(memoriaCte(p));
 
   it("pagina el Demo con su nombre de fichero", () => {
     const r = renderMemoriaPdf(bloques, p.nombre);
@@ -20,8 +20,8 @@ describe("renderMemoriaPdf", () => {
   it("escribe los títulos y el pie con el motor en cada página", () => {
     const doc = componerMemoriaPdf(bloques, p.nombre);
     const crudo = doc.output();
-    expect(crudo).toContain("(Memoria CTE de instalaciones)");
-    expect(crudo).toContain("(Salubridad \\(DB-HS\\))");
+    expect(crudo).toContain("(3. Cumplimiento del CTE)");
+    expect(crudo).toContain("(3.4. Salubridad DB HS)");
     expect(crudo.match(/\(Motor v/g)).toHaveLength(doc.getNumberOfPages());
   });
 
