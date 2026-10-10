@@ -183,7 +183,8 @@ describe("HE y HR (paso 5)", () => {
 
   it("HR: el forjado con la vivienda de arriba y el local de al lado, leídos del edificio entero", () => {
     const hr = apartado(t, "3.5. Protección frente al ruido DB HR");
-    expect(hr).toContain("Forjado entre la vivienda y la vivienda superior existente (viviendas existentes de P1)");
+    expect(hr).toContain("Elementos de separación horizontales bajo las viviendas existentes de P1");
+    expect(hr).toContain("En el forjado con la vivienda superior existente, la tabla comprueba el ruido aéreo");
     expect(hr).toContain("se aplica el criterio de flexibilidad de la Parte I del CTE (art. 2.3)");
     expect(hr).toContain("Local sin uso (PB)");
     // La cubierta no está sobre la vivienda nueva, ni el portal reformado es del ámbito del DB-HR.

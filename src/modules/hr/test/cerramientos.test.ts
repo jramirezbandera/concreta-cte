@@ -79,7 +79,11 @@ describe("HR · la planta baja distinta (K-CER.1)", () => {
     expect(pb.hueco?.ventanaRAtr).toBe(27);
     expect(j.elementos.find((e) => e.id === "fachada-dormitorios-pb")?.nombre).toBe("Fachada de los dormitorios de la planta baja");
     expect(detalle<"exterior">(j, "fachada-dormitorios")?.ciega.codigo).toBe("F 3.2");
-    expect(textoPlanoMemoria(hr.memoria(j))).toContain("Fachada de los dormitorios de la planta baja (recinto más desfavorable");
+    // La ficha K.1: un bloque por recinto receptor, el de la planta baja aparte (feature-31).
+    const m = hr.memoria(j);
+    const pbT = m.tablas!.find((t) => t.rotulo === "Fachada de la planta baja, dormitorios: Ld = 60 dBA, D2m,nT,Atr ≥ 30 dBA");
+    expect(pbT?.filas[0].slice(0, 2)).toEqual(["Parte ciega", "SATE sobre LP ½ pie (CEC F 4.1, p. 64)"]);
+    expect(textoPlanoMemoria(m)).toContain("Fachada y cubierta, dormitorios: Ld = 60 dBA");
   });
 
   it("las separaciones se comprueban con las dos fachadas y vale la peor (flancos, lado seguro)", () => {
@@ -88,6 +92,9 @@ describe("HR · la planta baja distinta (K-CER.1)", () => {
     const sv = detalle<"vertical">(justificar(conPB), "separacion")!;
     expect(sv.r.cumple).toBe(false);
     expect(sv.r.flancos).toEqual([{ texto: "Fachada de una hoja: m 161 kg/m², RA 42 dBA; m ≥ 225 kg/m² y RA ≥ 50 dBA", cumple: false }]);
+    // En la memoria, el flanco que falla es un condicionante que no cumple (feature-31).
+    const cond = hr.memoria(justificar(conPB)).tablas!.find((t) => t.rotulo === "Condicionantes de las soluciones");
+    expect(cond?.filas).toContainEqual(["Entre viviendas y con la zona común", "Fachada de una hoja: m 161 kg/m², RA 42 dBA; m ≥ 225 kg/m² y RA ≥ 50 dBA", "No cumple"]);
     // Con la misma fachada en la planta baja (solo otra ventana), como siempre.
     const misma = setCerramientos(setPlantaBajaDistinta(PLURI, true), { ventanaPB: { id: "ve-4-c-4-batiente", marco: "pvc_tres_camaras" } });
     expect(detalle<"vertical">(justificar(misma), "separacion")?.r.cumple).toBe(true);

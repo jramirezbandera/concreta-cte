@@ -130,7 +130,15 @@ export type DetalleHr =
       r: ResultadoFachada;
     }
   | { clase: "puerta"; abre: "vestibulo" | "estancia"; exige: number; RA: number | null; cerramientoRA: number }
-  | { clase: "ascensor"; modo: ModoAscensor; habitual: boolean; RA: number; r: ResultadoVertical | null }
+  | {
+      clase: "ascensor";
+      modo: ModoAscensor;
+      habitual: boolean;
+      RA: number;
+      r: ResultadoVertical | null;
+      /** Lo que cierra el recinto: la separación con la actividad (en el hueco) o la de las viviendas (en un cuarto), para la ficha K.1. */
+      cerramiento: { sol: SolucionUsada; m: number; RA: number; trasdosado: (SolucionUsada & { dRA: number; unaCara: boolean }) | null };
+    }
   | { clase: "instalaciones"; ascensor: boolean; condiciones: string[] };
 
 export type ElementoHr = ElementoSi<DetalleHr>;
@@ -435,7 +443,9 @@ export function justificarHr(estado: HrEstado, p: ProyectoSi, comparar = true): 
               }),
             )
           : null;
-      const RA = modo === "hueco" ? RA_conjunto(sa, saTr) : RA_conjunto(sv, svTr);
+      const cb = modo === "hueco" ? sa : sv;
+      const ctr = modo === "hueco" ? saTr : svTr;
+      const RA = RA_conjunto(cb, ctr);
       const ok = r ? r.cumple : RA > L.ascensorRA;
       elementos.push({
         id: "ascensor",
@@ -448,7 +458,7 @@ export function justificarHr(estado: HrEstado, p: ProyectoSi, comparar = true): 
           ? { tipo: "grado_tabla", tabla: "Tabla 3.2", entradas: [{ k: "Caso", v: "recinto de instalaciones" }] }
           : { tipo: "formula", formula: "RA del cerramiento > 50 dBA", resultado: { valor: L.ascensorRA, unidad: "dBA" } },
         cita: ["HR · ap. 3.3.3.5"],
-        detalle: { clase: "ascensor", modo, habitual: st.ascensor === null, RA, r },
+        detalle: { clase: "ascensor", modo, habitual: st.ascensor === null, RA, r, cerramiento: { sol: cb.u, m: cb.m, RA: cb.RA, trasdosado: ctr } },
       });
     }
 
