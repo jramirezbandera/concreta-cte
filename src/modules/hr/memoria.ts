@@ -18,6 +18,15 @@ function parrafoAmbito(j: JustificacionHr): Trozo[] {
   if (!j.aplica) {
     return ["La obra es una intervención en un edificio existente que no constituye rehabilitación integral, por lo que queda excluida del ámbito del DB-HR (Introducción II d)."];
   }
+  // En un edificio existente, a qué se aplica lo dice la nota de alcance, que la
+  // memoria pone delante: aquí solo el método (feature-28).
+  if (j.existente) {
+    return [
+      j.tipologia === "plurifamiliar"
+        ? "En la parte a la que se aplica, se justifica mediante la opción simplificada (ap. 3.1.2), con forjados de hormigón (ap. 3.1.2.1)."
+        : "En la parte a la que se aplica, se justifica mediante la opción simplificada (ap. 3.1.2).",
+    ];
+  }
   switch (j.tipologia) {
     case "aislada":
       return [

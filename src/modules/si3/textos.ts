@@ -427,7 +427,7 @@ export function memoriaSi3(j: JustificacionSi3): MemoriaDoc {
         parrafos.push([
           `La escalera es `,
           { v: NOMBRE_ESCALERA[d.proteccion] },
-          `, lo que admite la tabla 5.1 para una altura de evacuación de ${m(d.h_m)} en uso Residencial Vivienda. Con una anchura de ${m(d.anchura_m)} tiene capacidad para ${d.capacidad} personas (tablas 4.1 y 4.2), más que las ${d.p} que la usan; la anchura mínima es la del DB SUA 1, tabla 4.1.`,
+          `, lo que admite la tabla 5.1 para una altura de evacuación de ${m(d.h_m)} en uso Residencial Vivienda. Con una anchura de ${m(d.anchura_m)} tiene capacidad para ${d.capacidad} personas (tablas 4.1 y 4.2)${d.p > 0 ? `, más que las ${d.p} que la usan; la anchura mínima es la del DB SUA 1, tabla 4.1.` : ", y ningún ocupante de la zona a la que se aplica la Sección evacua por ella. La anchura mínima es la del DB SUA 1, tabla 4.1."}`,
         ]);
         break;
       case "escalera_garaje":

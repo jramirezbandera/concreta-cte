@@ -205,7 +205,7 @@ describe("la verificación energética con el informe leído", () => {
 
   it("en la memoria: el programa, el informe y la tabla de resultados de cada apartado", () => {
     const b = bloquesMemoria(memoriaCte(conInforme()), "4 oct 2026");
-    const i = b.findIndex((x) => x.tipo === "titulo" && x.texto === "DB-HE0 / DB-HE1 · Verificación energética global");
+    const i = b.findIndex((x) => x.tipo === "titulo" && x.texto === "DB-HE 0 / DB-HE 1 · Verificación energética global");
     expect(b[i + 1]).toEqual({
       tipo: "parrafo",
       texto: "Se justifica con CE3X v2.3, según su informe de verificación de los requisitos de HE0 y HE1 de 3/5/2026, que se adjunta. Documento de referencia: HE-01. Resultados:",
@@ -213,7 +213,7 @@ describe("la verificación energética con el informe leído", () => {
     expect(b[i + 2]).toMatchObject({ tipo: "tabla", cabecera: ["Exigencia", "Proyecto", "Límite", "Cumple"] });
     const tabla = (x: (typeof b)[number] | undefined) => (x?.tipo === "tabla" ? x.filas : []);
     expect(tabla(b[i + 2])[0]).toEqual(["HE0 · Energía primaria no renovable (Cep,nren)", "48,07 kWh/m²·año", "≤ 60,21 kWh/m²·año", "Sí"]);
-    const he1 = b.findIndex((x) => x.tipo === "titulo" && x.texto === "DB-HE1 · Envolvente térmica");
+    const he1 = b.findIndex((x) => x.tipo === "titulo" && x.texto === "DB-HE 1 · Envolvente térmica");
     expect(tabla(b[he1 + 2]).map((f) => f[0])).toContain("HE1 · Condensaciones intersticiales");
   });
 

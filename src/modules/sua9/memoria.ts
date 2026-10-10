@@ -114,7 +114,7 @@ function parrafoAscensor(j: JustificacionSua9): Trozo[] {
   }
   if (a.residencial) {
     const p: Trozo[] = [
-      `Desde la entrada principal accesible hay que salvar ${plural(a.plantasASalvar, "planta", "plantas")}, no más de dos, y hay ${a.viviendasSinEntrada} viviendas, no más de 12, en plantas sin entrada principal accesible, por lo que `,
+      `${aSalvar(a.plantasASalvar)}, y ${a.viviendasSinEntrada > 0 ? `hay ${a.viviendasSinEntrada} viviendas, no más de 12,` : "no hay viviendas"} en plantas sin entrada principal accesible, por lo que `,
       { v: "no se exige ascensor accesible" },
     ];
     if (a.hay) p.push(`; no obstante, el edificio dispone de ascensor accesible que comunica ${a.plantas} (${cita}).`);
@@ -122,10 +122,17 @@ function parrafoAscensor(j: JustificacionSua9): Trozo[] {
     return p;
   }
   return [
-    `Desde la entrada principal accesible hay que salvar ${plural(a.plantasASalvar, "planta", "plantas")}, no más de dos, y en las plantas sin entrada accesible hay ${m2(a.utilSinEntrada_m2)} útiles sin las zonas de ocupación nula, no más de 200 m², por lo que `,
+    `${aSalvar(a.plantasASalvar)}, y en las plantas sin entrada accesible hay ${m2(a.utilSinEntrada_m2)} útiles sin las zonas de ocupación nula, no más de 200 m², por lo que `,
     { v: "no se exige ascensor accesible" },
     ` (${cita})${a.hay ? "; no obstante, el edificio dispone de ascensor accesible" : ""}.`,
   ];
+}
+
+/** «Desde la entrada principal accesible hay que salvar 1 planta, no más de dos» o, sin plantas, que no hay ninguna (feature-28). */
+function aSalvar(n: number): string {
+  return n > 0
+    ? `Desde la entrada principal accesible hay que salvar ${plural(n, "planta", "plantas")}, no más de dos`
+    : "Desde la entrada principal accesible no hay ninguna planta que salvar";
 }
 
 function parrafoCabina(j: JustificacionSua9): Trozo[] {

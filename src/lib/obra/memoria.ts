@@ -17,6 +17,7 @@ import { textoParrafo } from "../cte/memoria";
 import type { JustificacionKey, Proyecto } from "../proyecto/tipos";
 import { notaAlcance, type NotaAlcance } from "./alcanceTexto";
 import { evaluarExpediente, type EvaluacionJustificacion } from "./evaluar";
+import { aplicabilidadEfectiva } from "../proyecto/aplicabilidad";
 import { CLAVES_ENERGIA, programaEnergia, referenciaExterna, resultadosDe, type ResultadoVerificacion } from "../energia/verificacion";
 
 export const TITULO_MEMORIA = "Memoria CTE de instalaciones";
@@ -40,6 +41,10 @@ export type ApartadoMemoria =
       referencia?: string;
       /** Del informe leído (energía): cuál es y qué comprueba. */
       informe?: { archivo: string; fecha?: string; resultados: ResultadoVerificacion[] };
+      /** En un edificio existente, a qué se aplica (feature-28). */
+      alcance?: NotaAlcance;
+      /** HE 1 que va en el documento de la verificación global (feature-28). */
+      conLaGlobal?: boolean;
     });
 
 export interface MemoriaCte {
@@ -48,6 +53,22 @@ export interface MemoriaCte {
   apartados: ApartadoMemoria[];
   /** Lo que la herramienta aún no redacta (o no tiene nada que redactar). */
   pendientes: { codigo: string; label: string }[];
+}
+
+/** «DB-HS2» → «DB-HS 2», «DB-HE0 / DB-HE1» → «DB-HE 0 / DB-HE 1»: como los redactados (feature-28). */
+export function normaLegible(db: string): string {
+  return db.replace(/\b(DB-[A-Z]+)(\d)/g, "$1 $2");
+}
+
+/**
+ * La nota de alcance de una externa en un edificio existente, sin la frase
+ * «Se justifica con…» del final, que ya dice el apartado (feature-28).
+ */
+function alcanceExterno(ev: EvaluacionJustificacion, p: Proyecto): NotaAlcance | undefined {
+  if (p.datosGenerales.intervencion === "obra_nueva" || !p.datosGenerales.alcance || !ev.nota) return undefined;
+  const parrafo = ev.nota.replace(/\s*Se justifica con [^.]*\.$/, "").trim();
+  if (!parrafo) return undefined;
+  return { parrafo, ...(ev.cita ? { cita: ev.cita } : {}) };
 }
 
 function apartadoDe(ev: EvaluacionJustificacion, p: Proyecto): ApartadoMemoria | null {
@@ -76,15 +97,15 @@ function apartadoDe(ev: EvaluacionJustificacion, p: Proyecto): ApartadoMemoria |
     case "error":
       return {
         ...base,
-        encabezado: `${e.db} · ${e.label}`,
+        encabezado: `${normaLegible(e.db)} · ${e.label}`,
         tipo: "no_cumple",
-        doc: { titulo: e.label, norma: e.db, parrafos: [], fuente: "" },
+        doc: { titulo: e.label, norma: normaLegible(e.db), parrafos: [], fuente: "" },
         motivos: ev.incumplimientos.map((i) => i.titulo),
       };
     case "no_aplica":
       return {
         ...base,
-        encabezado: `${e.db} · ${e.label}`,
+        encabezado: `${normaLegible(e.db)} · ${e.label}`,
         tipo: "no_aplica",
         parrafo: ev.nota ?? `${e.codigo} ${e.label}: no es de aplicación.`,
         ...(ev.cita !== undefined ? { cita: ev.cita } : {}),
@@ -93,13 +114,17 @@ function apartadoDe(ev: EvaluacionJustificacion, p: Proyecto): ApartadoMemoria |
       const ref = referenciaExterna(p, ev.key);
       const v = p.justificaciones.he0he1_global?.verificacion;
       const resultados = v && CLAVES_ENERGIA.includes(ev.key) ? resultadosDe(v, ev.key) : [];
+      const al = alcanceExterno(ev, p);
+      const conLaGlobal = ev.key === "he1" && aplicabilidadEfectiva(p, "he0he1_global").aplicabilidad === "externo";
       return {
         ...base,
-        encabezado: `${e.db} · ${e.label}`,
+        encabezado: `${normaLegible(e.db)} · ${e.label}`,
         tipo: "externo",
         destino: programaEnergia(p, ev.key),
         ...(ref ? { referencia: ref } : {}),
         ...(v && resultados.length > 0 ? { informe: { archivo: v.archivo, ...(v.fecha ? { fecha: v.fecha } : {}), resultados } } : {}),
+        ...(al ? { alcance: al } : {}),
+        ...(conLaGlobal ? { conLaGlobal } : {}),
       };
     }
     default:
@@ -137,9 +162,11 @@ function textoExterno(a: Extract<ApartadoMemoria, { tipo: "externo" }>): string 
     const ref = a.referencia ? ` Documento de referencia: ${a.referencia}.` : "";
     return `Se justifica con ${a.destino}, según su informe de verificación de los requisitos de HE0 y HE1${cuando}, que se adjunta.${ref} Resultados:`;
   }
-  return a.referencia
-    ? `Se justifica con ${a.destino}. Documento de referencia: ${a.referencia}.`
-    : `Se justifica con ${a.destino}. Pendiente de adjuntar el documento.`;
+  // HE 1 con la global: el mismo documento, no otro que adjuntar (feature-28).
+  const con = a.conLaGlobal
+    ? `Se justifica con ${a.destino}, en el mismo documento que la verificación energética global.`
+    : `Se justifica con ${a.destino}.`;
+  return a.referencia ? `${con} Documento de referencia: ${a.referencia}.` : a.conLaGlobal ? con : `${con} Pendiente de adjuntar el documento.`;
 }
 
 /**
@@ -158,7 +185,7 @@ export function bloquesMemoria(m: MemoriaCte, fecha: string): BloqueMemoria[] {
       b.push({ tipo: "titulo", nivel: 2, texto: grupo });
     }
     b.push({ tipo: "titulo", nivel: 3, texto: a.encabezado });
-    if ((a.tipo === "redactado" || a.tipo === "no_cumple") && a.alcance) {
+    if ((a.tipo === "redactado" || a.tipo === "no_cumple" || a.tipo === "externo") && a.alcance) {
       b.push({ tipo: "parrafo", texto: a.alcance.parrafo });
       if (a.alcance.cita) b.push({ tipo: "nota", texto: a.alcance.cita });
     }

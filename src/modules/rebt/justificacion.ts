@@ -28,6 +28,7 @@ import type { Edificio, ViviendaTipo } from "../../lib/edificio/tipos";
 import type { Veredicto } from "../../lib/pdf/renderFicha";
 import { resolverHe4, he4EstadoDefaults, type He4Estado } from "../he4/estado";
 import { recargaDeHe6 } from "../he6/justificacion";
+import { seAplicaEnLaObra } from "../../lib/proyecto/aplicabilidad";
 import { resolverDecisionesHs3, DECISIONES_HS3_POR_DEFECTO, type DecisionesHs3 } from "../hs3/red";
 import type { ProyectoSi } from "../si/definicion";
 import { edificioSi, superficies, type ZonaSi } from "../si/edificio";
@@ -394,8 +395,12 @@ export function justificarRebt(estado: RebtEstado, p: ProyectoSi): Justificacion
   const R = RECARGA_REBT.datos;
   const A2 = ANEXO2_GUIA_BT52.datos;
   const he6 = recargaDeHe6(p);
-  const otrosUsos = clasificacion === "oficinas" && he6.aplica;
-  if ((clasificacion === "viviendas" && plazasGaraje > 0) || otrosUsos) {
+  // En un edificio existente con el alcance respondido, la recarga solo entra si
+  // HE 6 se aplica a la obra: el garaje que no se toca no suma (ITC-BT-52, nueva
+  // construcción; feature-28). Sin asistente, como hasta ahora.
+  const recargaEnLaObra = p.datosGenerales.alcance === undefined || seAplicaEnLaObra(p, "he6");
+  const otrosUsos = clasificacion === "oficinas" && he6.aplica && recargaEnLaObra;
+  if ((clasificacion === "viviendas" && plazasGaraje > 0 && recargaEnLaObra) || otrosUsos) {
     const minimas = plazasGaraje * R.fraccionPlazas;
     const dadas = noNegativo(estado.plazasRecarga);
     const estaciones = otrosUsos ? he6.estaciones : 0;
@@ -470,7 +475,7 @@ export function justificarRebt(estado: RebtEstado, p: ProyectoSi): Justificacion
     // ITC-BT-52 ap. 3.2 b): módulos de reserva para el 20 % de las plazas no asociadas
     // a una vivienda (se supone una plaza por vivienda), al menos uno. ap. 5: el
     // contador principal del esquema colectivo va en la concentración.
-    if (plazasGaraje > 0) {
+    if (plazasGaraje > 0 && recargaEnLaObra) {
       const noAsociadas = Math.max(0, plazasGaraje - (clasificacion === "viviendas" ? n : 0));
       desglose.push({ que: "reserva para la recarga", n: Math.max(1, Math.ceil(noAsociadas * R.reservaPlazasNoAsociadas - 1e-9)) });
     }

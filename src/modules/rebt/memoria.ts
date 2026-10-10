@@ -181,7 +181,7 @@ function parrafoDocumentacion(j: JustificacionRebt): Trozo[] {
 function tablaPrevision(j: JustificacionRebt): MemoriaDoc["tabla"] {
   const t = detalle(j, "total")!;
   const filas: string[][] = [];
-  for (const v of j.viviendas) filas.push([`Vivienda ${v.nombre}`, `${v.cantidad} × ${m2(v.superficie_m2)}`, NOMBRE_GRADO[v.grado], W(v.potencia_W)]);
+  for (const v of j.viviendas) filas.push([j.unifamiliar ? "Vivienda" : `Vivienda ${v.nombre}`, `${v.cantidad} × ${m2(v.superficie_m2)}`, NOMBRE_GRADO[v.grado], W(v.potencia_W)]);
   const vv = detalle(j, "viviendas");
   if (vv) filas.push(["Conjunto de viviendas", `${vv.n} viviendas`, `coef. ${num(vv.coeficiente, 1)}`, W(vv.p_W)]);
   const s = detalle(j, "servicios");

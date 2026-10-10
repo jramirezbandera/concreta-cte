@@ -167,7 +167,9 @@ function parrafoOtros(j: JustificacionHs4): Trozo[] {
   const g = j.red.decisiones;
   p.push(
     g.aguaCaliente === "individual"
-      ? "El agua caliente se produce de forma individual en cada unidad; su producción se justifica con HE 4."
+      ? j.red.unifamiliar
+        ? "El agua caliente se produce en la propia vivienda; su producción se justifica con HE 4."
+        : "El agua caliente se produce de forma individual en cada unidad; su producción se justifica con HE 4."
       : "El agua caliente se produce de forma centralizada; su red de impulsión y retorno se justifica aparte.",
   );
   const locales = delTipo(j, "local");

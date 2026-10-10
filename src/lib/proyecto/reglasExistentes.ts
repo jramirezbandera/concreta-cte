@@ -374,6 +374,14 @@ function hr(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
 const HE1 = "DB-HE 1 Condiciones para el control de la demanda energética";
 const CITA_HE1 = "DB-HE 1, ámbito de aplicación y ap. 3.1.1 pto 2, 3.1.3 pto 3 y 3.2 pto 2";
 
+/**
+ * La reforma que renueva poco no verifica K ni el control solar. Si la obra
+ * tiene además verificación global (un cambio de uso, por ejemplo), sí se
+ * verifican y `he1SegunGlobal` quita la frase (feature-28).
+ */
+export const HE1_SIN_K =
+  " Se renueva el 25 % o menos de la superficie total de la envolvente térmica final, por lo que no se verifican el coeficiente global K ni el control solar.";
+
 function he1(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
   const a = c.alcance;
   if (caso === "cambio_uso_caracteristico") {
@@ -402,7 +410,7 @@ function he1(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
     a.envolventeMas25 === true
       ? " Se renueva más del 25 % de la superficie total de la envolvente térmica final: el coeficiente global K y el control solar se verifican en la justificación energética global (tablas 3.1.1.b/c, fila de reformas, y ap. 3.1.2); según los comentarios del Ministerio al DB-HE, K se calcula con todos los elementos de la envolvente, estén o no afectados."
       : a.envolventeMas25 === false
-        ? " Se renueva el 25 % o menos de la superficie total de la envolvente térmica final, por lo que no se verifican el coeficiente global K ni el control solar."
+        ? HE1_SIN_K
         : "";
   if (a.envolvente === undefined || a.envolvente.length > 0 || a.pasaAcondicionado === true) {
     return reformado(
@@ -423,7 +431,11 @@ function he0he1(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
   const a = c.alcance;
   const ext = (nota: string): PropuestaExistente => ({ aplicabilidad: "externo", nota, cita: CITA_GLOBAL });
   if (caso === "cambio_uso_caracteristico" || caso === "cambio_uso_parcial") {
-    const he0 = c.edificio.utilCambioUso_m2 > 50 || caso === "cambio_uso_caracteristico";
+    // HE 0 ap. 1 pto 1 b): más de 50 m² útiles, sea característico o parcial
+    // (K-MEM.1). Sin zonas marcadas que cambien de uso, el característico se
+    // queda del lado prudente: se aplica (feature-28).
+    const util = c.edificio.utilCambioUso_m2;
+    const he0 = util > 50 || (caso === "cambio_uso_caracteristico" && util === 0);
     return ext(
       `${GLOBAL}: el coeficiente global K y el control solar se verifican con los valores límite de cambios de uso (HE 1, tablas 3.1.1.b/c y ap. 3.1.2)${he0 ? ", y el consumo de energía primaria con los de HE 0, a la unidad o unidades de uso que cambian de uso (HE 0 ap. 1)" : ""}.`,
     );
@@ -659,6 +671,23 @@ const RANGO: Record<Aplicabilidad, number> = {
 };
 
 /**
+ * Notas de varios casos que empiezan por el mismo sujeto («SI 2 Propagación
+ * exterior: »): la primera lo conserva y las demás siguen con «Además, …», sin
+ * repetirlo (feature-28).
+ */
+export function juntarNotas(notas: readonly string[]): string[] {
+  const i = notas[0]?.indexOf(": ") ?? -1;
+  if (notas.length < 2 || i < 0) return [...notas];
+  const sujeto = notas[0].slice(0, i + 2);
+  return [notas[0], ...notas.slice(1).map((n) => (n.startsWith(sujeto) ? `Además, ${n.slice(sujeto.length)}` : n))];
+}
+
+/** Quita las citas que ya están al principio de otra más completa (feature-28). */
+export function sinContenidas(citas: readonly string[]): string[] {
+  return citas.filter((c) => !citas.some((o) => o !== c && o.startsWith(c)));
+}
+
+/**
  * Propuesta para una justificación en una obra en un edificio existente: cada
  * caso de obra con su regla; gana el más exigente; en empate de «aplica a lo
  * intervenido», se juntan las notas distintas. Cierra con el no empeoramiento y,
@@ -675,8 +704,8 @@ export function propuestaExistente(
   const max = Math.max(...props.map((p) => RANGO[p.aplicabilidad]));
   const ganan = props.filter((p) => RANGO[p.aplicabilidad] === max);
   const elegida = ganan[0];
-  const notas = elegida.aplicabilidad === "aplica_reformado" ? [...new Set(ganan.map((p) => p.nota))] : [elegida.nota];
-  const citas = [...new Set(ganan.map((p) => p.cita))];
+  const notas = elegida.aplicabilidad === "aplica_reformado" ? juntarNotas([...new Set(ganan.map((p) => p.nota))]) : [elegida.nota];
+  const citas = sinContenidas([...new Set(ganan.map((p) => p.cita))]);
   const cola: string[] = [];
   if (elegida.aplicabilidad === "aplica_reformado") {
     const f = fraseNoEmpeoramiento(key);

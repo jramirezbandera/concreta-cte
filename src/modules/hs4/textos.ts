@@ -79,13 +79,22 @@ function conArticulo(t: TipoAparatoHS4): string {
   return `${a[1]} ${a[0]}`;
 }
 
+/** Cuartos de nombre femenino: «de la cocina», no «del cocina» (feature-28). */
+const CUARTOS_FEMENINOS = ["cocina", "terraza", "galería", "lavandería", "despensa", "zona", "sala"];
+
+/** «del baño 1», «de la cocina». */
+export function delCuarto(cuarto: string): string {
+  const c = cuarto.toLowerCase();
+  return CUARTOS_FEMENINOS.some((f) => c === f || c.startsWith(`${f} `)) ? `de la ${c}` : `del ${c}`;
+}
+
 /** «la ducha de A3», «la bañera del baño 1», «el lavabo de los aseos de P2». */
 export function describirPunto(p: PuntoHs4, unifamiliar: boolean): string {
   const ap = conArticulo(p.aparato.tipo);
   if (!p.unidad) return `${ap} (${p.nombre})`;
   if (p.unidad.clase === "oficinas") return `${ap} de los aseos de ${etiquetaNivel(p.unidad.nivel)}`;
   if (p.aparato.tipo === "grifo_garaje") return p.nivel !== null ? `${ap} de ${etiquetaNivel(p.nivel)}` : ap;
-  if (unifamiliar) return `${ap} del ${(p.cuarto ?? "cuarto").toLowerCase()}`;
+  if (unifamiliar) return `${ap} ${delCuarto(p.cuarto ?? "cuarto")}`;
   return `${ap} de ${p.unidad.nombre}`;
 }
 

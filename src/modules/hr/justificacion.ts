@@ -27,6 +27,7 @@ import type { ProyectoSi } from "../si/definicion";
 import type { ElementoSi, JustificacionSiBase } from "../si/tipos";
 import { cerramientosDe } from "../../lib/constructivo/cerramientos";
 import { plantasDe } from "../../lib/edificio/derivar";
+import { seAplicaEnLaObra } from "../../lib/proyecto/aplicabilidad";
 import {
   CAPIALZADOS,
   dRASuelo,
@@ -130,6 +131,8 @@ export type ElementoHr = ElementoSi<DetalleHr>;
 export interface JustificacionHr extends JustificacionSiBase {
   elementos: ElementoHr[];
   aplica: boolean;
+  /** Obra en un edificio existente: el ámbito lo explica la nota de alcance (feature-28). */
+  existente: boolean;
   tipologia: Tipologia;
   separaciones: SeparacionesHr;
   /** La tabiquería, para las columnas de las tablas. */
@@ -244,7 +247,9 @@ export function justificarHr(estado: HrEstado, p: ProyectoSi, comparar = true): 
   const elementos: ElementoHr[] = [];
   const avisos: Aviso[] = [];
   const ld = ldDe(p);
-  const aplica = p.datosGenerales.intervencion === "obra_nueva";
+  // En un edificio existente manda la aplicabilidad del expediente (K-REF.4: el
+  // cambio de uso a vivienda sí se justifica), no la exclusión genérica (feature-28).
+  const aplica = seAplicaEnLaObra(p, "hr");
 
   // ── Soluciones ─────────────────────────────────────────────────────────────
   const tabS = solucionDe("tabiqueria", st.tabiqueria.id);
@@ -571,7 +576,8 @@ export function justificarHr(estado: HrEstado, p: ProyectoSi, comparar = true): 
     avisos.push({ id: "medios", tipo: "caso_especial", elementoId: elementos.find((x) => x.veredicto === "fail")?.id, datos: {} });
   }
 
-  return { elementos, avisos, veredicto, aplica, tipologia, separaciones: sep, tabiqueria: tab, ld, medios };
+  const existente = p.datosGenerales.intervencion !== "obra_nueva";
+  return { elementos, avisos, veredicto, aplica, existente, tipologia, separaciones: sep, tabiqueria: tab, ld, medios };
 }
 
 /** Las condiciones que la ficha declara (bloque L de la verificación), las que tienen objeto en el edificio. */

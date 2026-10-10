@@ -16,6 +16,7 @@ import { edificioSi } from "../../modules/si/edificio";
 import { alcanceDeEdificio, tiposDeObra } from "./alcance";
 import {
   CITA_MANTENIMIENTO,
+  HE1_SIN_K,
   NOTA_MANTENIMIENTO,
   REGLAS_EXISTENTES,
   casosDeObra,
@@ -403,7 +404,8 @@ function he1SegunGlobal(he1: AplicabilidadCalculada, global: Aplicabilidad): Apl
   const conGlobal = `Se justifica con ${destino}, junto con la verificación energética global.`;
   return {
     aplicabilidad: "externo",
-    nota: he1.nota && he1.nota !== NOTA_ALCANCE_PENDIENTE ? `${he1.nota} ${conGlobal}` : conGlobal,
+    // Con verificación global sí se verifican K y el control solar (feature-28).
+    nota: he1.nota && he1.nota !== NOTA_ALCANCE_PENDIENTE ? `${he1.nota.replace(HE1_SIN_K, "")} ${conGlobal}` : conGlobal,
     cita: he1.cita && he1.cita !== CITA_PARTE_I ? he1.cita : "DB-HE1",
   };
 }
@@ -414,7 +416,7 @@ function he1SegunGlobal(he1: AplicabilidadCalculada, global: Aplicabilidad): Apl
  * herramienta propone, el proyectista dispone); si no, la propuesta del motor.
  */
 export function aplicabilidadEfectiva(
-  p: Proyecto,
+  p: ProyectoAplicabilidad,
   key: JustificacionKey,
 ): AplicabilidadCalculada & { forzada: boolean } {
   const forzada = p.justificaciones[key]?.aplicabilidadForzada;
@@ -424,8 +426,25 @@ export function aplicabilidadEfectiva(
   return { ...aplicabilidadPropuesta(p, key), forzada: false };
 }
 
+/** Lo que leen la aplicabilidad efectiva y la propuesta: no hace falta el proyecto entero. */
+export type ProyectoAplicabilidad = Pick<Proyecto, "datosGenerales" | "edificio" | "justificaciones">;
+
+/**
+ * ¿Se aplica esta justificación a la obra? Para los módulos que leen la de otro
+ * (o su propio ámbito) en un edificio existente (feature-28): en obra nueva, sí,
+ * como siempre; en un edificio existente, si la aplicabilidad efectiva —la del
+ * asistente de alcance o la que fuerza el proyectista— no es `no_aplica`.
+ */
+export function seAplicaEnLaObra(
+  p: Pick<Proyecto, "datosGenerales" | "edificio"> & { justificaciones?: Proyecto["justificaciones"] },
+  key: JustificacionKey,
+): boolean {
+  if (p.datosGenerales.intervencion === "obra_nueva") return true;
+  return aplicabilidadEfectiva({ ...p, justificaciones: p.justificaciones ?? {} }, key).aplicabilidad !== "no_aplica";
+}
+
 /** Lo que propone el motor para una justificación, se haya forzado o no. */
-export function aplicabilidadPropuesta(p: Proyecto, key: JustificacionKey): AplicabilidadCalculada {
+export function aplicabilidadPropuesta(p: ProyectoAplicabilidad, key: JustificacionKey): AplicabilidadCalculada {
   const he4 = p.justificaciones.he4?.inputs as Partial<He4Estado> | undefined;
   const base = propuestasSinGlobal(atributosDe(p.datosGenerales, p.edificio, he4, p.justificaciones));
   if (key !== "he1") return base[key];

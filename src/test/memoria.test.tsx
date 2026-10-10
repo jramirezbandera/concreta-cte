@@ -31,7 +31,7 @@ describe("«/p/demo/memoria»", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Memoria CTE de instalaciones" }, { timeout: 20000 })).toBeInTheDocument();
     expect(screen.getByText("26 de 26 apartados listos")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "DB-HS 5 · Evacuación de aguas" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "DB-SUA6 · Ahogamiento" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "DB-SUA 6 · Ahogamiento" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "DB-HS 1 · Protección frente a la humedad" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "DB-SI 1 · Propagación interior" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "DB-HS 2 · Recogida y evacuación de residuos" })).toBeInTheDocument();
