@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { textoPlanoMemoria } from "../../../lib/cte/memoria";
+import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
 import type { Edificio } from "../../../lib/edificio/tipos";
 import { crearProyectoDemo } from "../../../lib/proyecto/demo";
@@ -118,5 +118,53 @@ describe("SUA2 · memoria, ficha y dibujo", () => {
       expect(ficha.verificaciones).toHaveLength(j.elementos.length);
       expect(sua2.frase(j).length).toBeGreaterThan(20);
     }
+  });
+});
+
+// Las tablas «Norma | Proyecto» (feature-31): cada una tras su párrafo; el texto no repite sus cifras.
+describe("SUA2 · tablas de la memoria", () => {
+  const tabla = (m: ReturnType<typeof sua2.memoria>, rotulo: string) => m.tablas!.find((t) => t.rotulo === rotulo)!;
+  const texto = (m: ReturnType<typeof sua2.memoria>) => m.parrafos.map(textoParrafo).join(" ");
+
+  it("plurifamiliar con locales: impacto, vidrios, y señalización y atrapamiento", () => {
+    const m = sua2.memoria(caso("plurifamiliar_locales"));
+    expect(m.tablas!.map((t) => t.rotulo)).toEqual(["Impacto con elementos fijos y practicables", "Vidrios en áreas con riesgo de impacto", "Señalización y atrapamiento"]);
+    // Tras el párrafo de las puertas, el de los vidrios y el de las correderas.
+    expect(m.tablas!.map((t) => textoParrafo(m.parrafos[t.tras! - 1]).slice(0, 30))).toEqual([
+      "La condición del barrido de la",
+      "Los vidrios de las áreas con r",
+      "Las puertas correderas de acci",
+    ]);
+  });
+
+  it("altura libre por zona (la decisión), umbrales y barrido; el texto no repite las alturas", () => {
+    const m = sua2.memoria(caso("plurifamiliar_locales"));
+    const t = tabla(m, "Impacto con elementos fijos y practicables");
+    expect(t.cabecera).toEqual(["Parámetro", "Norma", "Proyecto", "Cumple"]);
+    expect(t.filas).toContainEqual(["Altura libre en el interior de las viviendas", "≥ 2,10 m", "2,40 m", "Cumple"]);
+    expect(t.filas).toContainEqual(["Altura libre en los umbrales de las puertas", "≥ 2,00 m", "≥ 2,00 m", "Cumple"]);
+    expect(t.filas).toContainEqual(["Barrido de las puertas en pasillos < 2,50 m", "no invade el pasillo", "no lo invade", "Cumple"]);
+    expect(texto(m)).not.toMatch(/2,10 m|2,40 m|2,50 m|15 cm/);
+    // Lo que no cumple: «No cumple» en su fila y el arreglo en el texto.
+    const f = sua2.memoria(caso("plurifamiliar", { alturaGaraje_m: 2.1, puertas: "invaden" }));
+    const tf = tabla(f, "Impacto con elementos fijos y practicables");
+    expect(tf.filas).toContainEqual(["Altura libre en el garaje", "≥ 2,20 m", "2,10 m", "No cumple"]);
+    expect(tf.filas.at(-1)).toEqual(["Barrido de las puertas en pasillos < 2,50 m", "no invade el pasillo", "invade el pasillo", "No cumple"]);
+    expect(texto(f)).toContain("La altura libre en el garaje no alcanza el mínimo y debe aumentarse.");
+  });
+
+  it("vidrios: la fila de la tabla 1.1 de cada planta", () => {
+    const m = sua2.memoria(caso("plurifamiliar_locales"));
+    const t = tabla(m, "Vidrios en áreas con riesgo de impacto");
+    expect(t.cabecera).toEqual(["Vidrios", "Diferencia de cota", "Norma", "Proyecto", "Cumple"]);
+    expect(t.filas).toContainEqual(["P1–P3", "de 0,55 a 12 m", "X cualquiera · Y B o C · Z 1 ó 2", "X cualquiera · Y B o C · Z 1 ó 2", "Cumple"]);
+    expect(texto(m)).not.toMatch(/Z 1 ó 2|P1–P3/);
+  });
+
+  it("unifamiliar: sin barrido ni señalización; solo el atrapamiento", () => {
+    const m = sua2.memoria(caso("unifamiliar"));
+    expect(tabla(m, "Impacto con elementos fijos y practicables").filas.map((f) => f[0])).not.toContain("Barrido de las puertas en pasillos < 2,50 m");
+    expect(tabla(m, "Atrapamiento").filas).toEqual([["Holgura de las correderas manuales", "≥ 20 cm", "≥ 20 cm", "Cumple"]]);
+    expect(texto(m)).not.toContain("20 cm");
   });
 });

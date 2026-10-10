@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { textoPlanoMemoria } from "../../../lib/cte/memoria";
+import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
 import type { Edificio } from "../../../lib/edificio/tipos";
+import { obraDeCaso, proyectoParaModulo } from "../../../lib/proyecto/alcance";
 import { crearProyectoDemo } from "../../../lib/proyecto/demo";
+import type { Proyecto } from "../../../lib/proyecto/tipos";
 import { cambiarAscensor } from "../../sua/editar";
 import { sua1 } from "../definicion";
 import { sua1EstadoDefaults, type Sua1Estado } from "../estado";
@@ -195,7 +197,9 @@ describe("SUA1 · lo que no cumple y su arreglo", () => {
     const e = edificioDeCaso("plurifamiliar");
     const j = conEdificio({ ...e, cubierta: { ...e.cubierta, tipo: "plana_transitable" } });
     expect(el(j, "barreras-cubierta").detalle).toMatchObject({ cotaMax_m: 12, min_m: 1.1, altura_m: 1.1 });
-    expect(textoPlanoMemoria(sua1.memoria(j))).toMatch(/cubierta transitable/);
+    // La barrera de la cubierta, en la tabla de barreras (feature-31).
+    const barreras = sua1.memoria(j).tablas!.find((t) => t.rotulo === "Barreras de protección")!;
+    expect(barreras.filas).toContainEqual(["Cubierta transitable (a 12,00 m)", "≥ 1,10 m", "1,10 m", "Cumple"]);
   });
 });
 
@@ -239,5 +243,78 @@ describe("SUA1 · memoria, ficha y dibujo", () => {
     const j = caso("plurifamiliar", { barreraAlta_m: 1 });
     expect(j.veredicto).toBe("fail");
     expect(sua1.frase(j)).toMatch(/barrera baja/);
+  });
+});
+
+// Las tablas «Norma | Proyecto» (feature-31): cada una tras su párrafo; el texto no repite sus cifras.
+describe("SUA1 · tablas de la memoria", () => {
+  const tabla = (m: ReturnType<typeof sua1.memoria>, rotulo: string) => m.tablas!.find((t) => t.rotulo === rotulo)!;
+  const texto = (m: ReturnType<typeof sua1.memoria>) => m.parrafos.map(textoParrafo).join(" ");
+
+  it("plurifamiliar con locales: discontinuidades, barreras, cada escalera y los peldaños", () => {
+    const m = sua1.memoria(caso("plurifamiliar_locales"));
+    expect(m.tablas!.map((t) => t.rotulo)).toEqual(["Discontinuidades del pavimento", "Barreras de protección", "Escalera común (S1–P3)", "Escalera del garaje (S1–PB)", "Peldaños por planta"]);
+    const d = tabla(m, "Discontinuidades del pavimento");
+    expect(d.cabecera).toEqual(["Parámetro", "Norma", "Proyecto", "Cumple"]);
+    expect(d.filas).toContainEqual(["Resalto de las juntas", "≤ 4 mm", "≤ 4 mm", "Cumple"]);
+    expect(texto(m)).not.toContain("4 mm");
+  });
+
+  it("barreras: la altura exigida por la cota de cada planta y la de proyecto, tras su párrafo", () => {
+    const m = sua1.memoria(caso("plurifamiliar_locales"));
+    const b = tabla(m, "Barreras de protección");
+    expect(b.cabecera).toEqual(["Planta", "Norma", "Proyecto", "Cumple"]);
+    expect(b.filas).toEqual([
+      ["P1 (suelo a 4,00 m)", "≥ 0,90 m", "1,10 m", "Cumple"],
+      ["P2–P3 (suelo de 7,00 a 10,00 m)", "≥ 1,10 m", "1,10 m", "Cumple"],
+    ]);
+    expect(textoParrafo(m.parrafos[b.tras! - 1])).toMatch(/^Se disponen barreras de protección/);
+    expect(texto(m)).not.toMatch(/miden 1,10 m|mínimo 0,90 m|≥ 0,90 m/);
+    // Una barrera más baja que la exigida: «No cumple» en su fila.
+    const f = tabla(sua1.memoria(caso("plurifamiliar", { barreraAlta_m: 1 })), "Barreras de protección");
+    expect(f.filas.at(-1)!.at(-1)).toBe("No cumple");
+  });
+
+  it("escalera común: huella, contrahuella, 2C + H, tramo, anchura y pasamanos; el texto se queda con el porqué", () => {
+    const m = sua1.memoria(caso("plurifamiliar_locales"));
+    const e = tabla(m, "Escalera común (S1–P3)");
+    expect(e.filas).toContainEqual(["Contrahuella", "entre 13 y 18,5 cm", "16,67–17,39 cm", "Cumple"]);
+    expect(e.filas).toContainEqual(["Altura de un tramo", "≤ 3,20 m", "2,09 m", "Cumple"]);
+    expect(e.filas.map((f) => f[0])).toEqual(expect.arrayContaining(["Huella", "2C + H", "Anchura útil", "Pasamanos"]));
+    expect(textoParrafo(m.parrafos[e.tras! - 1])).toMatch(/^La escalera común \(S1–P3\) es de uso general y uso privado, con ascensor como alternativa/);
+    expect(texto(m)).not.toMatch(/huella H =|17,39 cm|2,09 m/);
+    // La de peldaños por planta, tras la última escalera.
+    expect(tabla(m, "Peldaños por planta").tras).toBe(tabla(m, "Escalera del garaje (S1–PB)").tras);
+  });
+
+  it("unifamiliar: escalera interior de uso restringido; 2C + H «no se exige», nunca «—»", () => {
+    const m = sua1.memoria(caso("unifamiliar"));
+    expect(tabla(m, "Escalera interior de la vivienda (PB–P1)").filas).toContainEqual(["Huella", "≥ 22 cm", "27 cm", "Cumple"]);
+    expect(tabla(m, "Peldaños por planta").filas).toEqual([["Interior", "PB–P1", "2,80 m", "16", "17,5 cm", "no se exige"]]);
+    expect(m.tablas!.flatMap((t) => t.filas.flat())).not.toContain("—");
+    expect(texto(m)).not.toMatch(/27 cm|≥ 22 cm/);
+  });
+
+  it("oficinas: la clase de resbaladicidad por localización", () => {
+    const m = sua1.memoria(caso("oficinas"));
+    const r = tabla(m, "Resbaladicidad de los suelos");
+    expect(r.cabecera).toEqual(["Localización", "Norma", "Proyecto", "Cumple"]);
+    expect(r.filas).toContainEqual(["Interior seco, pendiente < 6 %", "clase ≥ 1", "clase 1", "Cumple"]);
+    expect(texto(m)).not.toMatch(/clase 1|6 %/);
+  });
+
+  it("rampa de acceso y acristalamientos con fijos: sus tablas", () => {
+    const m = sua1.memoria(caso("plurifamiliar", { acceso: "rampa", carpinteria: "fijos" }));
+    expect(tabla(m, "Rampas").filas[0]).toEqual(["Pendiente de la rampa de acceso (tramo de 4,00 m)", "≤ 8 %", "8 %", "Cumple"]);
+    expect(tabla(m, "Limpieza de los acristalamientos").filas).toContainEqual(["Distancia al borde de la zona practicable", "≤ 0,85 m", "≤ 0,85 m", "Cumple"]);
+    expect(texto(m)).not.toMatch(/0,85 m|pendiente del 8/);
+  });
+
+  it("en un edificio existente, solo lo que se justifica: el pavimento de las zonas comunes (feature-30)", () => {
+    const p: Proyecto = { ...crearProyectoDemo("2026-10-10T10:00:00.000Z"), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
+    p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso("reforma_local_vivienda") ?? {}) };
+    const m = sua1.memoria(justificarSua1(sua1EstadoDefaults, proyectoParaModulo(p, "sua1")));
+    expect(m.tablas!.map((t) => t.rotulo)).toEqual(["Discontinuidades del pavimento"]);
+    expect(texto(m)).toContain("En las zonas comunes que se reforman el pavimento cumple");
   });
 });
