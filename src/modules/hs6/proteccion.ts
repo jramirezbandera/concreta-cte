@@ -26,7 +26,7 @@
 // =============================================================================
 
 import { etiquetaNivel, plantasDe } from "../../lib/edificio/derivar";
-import type { Edificio, UsoZona } from "../../lib/edificio/tipos";
+import type { Edificio, UsoZona, Zona } from "../../lib/edificio/tipos";
 import { parametrosEspacioContencion, requisitoDeZona, type ZonaRadon } from "./tablas";
 
 // -----------------------------------------------------------------------------
@@ -162,8 +162,14 @@ function sup(z: { superficieUtil_m2: number }): number {
   return Number.isFinite(z.superficieUtil_m2) ? Math.max(0, z.superficieUtil_m2) : 0;
 }
 
-export function proteccionDe(e: Edificio, zona: ZonaRadon, d: DecisionesHs6): ProteccionHs6 {
+/**
+ * `protegida`: en un edificio existente (feature-30), las zonas habitables que se
+ * protegen (las intervenidas); las demás cuentan para la geometría (qué está
+ * sobre el sótano) pero no se protegen. Sin ella, todas.
+ */
+export function proteccionDe(e: Edificio, zona: ZonaRadon, d: DecisionesHs6, protegida: (z: Zona) => boolean = () => true): ProteccionHs6 {
   const decisiones = resolverDecisionesHs6(d, zona);
+  const protege = (z: Zona): boolean => esHabitable(z.uso) && protegida(z);
   const plantas = plantasDe(e); // de arriba abajo
   const pb = plantas.find((p) => p.nivel === 0) ?? null;
   const s1 = plantas.find((p) => p.nivel === -1) ?? null;
@@ -174,7 +180,7 @@ export function proteccionDe(e: Edificio, zona: ZonaRadon, d: DecisionesHs6): Pr
 
   // Sótanos habitables: apoyan en el terreno (muros y solera).
   for (const p of sotanos) {
-    const hab = p.zonas.filter((z) => esHabitable(z.uso));
+    const hab = p.zonas.filter(protege);
     if (hab.length === 0) continue;
     const s = hab.reduce((a, z) => a + sup(z), 0);
     sobreTerreno.push({
@@ -187,7 +193,7 @@ export function proteccionDe(e: Edificio, zona: ZonaRadon, d: DecisionesHs6): Pr
   }
 
   if (pb) {
-    const habPb = pb.zonas.filter((z) => esHabitable(z.uso));
+    const habPb = pb.zonas.filter(protege);
     const supPb = pb.zonas.reduce((a, z) => a + sup(z), 0);
     const supHabPb = habPb.reduce((a, z) => a + sup(z), 0);
     if (habPb.length > 0) {
@@ -226,10 +232,10 @@ export function proteccionDe(e: Edificio, zona: ZonaRadon, d: DecisionesHs6): Pr
     }
   }
 
-  const altas = plantas.filter((p) => p.nivel > 0 && p.zonas.some((z) => esHabitable(z.uso)));
+  const altas = plantas.filter((p) => p.nivel > 0 && p.zonas.some(protege));
   const noTocan = {
     niveles: altas.map((p) => p.nivel).sort((a, b) => a - b),
-    usos: [...new Set(altas.flatMap((p) => p.zonas.filter((z) => esHabitable(z.uso)).map((z) => z.uso)))],
+    usos: [...new Set(altas.flatMap((p) => p.zonas.filter(protege).map((z) => z.uso)))],
   };
 
   const nucleo =

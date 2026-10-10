@@ -40,8 +40,12 @@ export function DecisionesHs6({ state, setField, j }: DecisionesHs6Props): JSX.E
     setField(k, (v === h[k] ? "habitual" : v) as Hs6Estado[K]);
   };
   const enLoHabitual =
-    state.posicionBarrera === "habitual" && state.medidaTerreno === "habitual" && state.viaBarrera === "habitual";
+    state.posicionBarrera === "habitual" &&
+    state.medidaTerreno === "habitual" &&
+    state.viaBarrera === "habitual" &&
+    state.barreraExistente === "lamina";
   const volverAloHabitual = () => {
+    setField("barreraExistente", "lamina");
     setField("posicionBarrera", "habitual");
     setField("medidaTerreno", "habitual");
     setField("viaBarrera", "habitual");
@@ -68,13 +72,20 @@ export function DecisionesHs6({ state, setField, j }: DecisionesHs6Props): JSX.E
   const verPosicion = hayBarrera && pr.sobreNoHabitable !== null;
   const verMedida = pr.sobreTerreno.length > 0 || pr.zona === "I";
   const verVia = hayBarrera;
+  // En un edificio existente, cómo se hace la barrera sobre la solera que ya hay (feature-30).
+  const verExistente = j.existente && hayBarrera && pr.sobreTerreno.length > 0;
   const nPosicion = verPosicion ? 1 : 0;
   const nMedida = nPosicion + (verMedida ? 1 : 0);
   const nVia = nMedida + (verVia ? 1 : 0);
+  const nExistente = nVia + (verExistente ? 1 : 0);
 
   const textoMedida = (m: MedidaTerreno): string => {
     if (m === "barrera") return "Basta la barrera de protección: en zona I es una de las dos medidas que valen.";
-    if (m === "despresurizacion") return "Una red de captación bajo la solera conectada a un conducto con extracción mecánica.";
+    if (m === "despresurizacion")
+      return j.existente
+        ? "Accediendo desde la solera, con un estudio de la cimentación y del aire bajo el edificio; se mide después."
+        : "Una red de captación bajo la solera conectada a un conducto con extracción mecánica.";
+    if (j.existente && pr.sobreTerreno.length > 0) return "Cámara por el interior, de al menos 5 cm y comunicada con el exterior; se mide después.";
     return pr.sobreTerreno.length > 0
       ? "Forjado sanitario con cámara de aire ventilada: 10 cm² de aberturas por metro de perímetro."
       : `Sin nada que apoye en el terreno, el ${garaje} ventilado hace de cámara (criterio de proyecto).`;
@@ -129,6 +140,24 @@ export function DecisionesHs6({ state, setField, j }: DecisionesHs6Props): JSX.E
             d.viaBarrera === "lamina_tipo"
               ? "Al menos 2 mm y un coeficiente de difusión menor que 10⁻¹¹ m²/s: vale sin cálculo."
               : "La exhalación a través de la barrera se calcula (ap. 3.1.2) y se justifica en documento aparte."
+          }
+        />
+      )}
+      {verExistente && (
+        <Decision<"lamina" | "solera">
+          numero={nExistente}
+          pregunta="Sobre la solera existente"
+          opciones={[
+            { valor: "lamina", label: "Lámina encima" },
+            { valor: "solera", label: "La solera sellada" },
+          ]}
+          valor={state.barreraExistente}
+          habitual="lamina"
+          onChange={(v) => setField("barreraExistente", v)}
+          texto={
+            state.barreraExistente === "lamina"
+              ? "La lámina sobre la solera, bajo el pavimento nuevo, entre el terreno y lo habitable."
+              : "Si no cabe la lámina: se sellan grietas, juntas y pasos de la solera, que hace de barrera (ap. 3.1.1 pto 4)."
           }
         />
       )}

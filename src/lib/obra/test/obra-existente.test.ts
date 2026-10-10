@@ -89,3 +89,45 @@ describe("instalaciones (paso 2)", () => {
     expect(rebt).not.toContain("precisa proyecto");
   });
 });
+
+describe("envolvente y aire (paso 3)", () => {
+  const t = texto(reforma());
+
+  it("HS 1: solo los huecos; lo demás existente no se describe", () => {
+    const hs1 = apartado(t, "3.4.1. HS 1 Protección frente a la humedad");
+    expect(hs1).toContain("los huecos de fachada, cuyas carpinterías se sustituyen");
+    expect(hs1).toContain("Los muros y los suelos en contacto con el terreno y la cubierta existentes no se modifican.");
+    expect(hs1).toContain("ap. 2.3.3.6 pto 2");
+    expect(hs1).not.toContain("Muros del sótano");
+    expect(hs1).not.toContain("La cubierta es plana");
+  });
+
+  it("HS 3: con la expulsión en fachada, mecánica y el párrafo de flexibilidad", () => {
+    expect(evaluarExpediente(reforma()).porClave.hs3?.avisos.map((a) => a.id)).toContain("expulsion-cubierta");
+    const p: Proyecto = { ...reforma(), justificaciones: { hs3: { inputs: { expulsion: "fachada", sistema: "hibrida" } } } };
+    const ev = evaluarExpediente(p).porClave.hs3!;
+    expect(ev.avisos.map((a) => a.id)).toEqual(expect.arrayContaining(["expulsion-hibrida", "expulsion-ordenanza"]));
+    const hs3 = apartado(texto(p), "3.4.3. HS 3 Calidad del aire interior");
+    expect(hs3).toContain("sistema mecánico");
+    expect(hs3).toContain("boca de expulsión en fachada");
+    expect(hs3).toContain("se aplica el criterio de flexibilidad de la Parte I del CTE (art. 2.3)");
+  });
+
+  it("HS 6: sobre el garaje que no se toca, la barrera en el forjado y el garaje como contención", () => {
+    const hs6 = apartado(t, "3.4.6. HS 6 Protección frente a la exposición al radón");
+    expect(hs6).toContain("Sobre el garaje, la barrera se dispone en el forjado de planta baja");
+    expect(hs6).not.toContain("forjado sanitario");
+    expect(hs6).not.toContain("bajo la solera y en los muros");
+  });
+
+  it("HS 6: lo que apoya en el terreno, con las soluciones para existentes y la medición posterior", () => {
+    const p = reforma();
+    // Sin sótano: la vivienda nueva apoya en la solera existente.
+    p.edificio = { ...p.edificio, grupos: p.edificio.grupos.filter((g) => g.nivelInicial >= 0) };
+    const hs6 = apartado(texto(p), "3.4.6. HS 6 Protección frente a la exposición al radón");
+    expect(hs6).toContain("se dispone sobre la solera existente, bajo el pavimento nuevo");
+    expect(hs6).toContain("se construye por el interior una cámara de aire de al menos 5 cm");
+    expect(hs6).toContain("mediciones de la concentración de radón posteriores a la intervención");
+    expect(evaluarExpediente(p).porClave.hs6?.avisos.map((a) => a.id)).toContain("medicion-posterior");
+  });
+});

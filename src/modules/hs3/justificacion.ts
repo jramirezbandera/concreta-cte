@@ -11,7 +11,9 @@
 // garaje y los trasteros («garaje»).
 // =============================================================================
 
+import type { ObraExistente } from "../../lib/proyecto/alcance";
 import type { Aviso, ElementoResultado } from "../../lib/cte/resultado";
+import { plantasDe } from "../../lib/edificio/derivar";
 import type { Edificio } from "../../lib/edificio/tipos";
 import type { Veredicto } from "../../lib/pdf/renderFicha";
 import { calcHS3, seccionPorTramo, type HS3Result, type ResultadoEstancia, type SistemaVentilacion } from "./calc";
@@ -89,7 +91,18 @@ export interface ParteHs3 {
   nombre: string;
 }
 
+/** Datos de la obra que usa HS3. */
+export interface ObraHs3 {
+  /** En un edificio existente, lo que hay alrededor de lo intervenido (feature-30). */
+  existente?: ObraExistente;
+}
+
 export interface JustificacionHs3 {
+  /**
+   * Dónde expulsan los conductos de las viviendas: en fachada solo en un edificio
+   * existente, por flexibilidad (CTE Parte I art. 2.3; K-MEM.3).
+   */
+  expulsion: "cubierta" | "fachada";
   red: RedHs3;
   zona: ZonaTermica;
   /** `calcHS3` de cada vivienda tipo, por id de tipo. */
@@ -160,12 +173,25 @@ function conductosDe(t: TipoVentilacion, sistema: SistemaVentilacion, zona: Zona
 // Justificación
 // -----------------------------------------------------------------------------
 
-export function justificarHs3(estado: Hs3Estado, edificio: Edificio): JustificacionHs3 {
-  const red = generarRedHs3(edificio, estado);
+export function justificarHs3(estado: Hs3Estado, edificio: Edificio, obra: ObraHs3 = {}): JustificacionHs3 {
+  // Con la expulsión en fachada la ventilación es mecánica: la híbrida exige la
+  // boca en cubierta (ap. 3.2.1 pto 5; K-MEM.3).
+  const expulsion = obra.existente && estado.expulsion === "fachada" ? "fachada" : "cubierta";
+  const pedida = generarRedHs3(edificio, estado).decisiones.sistema;
+  const red = generarRedHs3(edificio, expulsion === "fachada" ? { ...estado, sistema: "mecanica" } : estado);
   const d = red.decisiones;
   const zona = estado.zonaTermica;
   const elementos: ElementoHs3[] = [];
   const avisos: Aviso[] = [];
+  if (expulsion === "fachada" && red.tipos.length > 0) {
+    if (pedida === "hibrida") avisos.push({ id: "expulsion-hibrida", tipo: "caso_especial", datos: {} });
+    avisos.push({ id: "expulsion-ordenanza", tipo: "caso_especial", datos: {} });
+  } else if (obra.existente && red.tipos.length > 0) {
+    // Lo intervenido tiene encima plantas que no se tocan: los conductos tienen que atravesarlas.
+    const arriba = Math.max(...plantasDe(edificio).filter((p) => p.zonas.length > 0).map((p) => p.nivel));
+    const encima = plantasDe(obra.existente.edificio).some((p) => p.nivel > arriba && p.zonas.length > 0);
+    if (encima) avisos.push({ id: "expulsion-cubierta", tipo: "supuesto", datos: {} });
+  }
   const porTipo = new Map<string, HS3Result>();
   const partes: ParteHs3[] = [];
   const t41 = AREA_EFECTIVA_ABERTURAS.datos;
@@ -412,5 +438,5 @@ export function justificarHs3(estado: Hs3Estado, edificio: Edificio): Justificac
   let veredicto: Veredicto = elementos.length === 0 ? "neutral" : "ok";
   if (elementos.some((e) => e.veredicto === "fail")) veredicto = "fail";
 
-  return { red, zona, porTipo, partes, elementos, avisos, veredicto };
+  return { expulsion, red, zona, porTipo, partes, elementos, avisos, veredicto };
 }

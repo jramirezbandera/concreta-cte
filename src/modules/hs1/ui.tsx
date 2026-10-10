@@ -31,7 +31,7 @@ import { textoPlanoMemoria } from "../../lib/cte/memoria";
 import { renderFicha } from "../../lib/pdf/renderFicha";
 import { fichaConAlcance } from "../../lib/obra/alcanceTexto";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
-import { edificioParaModulo } from "../../lib/proyecto/alcance";
+import { edificioParaModulo, obraExistenteDe } from "../../lib/proyecto/alcance";
 import { ajustar } from "../../lib/ui/ajustar";
 import { DecisionesHs1 } from "./DecisionesHs1";
 import { filasQueEntraHs1 } from "./entra";
@@ -66,7 +66,9 @@ export function Hs1Module() {
   // En una obra existente, lo intervenido (feature-27).
   const edificio = edificioParaModulo(proyecto.datosGenerales, proyecto.edificio, "hs1");
   const dg = proyecto.datosGenerales;
-  const obra = useMemo(() => obraHs1De(dg), [dg]);
+  // …y lo existente alrededor, para redactarlo como en La obra (feature-30).
+  const edificioCompleto = proyecto.edificio;
+  const obra = useMemo(() => obraHs1De(dg, obraExistenteDe(dg, edificioCompleto)), [dg, edificioCompleto]);
   const j = useMemo(() => justificarHs1(deferredState, edificio, obra), [deferredState, edificio, obra]);
 
   // ── Avisos y estados ───────────────────────────────────────────────────────

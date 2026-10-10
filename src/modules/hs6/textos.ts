@@ -77,7 +77,7 @@ export function resultadoLista(el: ElementoHs6): string {
     case "contencion_garaje":
       return det.criterio ? "ventilado · criterio" : "ventilado (HS 3)";
     case "camara":
-      return `${n0(det.aberturas_cm2)} cm² de aberturas`;
+      return det.existente ? "≥ 5 cm por el interior" : `${n0(det.aberturas_cm2)} cm² de aberturas`;
     case "despresurizacion":
       return "captación + extracción";
     case "nucleo":
@@ -172,6 +172,21 @@ export function franjaDe(el: ElementoHs6, j: JustificacionHs6, estado: EstadoPre
 
     case "camara": {
       const s = det.partes.reduce((a, t) => a + t.superficie_m2, 0);
+      if (det.existente) {
+        return {
+          ...base,
+          clase: "Espacio de contención",
+          titulo: "Cámara por el interior, sobre la solera existente",
+          unidad: "cm",
+          manda: "El edificio existente: sin cámara bajo la solera, se construye por el interior, continua y comunicada con el exterior (ap. 3.2 pto 6).",
+          nota: "Su eficacia se comprueba midiendo el radón después de la obra (ap. 3.2 pto 7).",
+          filas: [
+            { k: "Superficie", v: `${n0(s)} m²` },
+            { k: "Altura o espesor", v: "≥ 5 cm" },
+            { k: "Comunicada con", v: "el exterior" },
+          ],
+        };
+      }
       const per = det.partes.reduce((a, t) => a + t.perimetro_m, 0);
       return {
         ...base,
@@ -281,6 +296,20 @@ export interface TextoAviso {
 }
 
 export function textoAviso(a: Aviso): TextoAviso {
+  if (a.id === "medicion-posterior") {
+    return {
+      titulo: "Hay que medir el radón después de la obra.",
+      detalle:
+        "En un edificio existente, la eficacia de la cámara o de la despresurización se comprueba con mediciones posteriores según el apéndice C (HS 6 ap. 3.2 pto 7 y 3.3 pto 6). Inclúyelo en el pliego y en la documentación final.",
+    };
+  }
+  if (a.id === "despresurizacion-estudio") {
+    return {
+      titulo: "La despresurización necesita un estudio específico.",
+      detalle:
+        "En un edificio existente, de la cimentación y de la circulación del aire bajo el edificio (HS 6 ap. 3.3 pto 3). Cita el documento en la memoria.",
+    };
+  }
   if (a.id === "nucleo-garaje") {
     return {
       titulo: "La escalera y el ascensor bajan al garaje.",

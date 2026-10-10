@@ -416,6 +416,26 @@ export interface TextoAviso {
 }
 
 export function textoAviso(a: Aviso): TextoAviso {
+  if (a.id === "expulsion-hibrida") {
+    return {
+      titulo: "Con la expulsión en fachada, la ventilación es mecánica.",
+      detalle: "La híbrida necesita la boca de expulsión en la cubierta (ap. 3.2.1 pto 5): se calcula como mecánica.",
+    };
+  }
+  if (a.id === "expulsion-cubierta") {
+    return {
+      titulo: "Los conductos atraviesan plantas que no se tocan.",
+      detalle:
+        "Se supone que llegan a la cubierta por el edificio existente (patinillo o conducto propio). Si no es posible, elige la expulsión en fachada en las decisiones: se justifica por flexibilidad.",
+    };
+  }
+  if (a.id === "expulsion-ordenanza") {
+    return {
+      titulo: "Comprueba la ordenanza municipal de salidas a fachada.",
+      detalle:
+        "La boca de expulsión en fachada se justifica por flexibilidad (CTE Parte I art. 2.3). Las ordenanzas municipales pueden prohibirla o condicionarla (humos, ruido de los extractores).",
+    };
+  }
   if (a.id.endsWith("hibrida-ultimas-plantas")) {
     return {
       titulo: "Las dos últimas plantas, con conducto individual.",

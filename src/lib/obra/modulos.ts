@@ -116,7 +116,7 @@ const hs1: ModuloObra = {
   key: "hs1",
   defaults: hs1EstadoDefaults as unknown as Record<string, unknown>,
   calcular(estado, p, revisados) {
-    const j: JustificacionHs1 = justificarHs1(estado as unknown as Hs1Estado, p.edificio, obraHs1De(p.datosGenerales));
+    const j: JustificacionHs1 = justificarHs1(estado as unknown as Hs1Estado, p.edificio, obraHs1De(p.datosGenerales, p.existente));
     return {
       veredicto: j.veredicto,
       elementos: j.elementos,
@@ -137,7 +137,7 @@ const hs3: ModuloObra = {
   key: "hs3",
   defaults: hs3EstadoDefaults as unknown as Record<string, unknown>,
   calcular(estado, p, revisados) {
-    const j: JustificacionHs3 = justificarHs3(estado as unknown as Hs3Estado, p.edificio);
+    const j: JustificacionHs3 = justificarHs3(estado as unknown as Hs3Estado, p.edificio, p.existente ? { existente: p.existente } : {});
     return {
       veredicto: j.veredicto,
       elementos: j.elementos,
@@ -203,7 +203,7 @@ const hs6: ModuloObra = {
   key: "hs6",
   defaults: hs6EstadoDefaults as unknown as Record<string, unknown>,
   calcular(estado, p, revisados) {
-    const j: JustificacionHs6 = justificarHs6(estado as unknown as Hs6Estado, p.edificio);
+    const j: JustificacionHs6 = justificarHs6(estado as unknown as Hs6Estado, p.edificio, p.existente ? { existente: p.existente } : {});
     return {
       veredicto: j.veredicto,
       elementos: j.elementos,

@@ -37,7 +37,7 @@ function limite(el: ElementoHs6): string {
     case "contencion_garaje":
       return "ventilación HS 3";
     case "camara":
-      return "10 cm²/m de perímetro";
+      return det.existente ? "≥ 5 cm, por el interior" : "10 cm²/m de perímetro";
     case "despresurizacion":
       return "captación + extracción";
     case "nucleo":

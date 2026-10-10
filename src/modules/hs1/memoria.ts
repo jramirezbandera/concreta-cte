@@ -44,7 +44,20 @@ function det<C extends DetalleHs1["clase"]>(j: JustificacionHs1, clase: C): { el
   return j.elementos.flatMap((el) => (el.detalle.clase === clase ? [{ el, d: el.detalle as Extract<DetalleHs1, { clase: C }> }] : []));
 }
 
-function parrafoAmbito(): Trozo[] {
+function parrafoAmbito(j: JustificacionHs1): Trozo[] {
+  const ex = j.existente;
+  if (ex) {
+    // En un edificio existente, lo que se toca y lo que no (feature-30).
+    const toca = listaY([
+      ...(det(j, "muro").length + det(j, "suelo").length > 0 ? ["los muros y los suelos en contacto con el terreno"] : []),
+      ...(det(j, "fachada").length > 0 ? [ex.soloHuecos ? "los huecos de fachada, cuyas carpinterías se sustituyen" : "las fachadas"] : []),
+      ...(det(j, "cubierta").length > 0 ? ["la cubierta"] : []),
+    ]);
+    const noToca = ex.sinTocar.length > 0 ? ` ${mayuscula(listaY(ex.sinTocar))} ${ex.sinTocar.length > 1 || ex.sinTocar[0].startsWith("las ") || ex.sinTocar[0].startsWith("los ") ? "existentes no se modifican" : "existente no se modifica"}.` : "";
+    return [
+      `La sección HS 1 se aplica a los elementos de la envolvente objeto de la intervención${toca ? `: ${toca}` : ""}.${noToca} La limitación de las condensaciones se comprueba en la sección HE 1 del DB-HE.`,
+    ];
+  }
   return [
     "La sección HS 1 se aplica a los muros y los suelos en contacto con el terreno y a los cerramientos en contacto con el aire exterior: las fachadas y la cubierta. La limitación de las condensaciones se comprueba en la sección HE 1 del DB-HE.",
   ];
@@ -168,6 +181,28 @@ function parrafoDrenaje(j: JustificacionHs1): Trozo[] {
   return p;
 }
 
+function mayuscula(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/**
+ * Solo se sustituyen los huecos de una fachada existente (feature-30): el grado
+ * de la fachada decide el encuentro con la carpintería (ap. 2.3.3.6, cotejado en
+ * imagen, DB-HS p. 26); la fachada no se justifica.
+ */
+function parrafosHuecos(f: Extract<DetalleHs1, { clase: "fachada" }>, grado: Trozo[]): Trozo[][] {
+  return [
+    grado,
+    [
+      "La fachada existente no se modifica; en el encuentro con las carpinterías nuevas se sella la junta entre el cerco y el muro con un cordón encajado en un llagueado del muro (ap. 2.3.3.6 pto 2)",
+      f.grado === 5
+        ? " y, si las carpinterías quedan retranqueadas, se dispone precerco y una barrera impermeable en las jambas entre la hoja principal y el precerco, prolongada 10 cm hacia el interior del muro (pto 1)."
+        : ".",
+      " Con la carpintería retranqueada, el alféizar se remata con un vierteaguas de pendiente hacia el exterior de al menos 10º, impermeable o sobre una barrera impermeable, con goterón separado al menos 2 cm del paramento y entrega lateral en la jamba de al menos 2 cm, y el dintel lleva goterón, o se adoptan soluciones que produzcan los mismos efectos (ptos 3 a 5).",
+    ],
+  ];
+}
+
 function parrafosFachada(j: JustificacionHs1): Trozo[][] {
   const fs = det(j, "fachada").map((x) => x.d);
   const f = fs[0];
@@ -182,6 +217,7 @@ function parrafosFachada(j: JustificacionHs1): Trozo[][] {
     { v: `${f.grado}` },
     " (tabla 2.5). ",
   ];
+  if (j.existente?.soloHuecos) return parrafosHuecos(f, p);
   const porFachada = fs.flatMap((x): Trozo[][] => {
     const quien = fs.length > 1 ? (x.rol === "fachada-pb" ? "La fachada de la planta baja" : "La fachada de las demás plantas") : "La fachada";
     const tipo = `${quien}, ${designacionEnFrase(x.sol)}, ${x.columna === "con_revestimiento" ? `con revestimiento exterior de resistencia R${x.niveles.R}` : "sin revestimiento exterior"}${x.unaHoja ? " y de una sola hoja" : ""}`;
@@ -204,6 +240,7 @@ function parrafosFachada(j: JustificacionHs1): Trozo[][] {
 }
 
 function parrafoCubierta(j: JustificacionHs1): Trozo[] {
+  if (det(j, "cubierta").length === 0) return [];
   const c = j.cubierta;
   const exigidas = c.capas.filter((x) => x.exigida);
   const segun = c.capas.filter((x) => !x.exigida);
@@ -223,7 +260,10 @@ function parrafoCubierta(j: JustificacionHs1): Trozo[] {
   return p;
 }
 
-function parrafoResto(): Trozo[] {
+function parrafoResto(j: JustificacionHs1): Trozo[] {
+  if (j.existente?.soloHuecos && j.elementos.every((e) => e.detalle.clase === "fachada")) {
+    return ["Se cumplen además las condiciones de los productos de construcción (ap. 4), de la ejecución (ap. 5) y de mantenimiento y conservación (ap. 6)."];
+  }
   return [
     "Se cumplen además las condiciones de los puntos singulares (ap. 2.1.3, 2.2.3, 2.3.3 y 2.4.4), de los productos de construcción (ap. 4), de la ejecución (ap. 5) y de mantenimiento y conservación (ap. 6).",
   ];
@@ -235,7 +275,8 @@ function tablaResumen(j: JustificacionHs1): MemoriaDoc["tabla"] {
     const d = el.detalle;
     if (d.clase === "muro") filas.push([el.nombre, String(d.grado), solucionMuro(d.tipo, d.imper), d.condiciones ? codigos(d.condiciones) : "no aceptable"]);
     if (d.clase === "suelo") filas.push([el.nombre, String(d.grado), unaSolucionSuelo(d.tipo, d.intervencion).replace(/^una? /, ""), d.condiciones ? codigos(d.condiciones) : "no aceptable"]);
-    if (d.clase === "fachada") filas.push([el.nombre, String(d.grado), `${d.sol.codigo} · ${d.columna === "con_revestimiento" ? `R${d.niveles.R}` : "sin revestimiento"}`, d.cumple ? codigos(d.condiciones) : `no llega: falta ${codigos(d.faltan)}`]);
+    if (d.clase === "fachada" && j.existente?.soloHuecos) filas.push([`Huecos de ${el.nombre.toLowerCase()}`, String(d.grado), "fachada existente", d.grado === 5 ? "ap. 2.3.3.6 ptos 1 a 5" : "ap. 2.3.3.6 ptos 2 a 5"]);
+    else if (d.clase === "fachada") filas.push([el.nombre, String(d.grado), `${d.sol.codigo} · ${d.columna === "con_revestimiento" ? `R${d.niveles.R}` : "sin revestimiento"}`, d.cumple ? codigos(d.condiciones) : `no llega: falta ${codigos(d.faltan)}`]);
     if (d.clase === "cubierta") filas.push([el.nombre, "único", `${d.cubierta.sol.codigo} · ${solucionCubierta(d.cubierta, false)}`, textoPendiente(d.cubierta) ? `pendiente ${textoPendiente(d.cubierta)}` : "ap. 2.4.2"]);
   }
   return { cabecera: ["Elemento", "Grado", "Solución", "Condiciones"], filas };
@@ -243,17 +284,24 @@ function tablaResumen(j: JustificacionHs1): MemoriaDoc["tabla"] {
 
 export function memoriaHs1(j: JustificacionHs1): MemoriaDoc {
   const parrafos = [
-    parrafoAmbito(),
+    parrafoAmbito(j),
     parrafoTerreno(j),
     ...parrafosMuro(j),
     ...parrafosSuelos(j),
     parrafoDrenaje(j),
     ...parrafosFachada(j),
     parrafoCubierta(j),
-    parrafoResto(),
+    parrafoResto(j),
   ].filter((p) => p.length > 0);
-  const tablas = ["2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7"];
-  if (j.cubierta.pendiente) tablas.push(j.cubierta.pendiente.tabla.replace("Tabla ", ""));
+  const ex = j.existente;
+  // En un edificio existente, solo las tablas de lo que se justifica (feature-30).
+  const tablas = ex
+    ? [
+        ...(det(j, "muro").length + det(j, "suelo").length > 0 ? ["2.1", "2.2", "2.3", "2.4"] : []),
+        ...(det(j, "fachada").length > 0 ? (ex.soloHuecos ? ["2.5", "2.6"] : ["2.5", "2.6", "2.7"]) : []),
+      ]
+    : ["2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7"];
+  if (j.cubierta.pendiente && (!ex || det(j, "cubierta").length > 0)) tablas.push(j.cubierta.pendiente.tabla.replace("Tabla ", ""));
   if (j.elementos.some((e) => e.detalle.clase === "dren")) tablas.push("3.1", "3.2");
   if (j.elementos.some((e) => e.detalle.clase === "canaletas")) tablas.push("3.3");
   if (j.elementos.some((e) => e.detalle.clase === "bombeo")) tablas.push("3.4");
@@ -264,7 +312,8 @@ export function memoriaHs1(j: JustificacionHs1): MemoriaDoc {
     tabla: tablaResumen(j),
     fuente: [
       "DB-HS · HS 1 (consolidado 14-06-2022)",
-      `tablas ${listaY(tablas)}`,
+      ...(tablas.length > 0 ? [`tablas ${listaY(tablas)}`] : []),
+      ...(ex?.soloHuecos ? ["ap. 2.3.3.6"] : []),
       "datos de El edificio y de la obra",
       `motor ${ENGINE_VERSION}`,
     ].join(" · "),

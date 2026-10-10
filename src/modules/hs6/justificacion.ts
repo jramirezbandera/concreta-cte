@@ -10,8 +10,10 @@
 // =============================================================================
 
 import type { Aviso, ElementoResultado } from "../../lib/cte/resultado";
-import type { Edificio, UsoZona } from "../../lib/edificio/tipos";
+import type { Edificio, UsoZona, Zona } from "../../lib/edificio/tipos";
 import type { Veredicto } from "../../lib/pdf/renderFicha";
+import { obraDeZona, type ObraExistente } from "../../lib/proyecto/alcance";
+import { plantasDe } from "../../lib/edificio/derivar";
 import type { Hs6Estado } from "./estado";
 import { proteccionDe, type ProteccionHs6, type SobreNoHabitable, type SobreTerreno } from "./proteccion";
 import { nivelReferenciaRadon_Bq_m3, parametrosBarrera, parametrosEspacioContencion, type ZonaRadon } from "./tablas";
@@ -25,10 +27,24 @@ export type DetalleHs6 =
       via: "lamina_tipo" | "calculo";
       espesorMin_mm: number;
       coefLimite_m2_s: number;
+      /** En un edificio existente, cómo se resuelve sobre lo que apoya en el terreno (feature-30). */
+      existente?: "lamina" | "solera";
     }
   | { clase: "contencion_garaje"; parte: SobreNoHabitable; criterio: boolean }
-  | { clase: "camara"; partes: SobreTerreno[]; aberturas_cm2: number; distanciaMax_m: number }
-  | { clase: "despresurizacion"; partes: SobreTerreno[] }
+  | {
+      clase: "camara";
+      partes: SobreTerreno[];
+      aberturas_cm2: number;
+      distanciaMax_m: number;
+      /** En un edificio existente: cámara por el interior, de al menos 5 cm (ap. 3.2 pto 6). */
+      existente?: boolean;
+    }
+  | {
+      clase: "despresurizacion";
+      partes: SobreTerreno[];
+      /** En un edificio existente: accediendo desde la solera, con estudio específico (ap. 3.3 pto 3). */
+      existente?: boolean;
+    }
   | { clase: "nucleo" }
   | { clase: "no_tocan"; niveles: number[]; usos: UsoZona[] };
 
@@ -37,7 +53,18 @@ export interface ElementoHs6 extends ElementoResultado {
   detalle: DetalleHs6;
 }
 
+/** Datos de la obra que usa HS6. */
+export interface ObraHs6 {
+  /** En un edificio existente, lo que hay alrededor de lo intervenido (feature-30). */
+  existente?: ObraExistente;
+}
+
+/** Altura mínima de la cámara por el interior en un edificio existente (HS 6 ap. 3.2 pto 6). */
+export const CAMARA_EXISTENTE_MIN_cm = 5;
+
 export interface JustificacionHs6 {
+  /** En un edificio existente con el asistente respondido (feature-30). */
+  existente: boolean;
   proteccion: ProteccionHs6;
   municipio: string;
   elementos: ElementoHs6[];
@@ -45,9 +72,19 @@ export interface JustificacionHs6 {
   veredicto: Veredicto;
 }
 
-export function justificarHs6(estado: Hs6Estado, edificio: Edificio): JustificacionHs6 {
+function proteccionExistente(estado: Hs6Estado, zona: ZonaRadon, ex: ObraExistente): ProteccionHs6 {
+  const intervenida = (z: Zona) => obraDeZona(z, ex.intervencion) !== "existente";
+  const sotanoSinTocar = plantasDe(ex.edificio).some((p) => p.nivel === -1 && p.zonas.length > 0 && p.zonas.every((z) => !intervenida(z)));
+  return proteccionDe(ex.edificio, zona, sotanoSinTocar ? { ...estado, posicionBarrera: "forjado" } : estado, intervenida);
+}
+
+export function justificarHs6(estado: Hs6Estado, edificio: Edificio, obra: ObraHs6 = {}): JustificacionHs6 {
+  const ex = obra.existente !== undefined;
   const zona = estado.zona;
-  const pr = proteccionDe(edificio, zona, estado);
+  // En un edificio existente, la geometría es la del edificio entero (lo intervenido
+  // puede estar sobre un sótano que no se toca) y solo se protege lo intervenido.
+  // Si el sótano no se toca, la barrera va en el forjado de la planta baja (feature-30).
+  const pr = obra.existente ? proteccionExistente(estado, zona, obra.existente) : proteccionDe(edificio, zona, estado);
   const d = pr.decisiones;
   const elementos: ElementoHs6[] = [];
   const avisos: Aviso[] = [];
@@ -92,6 +129,7 @@ export function justificarHs6(estado: Hs6Estado, edificio: Edificio): Justificac
           via: d.viaBarrera,
           espesorMin_mm: pb.espesorMin_mm,
           coefLimite_m2_s: pb.coefDifusionLimite_m2_s,
+          ...(ex && pr.sobreTerreno.length > 0 ? { existente: estado.barreraExistente === "solera" ? ("solera" as const) : ("lamina" as const) } : {}),
         },
       });
     }
@@ -111,7 +149,20 @@ export function justificarHs6(estado: Hs6Estado, edificio: Edificio): Justificac
     }
 
     // ── Lo que apoya en el terreno: cámara o despresurización ─────────────
-    if (pr.sobreTerreno.length > 0 && d.medidaTerreno === "camara") {
+    if (pr.sobreTerreno.length > 0 && d.medidaTerreno === "camara" && ex) {
+      // En un edificio existente, la cámara se construye por el interior (feature-30; K-INT.4).
+      elementos.push({
+        id: "camara",
+        nombre: "Cámara por el interior",
+        tipo: "espacio_contencion",
+        veredicto: "ok",
+        valor: { valor: CAMARA_EXISTENTE_MIN_cm, unidad: "cm" },
+        limite: { valor: CAMARA_EXISTENTE_MIN_cm, unidad: "cm" },
+        manda: { tipo: "decision_proyectista", decision: "camara_interior" },
+        cita: ["HS 6 · ap. 3.2 ptos 6 a 8"],
+        detalle: { clase: "camara", partes: pr.sobreTerreno, aberturas_cm2: 0, distanciaMax_m: 0, existente: true },
+      });
+    } else if (pr.sobreTerreno.length > 0 && d.medidaTerreno === "camara") {
       const pe = parametrosEspacioContencion();
       elementos.push({
         id: "camara",
@@ -141,9 +192,14 @@ export function justificarHs6(estado: Hs6Estado, edificio: Edificio): Justificac
         veredicto: "ok",
         valor: { texto: "Captación" },
         manda: { tipo: "decision_proyectista", decision: "despresurizacion" },
-        cita: ["HS 6 · ap. 3.3", "ap. 5.1.4"],
-        detalle: { clase: "despresurizacion", partes: pr.sobreTerreno },
+        cita: ex ? ["HS 6 · ap. 3.3 ptos 3 y 6"] : ["HS 6 · ap. 3.3", "ap. 5.1.4"],
+        detalle: { clase: "despresurizacion", partes: pr.sobreTerreno, ...(ex ? { existente: true } : {}) },
       });
+      if (ex) avisos.push({ id: "despresurizacion-estudio", tipo: "caso_especial", elementoId: "despresurizacion", datos: {} });
+    }
+    // Con cámara o despresurización en un edificio existente, la eficacia se mide después (ap. 3.2 pto 7 y 3.3 pto 6).
+    if (ex && pr.sobreTerreno.length > 0 && (d.medidaTerreno === "camara" || d.medidaTerreno === "despresurizacion")) {
+      avisos.push({ id: "medicion-posterior", tipo: "caso_especial", elementoId: d.medidaTerreno, datos: {} });
     }
 
     // ── El núcleo que comunica el garaje con lo habitable ─────────────────
@@ -184,5 +240,5 @@ export function justificarHs6(estado: Hs6Estado, edificio: Edificio): Justificac
   let veredicto: Veredicto = "ok";
   if (elementos.some((e) => e.veredicto === "fail")) veredicto = "fail";
 
-  return { proteccion: pr, municipio, elementos, avisos, veredicto };
+  return { existente: ex, proteccion: pr, municipio, elementos, avisos, veredicto };
 }

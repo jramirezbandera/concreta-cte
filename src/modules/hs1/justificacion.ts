@@ -16,6 +16,7 @@ import { cerramientosDe } from "../../lib/constructivo/cerramientos";
 import { NOMBRE_CERRAMIENTO } from "../../lib/constructivo/textos";
 import type { Aviso, ElementoResultado } from "../../lib/cte/resultado";
 import type { Edificio } from "../../lib/edificio/tipos";
+import type { ObraExistente } from "../../lib/proyecto/alcance";
 import type { DatosGenerales } from "../../lib/proyecto/tipos";
 import type { Veredicto } from "../../lib/pdf/renderFicha";
 import { cubiertaDe, type CubiertaHs1 } from "./cubierta";
@@ -79,11 +80,25 @@ export interface ObraHs1 {
   permeabilidadTerreno?: ClaseKs;
   /** Para decidir si el drenaje se bombea (HS5 la usa para el saneamiento). */
   cotaAlcantarillado_m?: number;
+  /** En un edificio existente, lo que hay alrededor de lo intervenido (feature-30). */
+  existente?: ObraExistente;
+}
+
+/**
+ * En un edificio existente (feature-30): qué elementos de la envolvente toca la
+ * obra, según el asistente. Lo que no toca no se describe.
+ */
+export interface ExistenteHs1 {
+  /** De la fachada solo se sustituyen los huecos: se justifican sus encuentros. */
+  soloHuecos: boolean;
+  /** Lo que existe y no se modifica: «los muros y los suelos en contacto con el terreno», «la cubierta». */
+  sinTocar: string[];
 }
 
 /** Los datos de HS1 del expediente. */
-export function obraHs1De(dg: DatosGenerales): ObraHs1 {
+export function obraHs1De(dg: DatosGenerales, existente?: ObraExistente): ObraHs1 {
   return {
+    ...(existente ? { existente } : {}),
     zonaPluviometricaHs1: dg.zonaPluviometricaHs1,
     zonaEolica: dg.zonaEolica,
     terrenoTipo: dg.terrenoTipo,
@@ -232,9 +247,54 @@ export interface JustificacionHs1 {
   /** Lo habitual en este edificio (el suelo depende de su grado). */
   habituales: DecisionesEfectivasHs1;
   cubierta: CubiertaHs1;
+  /** En un edificio existente con el asistente respondido (feature-30). */
+  existente?: ExistenteHs1;
   elementos: ElementoHs1[];
   avisos: Aviso[];
   veredicto: Veredicto;
+}
+
+/** Los elementos del terreno (muros, suelos y su drenaje). */
+const DEL_TERRENO: ReadonlySet<DetalleHs1["clase"]> = new Set(["terreno", "muro", "suelo", "dren", "canaletas", "bombeo"]);
+
+/**
+ * En un edificio existente, solo lo que la obra toca de la envolvente (HS 1 ap.
+ * 1.1; CTE Parte I art. 2.3). Sin la respuesta del asistente, todo (lo prudente).
+ */
+function soloLoQueSeToca(
+  j: Omit<JustificacionHs1, "veredicto">,
+  ex: ObraExistente,
+): Pick<JustificacionHs1, "elementos" | "avisos" | "existente"> {
+  const toca = ex.respuestas.envolvente;
+  if (!toca) return { elementos: j.elementos, avisos: j.avisos };
+  const terreno = toca.includes("terreno");
+  const fachada = toca.includes("fachadas") || toca.includes("huecos");
+  const cubierta = toca.includes("cubiertas");
+  const queda = (el: ElementoHs1): boolean => {
+    const c = el.detalle.clase;
+    if (DEL_TERRENO.has(c)) return terreno;
+    if (c === "fachada") return fachada;
+    if (c === "cubierta") return cubierta;
+    return true;
+  };
+  const soloHuecos = fachada && !toca.includes("fachadas");
+  // Con solo los huecos, la fachada existente no se justifica: no bloquea (sí su grado, que decide los encuentros).
+  const elementos = j.elementos
+    .filter(queda)
+    .map((el): ElementoHs1 => (soloHuecos && el.detalle.clase === "fachada" ? { ...el, veredicto: "criterio" } : el));
+  const ids = new Set(elementos.map((e) => e.id));
+  const sinTocar = [
+    ...(!terreno && j.elementos.some((e) => DEL_TERRENO.has(e.detalle.clase) && e.detalle.clase !== "terreno")
+      ? ["los muros y los suelos en contacto con el terreno"]
+      : []),
+    ...(!fachada ? ["las fachadas"] : []),
+    ...(!cubierta ? ["la cubierta"] : []),
+  ];
+  return {
+    elementos,
+    avisos: j.avisos.filter((a) => !a.elementoId || ids.has(a.elementoId)),
+    existente: { soloHuecos, sinTocar },
+  };
 }
 
 // -----------------------------------------------------------------------------
@@ -741,6 +801,8 @@ export function justificarHs1(estado: Hs1Estado, edificio: Edificio, obra: ObraH
     avisos.push({ id: "cubierta-pendiente-cec", tipo: "caso_especial", elementoId: "cubierta", datos: { codigo: cer.cubierta.sol.codigo, maxCec, maxDb: p.max_pct } });
   }
 
-  const veredicto: Veredicto = elementos.some((e) => e.veredicto === "fail") ? "fail" : "ok";
-  return { partes, decisiones: d, habituales, cubierta, elementos, avisos, veredicto };
+  const todo = { partes, decisiones: d, habituales, cubierta, elementos, avisos };
+  const r = obra.existente ? { ...todo, ...soloLoQueSeToca(todo, obra.existente) } : todo;
+  const veredicto: Veredicto = r.elementos.some((e) => e.veredicto === "fail") ? "fail" : "ok";
+  return { ...r, veredicto };
 }

@@ -13,9 +13,15 @@ import type { ZonaTermica } from "./tablas";
 export interface Hs3Estado extends DecisionesHs3 {
   /** Zona térmica (Tabla 4.4): la hereda de la obra. */
   zonaTermica: ZonaTermica;
+  /**
+   * Dónde expulsan los conductos de las viviendas. Solo se pregunta en un
+   * edificio existente (feature-30): «fachada», por flexibilidad (K-MEM.3).
+   */
+  expulsion: "cubierta" | "fachada";
 }
 
 export const hs3EstadoDefaults: Hs3Estado = {
   ...DECISIONES_HS3_POR_DEFECTO,
   zonaTermica: "X",
+  expulsion: "cubierta",
 };

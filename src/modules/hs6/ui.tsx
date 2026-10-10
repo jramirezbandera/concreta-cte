@@ -28,7 +28,7 @@ import { textoPlanoMemoria } from "../../lib/cte/memoria";
 import { renderFicha } from "../../lib/pdf/renderFicha";
 import { fichaConAlcance } from "../../lib/obra/alcanceTexto";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
-import { edificioParaModulo } from "../../lib/proyecto/alcance";
+import { edificioParaModulo, obraExistenteDe } from "../../lib/proyecto/alcance";
 import { ajustar } from "../../lib/ui/ajustar";
 import { DecisionesHs6 } from "./DecisionesHs6";
 import { filasQueEntraHs6 } from "./entra";
@@ -60,7 +60,11 @@ export function Hs6Module() {
   const deferredState = useDeferredValue(state);
   // En una obra existente, lo intervenido (feature-27).
   const edificio = edificioParaModulo(proyecto.datosGenerales, proyecto.edificio, "hs6");
-  const j = useMemo(() => justificarHs6(deferredState, edificio), [deferredState, edificio]);
+  // …y lo existente alrededor, para redactarlo como en La obra (feature-30).
+  const dg = proyecto.datosGenerales;
+  const edificioCompleto = proyecto.edificio;
+  const existente = useMemo(() => obraExistenteDe(dg, edificioCompleto), [dg, edificioCompleto]);
+  const j = useMemo(() => justificarHs6(deferredState, edificio, existente ? { existente } : {}), [deferredState, edificio, existente]);
 
   // ── Avisos y estados ───────────────────────────────────────────────────────
   const revisados = proyecto.justificaciones.hs6?.revisados ?? [];

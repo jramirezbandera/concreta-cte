@@ -28,7 +28,7 @@ import { textoPlanoMemoria } from "../../lib/cte/memoria";
 import { renderFicha } from "../../lib/pdf/renderFicha";
 import { fichaConAlcance } from "../../lib/obra/alcanceTexto";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
-import { edificioParaModulo } from "../../lib/proyecto/alcance";
+import { edificioParaModulo, obraExistenteDe } from "../../lib/proyecto/alcance";
 import { ajustar } from "../../lib/ui/ajustar";
 import { DecisionesHs3 } from "./DecisionesHs3";
 import { filasQueEntraHs3 } from "./entra";
@@ -61,7 +61,11 @@ export function Hs3Module() {
   const deferredState = useDeferredValue(state);
   // En una obra existente, lo intervenido (feature-27).
   const edificio = edificioParaModulo(proyecto.datosGenerales, proyecto.edificio, "hs3");
-  const j = useMemo(() => justificarHs3(deferredState, edificio), [deferredState, edificio]);
+  // …y lo existente alrededor, para redactarlo como en La obra (feature-30).
+  const dg = proyecto.datosGenerales;
+  const edificioCompleto = proyecto.edificio;
+  const existente = useMemo(() => obraExistenteDe(dg, edificioCompleto), [dg, edificioCompleto]);
+  const j = useMemo(() => justificarHs3(deferredState, edificio, existente ? { existente } : {}), [deferredState, edificio, existente]);
 
   // ── Avisos y estados ───────────────────────────────────────────────────────
   const revisados = proyecto.justificaciones.hs3?.revisados ?? [];
@@ -148,7 +152,7 @@ export function Hs3Module() {
       enlace={{ to: `/p/${proyecto.id}/edificio`, label: "Editar el edificio" }}
     />
   );
-  const entradas = <DecisionesHs3 state={state} setField={setField} j={j} edificio={edificio} />;
+  const entradas = <DecisionesHs3 state={state} setField={setField} j={j} edificio={edificio} existente={existente !== undefined} />;
 
   // ── El dibujo ──────────────────────────────────────────────────────────────
   const dibujo = parte ? calcularDibujoHs3(j, parte) : null;

@@ -141,7 +141,7 @@ const ADAPTADORES: Partial<Record<JustificacionKey, Adaptador>> = {
     ]);
     const estado = { ...estadoMod.hs1EstadoDefaults, ...inputs } as typeof estadoMod.hs1EstadoDefaults;
     const revisados = proyecto.justificaciones.hs1?.revisados ?? [];
-    const j = just.justificarHs1(estado, proyecto.edificio, just.obraHs1De(proyecto.datosGenerales));
+    const j = just.justificarHs1(estado, proyecto.edificio, just.obraHs1De(proyecto.datosGenerales, proyecto.existente));
     const svg = seccion.tamanoDibujoHs1(j, proyecto.edificio);
     const base = ficha.toFichaData(j, { estado, edificio: proyecto.edificio, revisados, svg });
     const data = { ...base, ...id, observaciones: [...(base.observaciones ?? [])] };
@@ -165,7 +165,7 @@ const ADAPTADORES: Partial<Record<JustificacionKey, Adaptador>> = {
     ]);
     const estado = { ...estadoMod.hs3EstadoDefaults, ...inputs } as typeof estadoMod.hs3EstadoDefaults;
     const revisados = proyecto.justificaciones.hs3?.revisados ?? [];
-    const j = just.justificarHs3(estado, proyecto.edificio);
+    const j = just.justificarHs3(estado, proyecto.edificio, proyecto.existente ? { existente: proyecto.existente } : {});
     const svg = planta.tamanoDibujoHs3();
     const base = ficha.toFichaData(j, { estado, edificio: proyecto.edificio, revisados, svg });
     const data = { ...base, ...id, observaciones: [...(base.observaciones ?? [])] };
@@ -241,7 +241,7 @@ const ADAPTADORES: Partial<Record<JustificacionKey, Adaptador>> = {
     ]);
     const estado = { ...estadoMod.hs6EstadoDefaults, ...inputs } as typeof estadoMod.hs6EstadoDefaults;
     const revisados = proyecto.justificaciones.hs6?.revisados ?? [];
-    const j = just.justificarHs6(estado, proyecto.edificio);
+    const j = just.justificarHs6(estado, proyecto.edificio, proyecto.existente ? { existente: proyecto.existente } : {});
     const svg = seccion.tamanoDibujoHs6();
     const base = ficha.toFichaData(j, { estado, edificio: proyecto.edificio, revisados, svg });
     const data = { ...base, ...id, observaciones: [...(base.observaciones ?? [])] };

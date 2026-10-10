@@ -16,9 +16,11 @@ interface DecisionesHs3Props {
   setField: <K extends keyof Hs3Estado>(field: K, value: Hs3Estado[K]) => void;
   j: JustificacionHs3;
   edificio: Edificio;
+  /** Edificio existente: se pregunta dónde expulsan los conductos (feature-30). */
+  existente?: boolean;
 }
 
-export function DecisionesHs3({ state, setField, j, edificio }: DecisionesHs3Props): JSX.Element {
+export function DecisionesHs3({ state, setField, j, edificio, existente = false }: DecisionesHs3Props): JSX.Element {
   const d: DecisionesEfectivasHs3 = j.red.decisiones;
   const h = decisionesHabitualesHs3(edificio);
   const hayViviendas = j.red.tipos.length > 0;
@@ -31,8 +33,10 @@ export function DecisionesHs3({ state, setField, j, edificio }: DecisionesHs3Pro
     state.sistema === "habitual" &&
     state.admision === "habitual" &&
     state.equilibrado === "habitual" &&
-    state.garaje === "habitual";
+    state.garaje === "habitual" &&
+    state.expulsion === "cubierta";
   const volverAloHabitual = () => {
+    setField("expulsion", "cubierta");
     setField("sistema", "habitual");
     setField("admision", "habitual");
     setField("equilibrado", "habitual");
@@ -44,7 +48,8 @@ export function DecisionesHs3({ state, setField, j, edificio }: DecisionesHs3Pro
   const nSistema = 1;
   const nAdmision = 2;
   const nEquilibrado = 3;
-  const nGaraje = hayViviendas ? 4 : 1;
+  const nExpulsion = 4;
+  const nGaraje = hayViviendas ? (existente ? 5 : 4) : 1;
 
   return (
     <section aria-label="Decisiones" className="flex flex-col">
@@ -65,7 +70,7 @@ export function DecisionesHs3({ state, setField, j, edificio }: DecisionesHs3Pro
             onChange={(v) => elegir("sistema", v)}
             texto={
               d.sistema === "mecanica"
-                ? "Extractores en la cubierta; los conductos se dimensionan con S ≥ 2,5·qvt."
+                ? `Extractores ${j.expulsion === "fachada" ? "con la boca en fachada" : "en la cubierta"}; los conductos se dimensionan con S ≥ 2,5·qvt.`
                 : "Tiro natural asistido por extractores: los conductos salen de las tablas 4.2 a 4.4 y un colectivo no sirve a más de 6 plantas."
             }
           />
@@ -101,6 +106,24 @@ export function DecisionesHs3({ state, setField, j, edificio }: DecisionesHs3Pro
                 : "Lo que falta para igualar se suma al salón (o a la cocina, si sobra admisión)."
             }
           />
+          {existente && (
+            <Decision<"cubierta" | "fachada">
+              numero={nExpulsion}
+              pregunta="Dónde expulsan los conductos"
+              opciones={[
+                { valor: "cubierta", label: "Cubierta" },
+                { valor: "fachada", label: "Fachada" },
+              ]}
+              valor={state.expulsion}
+              habitual="cubierta"
+              onChange={(v) => setField("expulsion", v)}
+              texto={
+                state.expulsion === "cubierta"
+                  ? "Lo que pide el ap. 3.2.1: bocas en la cubierta, a 3 m de tomas, ventanas y terrazas."
+                  : "Por flexibilidad (CTE Parte I art. 2.3): mecánica, con la boca a 3 m de ventanas, tomas y terrazas. Mira la ordenanza municipal."
+              }
+            />
+          )}
         </>
       )}
       {hayGaraje && (

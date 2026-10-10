@@ -37,7 +37,19 @@ function parrafoSistema(j: JustificacionHs3): Trozo[] {
   const d = j.red.decisiones;
   const entra = d.admision === "aireadores" ? "aireadores en la carpintería" : "aberturas fijas en la fachada";
   return [
-    `${j.red.unifamiliar ? "La vivienda se ventila" : "Las viviendas se ventilan"} con un sistema ${d.sistema === "mecanica" ? "mecánico" : "híbrido"} conforme a la sección HS 3 del DB-HS. El aire entra por ${entra} de dormitorios y salón, pasa por las puertas interiores y se extrae por rejillas en los locales húmedos, conectadas a conductos que ${d.sistema === "mecanica" ? "llegan a extractores en la cubierta" : "lo sacan a la cubierta por tiro natural, asistido por extractores cuando no basta"}.`,
+    `${j.red.unifamiliar ? "La vivienda se ventila" : "Las viviendas se ventilan"} con un sistema ${d.sistema === "mecanica" ? "mecánico" : "híbrido"} conforme a la sección HS 3 del DB-HS. El aire entra por ${entra} de dormitorios y salón, pasa por las puertas interiores y se extrae por rejillas en los locales húmedos, conectadas a conductos que ${j.expulsion === "fachada" ? "llegan a extractores con la boca de expulsión en fachada" : d.sistema === "mecanica" ? "llegan a extractores en la cubierta" : "lo sacan a la cubierta por tiro natural, asistido por extractores cuando no basta"}.`,
+  ];
+}
+
+/**
+ * La expulsión en fachada en un edificio existente (feature-30; K-MEM.3): no hay
+ * excepción en el DB-HS 3, así que se justifica por flexibilidad, con el
+ * criterio de adecuación que el propio DB admite en el HS 6 (ap. 3.3 pto 2).
+ */
+function parrafoExpulsion(j: JustificacionHs3): Trozo[] {
+  if (j.expulsion !== "fachada" || j.red.tipos.length === 0) return [];
+  return [
+    "En el edificio existente los conductos de extracción no pueden llevarse a la cubierta. El DB-HS 3 sitúa las bocas de expulsión en la cubierta (ap. 3.2.1 pto 4) y no tiene criterios propios para edificios existentes, por lo que se aplica el criterio de flexibilidad de la Parte I del CTE (art. 2.3): la ventilación es mecánica y las bocas de expulsión se sitúan en fachada, separadas al menos 3 m de cualquier elemento de entrada de ventilación (boca de toma, abertura de admisión, puerta exterior y ventana) y de los espacios donde pueda haber personas de forma habitual, como terrazas, galerías, miradores o balcones, y protegidas de la entrada del agua de lluvia. Se cumplen así las condiciones del ap. 3.2.1 salvo la disposición en cubierta, el criterio de adecuación que el propio DB-HS admite para las bocas de expulsión de la sección HS 6 (ap. 3.3 pto 2). En la documentación final de la obra quedará constancia del nivel de prestación alcanzado.",
   ];
 }
 
@@ -188,6 +200,7 @@ export function memoriaHs3(j: JustificacionHs3): MemoriaHs3 {
       parrafoCaudales(j),
       parrafoAberturas(j),
       parrafoConductos(j),
+      parrafoExpulsion(j),
       parrafoGaraje(j),
       parrafoRite(j),
     ].filter((p) => p.length > 0),
@@ -195,7 +208,7 @@ export function memoriaHs3(j: JustificacionHs3): MemoriaHs3 {
     fuente: [
       "DB-HS · HS 3 (consolidado 14-06-2022)",
       `tablas ${listaY(tablas)}`,
-      "ap. 3.1 y 4.2",
+      j.expulsion === "fachada" ? "ap. 3.1, 3.2.1 y 4.2 · CTE Parte I, art. 2.3" : "ap. 3.1 y 4.2",
       "datos de El edificio y de las viviendas tipo",
       `motor ${ENGINE_VERSION}`,
     ].join(" · "),

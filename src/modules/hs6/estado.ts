@@ -15,10 +15,17 @@ export interface Hs6Estado extends DecisionesHs6 {
   zona: ZonaRadon;
   /** Municipio, para la ficha (heredado). */
   municipio: string;
+  /**
+   * En un edificio existente (feature-30), la barrera sobre lo que apoya en el
+   * terreno: lámina sobre la solera existente o la propia solera sellada
+   * (HS 6 ap. 3.1.1 pto 4; K-INT.3 y K-INT.7).
+   */
+  barreraExistente: "lamina" | "solera";
 }
 
 export const hs6EstadoDefaults: Hs6Estado = {
   ...DECISIONES_HS6_POR_DEFECTO,
   zona: "II",
   municipio: "",
+  barreraExistente: "lamina",
 };
