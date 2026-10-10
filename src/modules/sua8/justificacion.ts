@@ -100,6 +100,9 @@ export interface ExistenteSua8 {
   sinVariacion: boolean;
   c4Antes: number;
   c4: number;
+  /** Ne y Na del edificio antes de la obra, para la tabla de la memoria (feature-31). */
+  neAntes: number;
+  naAntes: number;
 }
 
 interface Entradas {
@@ -149,7 +152,7 @@ export function justificarSua8(estado: Sua8Estado, p: ProyectoSi): Justificacion
     ...j,
     elementos,
     veredicto: elementos.some((x) => x.veredicto === "fail") ? "fail" : "ok",
-    existente: { sinVariacion, c4Antes: c4(antes), c4: c4(j) },
+    existente: { sinVariacion, c4Antes: c4(antes), c4: c4(j), neAntes: antes.resultado.ne, naAntes: antes.resultado.na },
   };
 }
 

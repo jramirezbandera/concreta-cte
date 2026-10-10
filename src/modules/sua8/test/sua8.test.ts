@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { textoPlanoMemoria } from "../../../lib/cte/memoria";
+import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
+import { obraDeCaso, proyectoParaModulo } from "../../../lib/proyecto/alcance";
 import { crearProyectoDemo } from "../../../lib/proyecto/demo";
-import type { DatosGenerales } from "../../../lib/proyecto/tipos";
+import type { DatosGenerales, Proyecto } from "../../../lib/proyecto/tipos";
 import { sua8 } from "../definicion";
 import { sua8EstadoDefaults, type Sua8Estado } from "../estado";
 import { calcularSua8, justificarSua8 } from "../justificacion";
@@ -87,6 +88,52 @@ describe("SUA8 · con El edificio", () => {
   it("el local sin uso se supone Comercial (C4 = 3); administrativo, 1", () => {
     const j = caso("plurifamiliar_locales");
     expect(j.elementos.find((e) => e.id === "na")!.detalle).toMatchObject({ c4: 3, c4Supuesto: true });
+  });
+
+  it("la memoria lleva los parámetros en su tabla y el texto se queda con la conclusión (feature-31)", () => {
+    const m = sua8.memoria(caso("plurifamiliar_locales"));
+    const t = m.tablas![0];
+    expect(t.cabecera).toEqual(["Parámetro", "Valor", "Referencia"]);
+    expect(t.columnas).toEqual(["texto", "dato", "texto"]);
+    expect(t.filas.map((f) => f[0].split(",")[0])).toEqual(["Ng", "Ae", "C1", "Ne", "C2", "C3", "C4", "C5", "Na", "E", "Nivel de protección"]);
+    expect(t.filas).toContainEqual(["C4, uso", "3", "tabla 1.4: local sin uso, como Comercial"]);
+    expect(t.filas).toContainEqual(["Nivel de protección", "3", "tabla 2.1: 0,80 ≤ E < 0,95"]);
+    expect(t.notas![0]).toMatch(/^Delimitada por una línea trazada a una distancia 3H del perímetro de una planta de 14,5 m × 14,5 m/);
+    expect(t.tras).toBe(0);
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).toMatch(/^Al ser la frecuencia esperada de impactos Ne mayor que el riesgo admisible Na, es necesaria la instalación/);
+    expect(texto).not.toContain("0,0231");
+    expect(texto).not.toContain("C1 =");
+    expect(texto).not.toContain("0,921");
+  });
+
+  it("con sustancias peligrosas, E ≥ 0,98 y nivel 1 en la tabla, sea cual sea Ne", () => {
+    const m = sua8.memoria(caso("plurifamiliar_locales", { especial: "peligrosas" }));
+    expect(m.tablas![0].filas.slice(-2)).toEqual([
+      ["E, eficiencia requerida", "≥ 0,98", "ap. 1 pto 2: sustancias peligrosas"],
+      ["Nivel de protección", "1", "tabla 2.1: E ≥ 0,98"],
+    ]);
+    expect(textoParrafo(m.parrafos[0])).toMatch(/sea cual sea la frecuencia esperada de impactos, dispone de un sistema de protección contra el rayo/);
+  });
+
+  it("con Ne ≤ Na la tabla acaba en Na", () => {
+    const m = sua8.memoria(caso("unifamiliar", {}, { densidadImpactosNg: 2 }));
+    expect(m.tablas![0].filas.at(-1)![0]).toBe("Na, riesgo admisible");
+    expect(textoPlanoMemoria(m)).toContain("no es necesaria la instalación");
+  });
+
+  it("en un edificio existente sin variación, Ne, C4 y Na antes y después (feature-30)", () => {
+    const p: Proyecto = { ...crearProyectoDemo("2026-10-10T10:00:00.000Z"), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
+    p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso("reforma_local_vivienda") ?? {}) };
+    const j = justificarSua8(sua8EstadoDefaults, proyectoParaModulo(p, "sua8"));
+    expect(j.existente?.sinVariacion).toBe(true);
+    const m = sua8.memoria(j);
+    const t = m.tablas![0];
+    expect(t.cabecera).toEqual(["Parámetro", "Antes de la obra", "Después", "Referencia"]);
+    expect(t.filas).toContainEqual(["C4, uso", "3", "3", "tabla 1.4"]);
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).toContain("se mantiene ese coeficiente, el más desfavorable");
+    expect(texto).not.toContain("C4 = 3");
   });
 
   it("los cuatro casos dan memoria, ficha y dibujo", () => {

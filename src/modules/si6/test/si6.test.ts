@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { textoPlanoMemoria } from "../../../lib/cte/memoria";
+import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
 import { crearProyectoDemo } from "../../../lib/proyecto/demo";
 import { si6 } from "../definicion";
@@ -71,5 +71,47 @@ describe("SI6 · justificación", () => {
 
   it("la memoria dice que la R del forjado es la del sector de debajo", () => {
     expect(textoPlanoMemoria(si6.memoria(caso("plurifamiliar_locales")))).toMatch(/es la del sector que tiene debajo \(tabla 3\.1, nota 1\)/);
+  });
+});
+
+describe("SI6 · tablas de la memoria (feature-31)", () => {
+  it("la R exigida y la de proyecto por planta y local de riesgo especial; el texto no las repite", () => {
+    const m = si6.memoria(caso("plurifamiliar_locales"));
+    const t = m.tablas![0];
+    expect(t.cabecera).toEqual(["Planta o elemento", "Uso que manda", "R exigida", "R de proyecto", "Cumple"]);
+    expect(t.filas[0]).toEqual(["P1–P3", "uso Residencial Vivienda, h ≤ 15 m", "R 60", "R 60 (Anejo C)", "Cumple"]);
+    // El cuarto de instalaciones del sótano: R 90 de la tabla 3.2, que sube a la de su planta (nota 1).
+    expect(t.filas).toContainEqual(["Instalaciones (S1)", "riesgo especial bajo (tabla 3.2)", "R 120 (1)", "R 120 (Anejo C)", "Cumple"]);
+    expect(t.notas).toEqual(["No inferior a la de la estructura portante de su planta (tabla 3.2, nota 1)."]);
+    // Tras el párrafo del criterio.
+    expect(textoParrafo(m.parrafos[t.tras!])).toMatch(/^Los elementos estructurales contenidos en una escalera protegida/);
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).not.toContain("R 60 (uso Residencial");
+    expect(texto).not.toContain("instalaciones de S1, R 120");
+  });
+
+  it("un local de riesgo que manda en su planta va en la fila de la planta, sin repetirse", () => {
+    const t = si6.memoria(caso("unifamiliar")).tablas![0];
+    expect(t.filas).toEqual([
+      ["P1", "vivienda unifamiliar, h ≤ 15 m", "R 30", "R 30 (Anejo C)", "Cumple"],
+      ["PB", "garaje privado, riesgo especial bajo (tabla 3.2)", "R 90", "R 90 (Anejo C)", "Cumple"],
+    ]);
+    expect(t.notas).toBeUndefined();
+  });
+
+  it("las dimensiones del Anejo C van en su tabla, con la nota del techo del garaje", () => {
+    const m = si6.memoria(caso("plurifamiliar_locales"));
+    const t = m.tablas![1];
+    expect(t.cabecera).toEqual(["Clase", "Soportes (tabla C.2)", "Forjado"]);
+    expect(t.filas[0]).toEqual(["R 60", "≥ 250 mm, a ≥ 20 mm", "a ≥ 20 mm, con bovedilla y techo revestido"]);
+    expect(t.filas[2][2]).toMatch(/^nervios como vigas: alma ≥ 120 mm.* \(1\)$/);
+    expect(t.tras).toBe(m.parrafos.length);
+    expect(m.parrafos.map(textoParrafo).join(" ")).not.toContain("soportes ≥ 250 mm");
+  });
+
+  it("acero: la R de proyecto se justifica con el Anejo D y no hay tabla del Anejo C", () => {
+    const m = si6.memoria(caso("plurifamiliar_locales", { material: "acero" }));
+    expect(m.tablas).toHaveLength(1);
+    expect(m.tablas![0].filas[0][3]).toBe("R 60 (Anejo D)");
   });
 });
