@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { textoPlanoMemoria } from "../../../lib/cte/memoria";
+import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
 import type { Edificio } from "../../../lib/edificio/tipos";
 import { crearProyectoDemo } from "../../../lib/proyecto/demo";
@@ -78,8 +78,21 @@ describe("SI1 · justificación", () => {
 describe("SI1 · textos, memoria y ficha", () => {
   it("la memoria cita la tabla 1.2 y redacta el vestíbulo del garaje", () => {
     const t = textoPlanoMemoria(si1.memoria(caso("plurifamiliar_locales")));
-    expect(t).toMatch(/los elementos que separan el garaje del resto del edificio son EI 120, con techo REI 120, y el vestíbulo de independencia tiene paredes EI 120 y dos puertas EI2 30-C5/);
+    expect(t).toContain("es la de la tabla 1.2, para una altura de evacuación del edificio de 10 m: el vestíbulo de independencia del garaje tiene paredes EI 120 y dos puertas EI2 30-C5");
     expect(t).toMatch(/C-s2,d0 \/ EFL/);
+  });
+
+  it("la tabla «Norma | Proyecto» lleva la superficie y la resistencia; el texto no las repite (feature-31)", () => {
+    const m = si1.memoria(caso("plurifamiliar_locales"));
+    const t = m.tablas![0];
+    expect(t.cabecera).toEqual(["Sector o local", "Uso o riesgo", "Superficie norma", "Superficie proyecto", "Resistencia norma", "Resistencia proyecto", "Cumple"]);
+    expect(t.filas).toContainEqual(["Garaje", "Aparcamiento", "sector propio", "504 m² (supuestos)", "EI 120 · techo REI 120 · vestíbulo", "EI 120 · techo REI 120 · vestíbulo", "Cumple"]);
+    expect(t.filas[0].slice(2, 4)).toEqual(["≤ 2500 m²", "655 m² (supuestos)"]);
+    // Tras los sectores, la resistencia y los locales; antes de los espacios ocultos.
+    expect(textoParrafo(m.parrafos[t.tras!])).toMatch(/^La compartimentación se mantiene en los espacios ocultos/);
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).not.toContain("655 m²");
+    expect(texto).not.toContain("son al menos EI 60");
   });
 
   it("la ficha lleva los datos de partida supuestos y una fila por elemento", () => {

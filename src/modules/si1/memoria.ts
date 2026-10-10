@@ -6,6 +6,7 @@
 
 import type { MemoriaDoc, Trozo, TablaMemoria } from "../../lib/cte/presentacion";
 import { soloTablas } from "../../lib/cte/memoria";
+import { cumpleTexto, NO_SE_EXIGE } from "../../lib/cte/tablaNorma";
 import { listaY } from "../../lib/cte/redaccion";
 import { fmt } from "../../lib/units/format";
 import { ENGINE_VERSION } from "../../lib/version";
@@ -25,29 +26,22 @@ function parrafoSectores(j: JustificacionSi1): Trozo[] {
   const c = j.comp;
   const p = de(j, "principal")[0].d;
   const s = p.sector;
-  const max = m2(SECTORES_TABLA_1_1.datos.sectorMax_m2);
+  // Las superficies y sus límites van en la tabla (feature-31).
   if (p.unifamiliar) {
-    return [
-      "La vivienda unifamiliar constituye un único sector de incendio, de ",
-      { v: construida(s.superficie.construida_m2, s.superficie.supuesta) },
-      ` construidos, que no excede de los ${max} que admite el uso Residencial Vivienda (SI 1, tabla 1.1); una vivienda unifamiliar no precisa sectores en su interior.`,
-    ];
+    return ["La vivienda unifamiliar constituye un único sector de incendio (SI 1, tabla 1.1); una vivienda unifamiliar no precisa sectores en su interior."];
   }
   const ex = j.existente;
   // En un edificio existente, en qué sector se integra lo intervenido (feature-30).
   const out: Trozo[] = ex
-    ? [`${ex.pasaAVivienda ? "La zona que se transforma en vivienda" : "Lo intervenido"} se integra en el sector de incendio de uso ${s.uso === "administrativo" ? "Administrativo" : "Residencial Vivienda"} del edificio existente (SI 1, tabla 1.1). `]
-    : [`El edificio se compartimenta en ${c.sectores.length === 1 ? "un único sector" : `${c.sectores.length} sectores`} de incendio (SI 1, tabla 1.1). `];
+    ? [`${ex.pasaAVivienda ? "La zona que se transforma en vivienda" : "Lo intervenido"} se integra en el sector de incendio de uso ${s.uso === "administrativo" ? "Administrativo" : "Residencial Vivienda"} del edificio existente (SI 1, tabla 1.1).`]
+    : [`El edificio se compartimenta en ${c.sectores.length === 1 ? "un único sector" : `${c.sectores.length} sectores`} de incendio (SI 1, tabla 1.1).`];
   const quien = s.uso === "administrativo" ? "Las oficinas" : "Las viviendas, con sus zonas comunes,";
-  if (s.porPlantas && s.plantaMayor) {
-    out.push(`${quien} suman ${m2(s.superficie.construida_m2)} construidos y se sectorizan por plantas; la mayor, ${s.plantaMayor.etiqueta}, tiene `, { v: construida(s.plantaMayor.construida_m2, s.plantaMayor.supuesta) }, `, sin exceder de ${max}.`);
-  } else {
-    out.push(`${quien} forman un sector de `, { v: construida(s.superficie.construida_m2, s.superficie.supuesta) }, ` construidos, que no excede de ${max}.`);
-  }
+  if (s.porPlantas && s.plantaMayor) out.push(` ${quien} se sectorizan por plantas.`);
+  else if (!ex && c.sectores.length > 1) out.push(` ${quien} forman un sector.`);
   for (const { d } of de(j, "sector")) {
     const sec = d.sector;
     if (sec.uso === "aparcamiento") {
-      out.push(` El garaje, de ${construida(sec.superficie.construida_m2, sec.superficie.supuesta)} construidos, es uso Aparcamiento por exceder de 100 m² y constituye un sector diferenciado; toda comunicación con el resto del edificio se hace a través de vestíbulo de independencia.`);
+      out.push(" El garaje es uso Aparcamiento por exceder de 100 m² y constituye un sector diferenciado; toda comunicación con el resto del edificio se hace a través de vestíbulo de independencia.");
     } else if (sec.id.startsWith("local-")) {
       out.push(
         sec.usoSupuesto
@@ -59,9 +53,7 @@ function parrafoSectores(j: JustificacionSi1): Trozo[] {
     }
   }
   for (const { d } of de(j, "exenta")) {
-    out.push(
-      ` ${d.exenta.zona.uso === "oficinas" ? "Las oficinas" : "El local, de uso Administrativo,"} no exceden de 500 m² construidos y no precisan constituir sector propio.`,
-    );
+    out.push(` ${d.exenta.zona.uso === "oficinas" ? "Las oficinas" : "El local, de uso Administrativo,"} no precisan constituir sector propio.`);
   }
   return out;
 }
@@ -70,25 +62,22 @@ function parrafoResistencia(j: JustificacionSi1): Trozo[] {
   const c = j.comp;
   const sectores = c.sectores.filter((s) => !s.principal);
   if (sectores.length === 0 && !c.principal.porPlantas) return [];
-  const out: Trozo[] = [`Conforme a la tabla 1.2 (altura de evacuación del edificio ${fmt(c.h_m, "m", 2)}), `];
-  if (j.existente) out[0] = `Conforme a la tabla 1.2 (altura de evacuación del edificio ${fmt(c.h_m, "m", 2)}), en lo que linda con lo intervenido, `;
-  const frases: Trozo[][] = sectores.map((s) => {
+  // La EI de cada sector va en la tabla (feature-31): aquí, de dónde sale y lo que la tabla no dice.
+  const out: Trozo[] = [
+    `La resistencia al fuego de los elementos que separan cada sector del resto del edificio es la de la tabla 1.2, para una altura de evacuación del edificio de ${fmt(c.h_m, "m", 2)}${j.existente ? ", en lo que linda con lo intervenido" : ""}`,
+  ];
+  const extra: string[] = [];
+  for (const s of sectores) {
     const l = limiteDe(c, s);
-    const quien = s.uso === "aparcamiento" ? "el garaje" : s.id.startsWith("local-") ? "el local" : s.id === "oficinas" ? "las oficinas" : "las viviendas";
-    const f: Trozo[] = [`los elementos que separan ${quien} del resto del edificio son `, { v: `EI ${l.ei}` }];
-    if (l.techo) f.push(`, con techo REI ${l.ei}`);
-    f.push(
+    const quien = s.uso === "aparcamiento" ? "del garaje" : s.id.startsWith("local-") ? "del local" : s.id === "oficinas" ? "de las oficinas" : "de las viviendas";
+    extra.push(
       l.vestibulo
-        ? `, y el vestíbulo de independencia tiene paredes EI ${VESTIBULO_INDEPENDENCIA.datos.paredes_EI} y dos puertas EI2 ${l.puerta_EI2}-C5`
-        : `; sus puertas de paso, si las tiene, son EI2 ${l.puerta_EI2}-C5`,
+        ? `el vestíbulo de independencia ${quien} tiene paredes EI ${VESTIBULO_INDEPENDENCIA.datos.paredes_EI} y dos puertas EI2 ${l.puerta_EI2}-C5`
+        : `las puertas de paso ${quien}, si las tiene, son EI2 ${l.puerta_EI2}-C5`,
     );
-    return f;
-  });
-  frases.forEach((f, i) => {
-    if (i > 0) out.push(i === frases.length - 1 ? "; y " : "; ");
-    out.push(...f);
-  });
-  if (c.principal.porPlantas) out.push(`${frases.length > 0 ? "; " : ""}los forjados entre plantas mantienen la compartimentación de los sectores`);
+  }
+  if (c.principal.porPlantas) extra.push("los forjados entre plantas mantienen la compartimentación de los sectores");
+  if (extra.length > 0) out.push(`: ${listaY(extra)}`);
   out.push(".");
   if (sectores.some((s) => s.uso === "aparcamiento")) {
     out.push(" El ascensor que comunica el garaje con otras plantas lo hace a través de vestíbulo de independencia (SI 1, ap. 1 pto 4).");
@@ -96,21 +85,16 @@ function parrafoResistencia(j: JustificacionSi1): Trozo[] {
   return out;
 }
 
-function parrafoEntreViviendas(j: JustificacionSi1): Trozo[] {
-  const e = de(j, "entre_viviendas")[0];
-  if (!e) return [];
-  return ["Los elementos que separan las viviendas entre sí son al menos ", { v: `EI ${e.d.ei}` }, " (SI 1, tabla 1.1)."];
-}
-
 function parrafosLocales(j: JustificacionSi1): Trozo[][] {
   const out: Trozo[][] = [];
   for (const { nombre, d } of de(j, "local")) {
     const k = d.condiciones;
     const l = d.local;
+    // La R, la EI y la puerta van en la tabla (feature-31).
     out.push([
       `${nombre} (${l.zona.plantas}) es local de riesgo especial `,
       { v: l.clase },
-      ` (SI 1, tabla 2.1: ${porQueLocal(l)}). Cumple la tabla 2.2: estructura R ${k.R}, paredes y techo EI ${k.EI}${k.subePorNota2 ? ", no menos que los sectores del uso al que sirve (nota 2)" : ""}, ${k.vestibulo ? `vestíbulo de independencia con dos puertas EI2 ${k.puerta_EI2}-C5` : `puerta EI2 ${k.puerta_EI2}-C5`} y recorrido hasta alguna de sus salidas no mayor que ${fmt(k.recorrido_m, "m", 0)}.`,
+      ` (SI 1, tabla 2.1: ${porQueLocal(l)}). Cumple la tabla 2.2${k.subePorNota2 ? ", con la resistencia de los sectores del uso al que sirve (nota 2)" : ""}${k.vestibulo ? `, con vestíbulo de independencia y dos puertas EI2 ${k.puerta_EI2}-C5` : ""}, y el recorrido hasta alguna de sus salidas no es mayor que ${fmt(k.recorrido_m, "m", 0)}.`,
     ]);
   }
   const no = de(j, "no_local");
@@ -140,28 +124,88 @@ function parrafoReaccion(j: JustificacionSi1): Trozo[] {
   return out;
 }
 
-function tabla(j: JustificacionSi1): TablaMemoria | undefined {
+/** «EI 120 · techo REI 120 · vestíbulo». */
+function resistenciaSector(l: ReturnType<typeof limiteDe>): string {
+  return [`EI ${l.ei}`, ...(l.techo ? [`techo REI ${l.ei}`] : []), ...(l.vestibulo ? ["vestíbulo"] : [])].join(" · ");
+}
+
+/**
+ * Sectores y locales de riesgo especial (feature-31): superficie y resistencia,
+ * lo exigido y lo de proyecto. La resistencia de proyecto es la que se declara.
+ */
+function tabla(j: JustificacionSi1, tras: number): TablaMemoria | undefined {
   const filas: string[][] = [];
   const c = j.comp;
+  const max = m2(SECTORES_TABLA_1_1.datos.sectorMax_m2);
+  const otros = c.sectores.some((s) => !s.principal) || de(j, "exenta").length > 0;
+  const entre = de(j, "entre_viviendas")[0]?.d;
   for (const el of j.elementos) {
     const d = el.detalle;
-    if (d.clase === "principal") filas.push([el.nombre, d.unifamiliar ? "Residencial Vivienda" : NOMBRE_USO_SECTOR[d.sector.uso], construida(d.sector.superficie.construida_m2, d.sector.superficie.supuesta), "sector"]);
-    if (d.clase === "sector") {
-      const l = limiteDe(c, d.sector);
-      filas.push([el.nombre, NOMBRE_USO_SECTOR[d.sector.uso], construida(d.sector.superficie.construida_m2, d.sector.superficie.supuesta), `EI ${l.ei}${l.vestibulo ? " · vestíbulo" : ""}`]);
+    const ok = cumpleTexto(el.veredicto === "fail" ? "fail" : "ok");
+    if (d.clase === "principal") {
+      const s = d.sector;
+      const planta = s.porPlantas ? s.plantaMayor : null;
+      const medida = planta ?? s.superficie;
+      const res = entre ? `EI ${entre.ei} entre viviendas` : otros ? "la de cada colindante" : NO_SE_EXIGE;
+      filas.push([
+        el.nombre,
+        d.unifamiliar ? "Residencial Vivienda" : NOMBRE_USO_SECTOR[s.uso],
+        planta ? `≤ ${max} por planta` : `≤ ${max}`,
+        `${construida(medida.construida_m2, medida.supuesta)}${planta ? ` (${planta.etiqueta})` : ""}`,
+        res,
+        res,
+        ok,
+      ]);
     }
-    if (d.clase === "local") filas.push([`${el.nombre} (${d.local.zona.plantas})`, `riesgo ${d.local.clase}`, d.local.s_m2 !== undefined ? m2(d.local.s_m2) : "—", `R ${d.condiciones.R} · EI ${d.condiciones.EI}`]);
+    if (d.clase === "sector") {
+      const s = d.sector;
+      const r = resistenciaSector(limiteDe(c, s));
+      filas.push([
+        el.nombre,
+        NOMBRE_USO_SECTOR[s.uso],
+        s.limite_m2 === null ? "sector propio" : `≤ ${m2(s.limite_m2)}`,
+        construida(s.superficie.construida_m2, s.superficie.supuesta),
+        r,
+        r,
+        ok,
+      ]);
+    }
+    if (d.clase === "exenta") {
+      const z = d.exenta.zona;
+      filas.push([
+        el.nombre,
+        "Administrativo",
+        `≤ ${m2(SECTORES_TABLA_1_1.datos.establecimientoExento_m2)} sin ser sector`,
+        construida(z.construida.valor * z.repeticiones, z.construida.supuesto),
+        NO_SE_EXIGE,
+        NO_SE_EXIGE,
+        ok,
+      ]);
+    }
+    if (d.clase === "local") {
+      const k = d.condiciones;
+      const r = `R ${k.R} · EI ${k.EI} · puerta EI2 ${k.puerta_EI2}-C5`;
+      filas.push([`${el.nombre} (${d.local.zona.plantas})`, `riesgo ${d.local.clase}`, NO_SE_EXIGE, d.local.s_m2 !== undefined ? m2(d.local.s_m2) : "no interviene", r, r, ok]);
+    }
   }
-  return { cabecera: ["Sector o local", "Uso o riesgo", "Superficie construida", "Resistencia"], filas };
+  if (filas.length === 0) return undefined;
+  return {
+    cabecera: ["Sector o local", "Uso o riesgo", "Superficie norma", "Superficie proyecto", "Resistencia norma", "Resistencia proyecto", "Cumple"],
+    columnas: ["texto", "texto", "norma", "proyecto", "norma", "proyecto", "cumple"],
+    filas,
+    tras,
+  };
 }
 
 export function memoriaSi1(j: JustificacionSi1): MemoriaDoc {
-  const parrafos = [parrafoSectores(j), parrafoResistencia(j), parrafoEntreViviendas(j), ...parrafosLocales(j), parrafoOcultos(), parrafoReaccion(j)].filter((p) => p.length > 0);
+  // La tabla, tras los sectores y los locales: antes de los espacios ocultos y la reacción al fuego.
+  const antes = [parrafoSectores(j), parrafoResistencia(j), ...parrafosLocales(j)].filter((p) => p.length > 0);
+  const parrafos = [...antes, parrafoOcultos(), parrafoReaccion(j)].filter((p) => p.length > 0);
   return {
     titulo: "Propagación interior",
     norma: "DB-SI 1",
     parrafos,
-    tablas: soloTablas(tabla(j)),
+    tablas: soloTablas(tabla(j, antes.length)),
     fuente: ["DB-SI · SI 1 (consolidado 4-mar-2025)", "tablas 1.1, 1.2, 2.1, 2.2 y 4.1", "datos de El edificio", `motor ${ENGINE_VERSION}`].join(" · "),
   };
 }
