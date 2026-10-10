@@ -192,3 +192,12 @@ describe("HE y HR (paso 5)", () => {
     expect(evaluarExpediente(p).porClave.hr?.avisos.map((a) => a.id)).toContain("impactos-existente");
   });
 });
+
+describe("SI 1 en obra existente (cierre)", () => {
+  it("la vivienda se integra en el sector del edificio y lo que linda con ella se separa con su resistencia", () => {
+    const si1 = apartado(texto(reforma()), "3.2.1. SI 1 Propagación interior");
+    expect(si1).toContain("La zona que se transforma en vivienda se integra en el sector de incendio de uso Residencial Vivienda del edificio existente");
+    expect(si1).toContain("los elementos que separan el local del resto del edificio son EI 90");
+    expect(si1).not.toContain("El edificio se compartimenta en un único sector");
+  });
+});

@@ -32,7 +32,11 @@ function parrafoSectores(j: JustificacionSi1): Trozo[] {
       ` construidos, que no excede de los ${max} que admite el uso Residencial Vivienda (SI 1, tabla 1.1); una vivienda unifamiliar no precisa sectores en su interior.`,
     ];
   }
-  const out: Trozo[] = [`El edificio se compartimenta en ${c.sectores.length === 1 ? "un único sector" : `${c.sectores.length} sectores`} de incendio (SI 1, tabla 1.1). `];
+  const ex = j.existente;
+  // En un edificio existente, en qué sector se integra lo intervenido (feature-30).
+  const out: Trozo[] = ex
+    ? [`${ex.pasaAVivienda ? "La zona que se transforma en vivienda" : "Lo intervenido"} se integra en el sector de incendio de uso ${s.uso === "administrativo" ? "Administrativo" : "Residencial Vivienda"} del edificio existente (SI 1, tabla 1.1). `]
+    : [`El edificio se compartimenta en ${c.sectores.length === 1 ? "un único sector" : `${c.sectores.length} sectores`} de incendio (SI 1, tabla 1.1). `];
   const quien = s.uso === "administrativo" ? "Las oficinas" : "Las viviendas, con sus zonas comunes,";
   if (s.porPlantas && s.plantaMayor) {
     out.push(`${quien} suman ${m2(s.superficie.construida_m2)} construidos y se sectorizan por plantas; la mayor, ${s.plantaMayor.etiqueta}, tiene `, { v: construida(s.plantaMayor.construida_m2, s.plantaMayor.supuesta) }, `, sin exceder de ${max}.`);
@@ -66,6 +70,7 @@ function parrafoResistencia(j: JustificacionSi1): Trozo[] {
   const sectores = c.sectores.filter((s) => !s.principal);
   if (sectores.length === 0 && !c.principal.porPlantas) return [];
   const out: Trozo[] = [`Conforme a la tabla 1.2 (altura de evacuación del edificio ${fmt(c.h_m, "m", 2)}), `];
+  if (j.existente) out[0] = `Conforme a la tabla 1.2 (altura de evacuación del edificio ${fmt(c.h_m, "m", 2)}), en lo que linda con lo intervenido, `;
   const frases: Trozo[][] = sectores.map((s) => {
     const l = limiteDe(c, s);
     const quien = s.uso === "aparcamiento" ? "el garaje" : s.id.startsWith("local-") ? "el local" : s.id === "oficinas" ? "las oficinas" : "las viviendas";

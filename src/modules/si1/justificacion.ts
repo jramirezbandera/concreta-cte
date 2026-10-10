@@ -9,6 +9,7 @@
 // =============================================================================
 
 import type { Aviso } from "../../lib/cte/resultado";
+import { obraDeZona } from "../../lib/proyecto/alcance";
 import type { Veredicto } from "../../lib/pdf/renderFicha";
 import type { ProyectoSi } from "../si/definicion";
 import { edificioSi, type ZonaSi } from "../si/edificio";
@@ -41,6 +42,47 @@ export type ElementoSi1 = ElementoSi<DetalleSi1>;
 export interface JustificacionSi1 extends JustificacionSiBase {
   elementos: ElementoSi1[];
   comp: Compartimentacion;
+  /**
+   * En un edificio existente con el asistente respondido (feature-30): los
+   * sectores son los del edificio entero, y solo quedan los que contienen lo
+   * intervenido o lindan con él (en su planta o la de debajo).
+   */
+  existente?: { pasaAVivienda: boolean };
+}
+
+export function justificarSi1(estado: Si1Estado, p: ProyectoSi): JustificacionSi1 {
+  const ex = p.existente;
+  if (!ex) return justificarSi1Edificio(estado, p);
+  const j = justificarSi1Edificio(estado, { ...p, edificio: ex.edificio, existente: undefined });
+  const tocadas = new Set(ex.edificio.grupos.flatMap((g) => g.zonas.filter((z) => obraDeZona(z, ex.intervencion) !== "existente").map((z) => z.id)));
+  const niveles = new Set(edificioSi(ex.edificio).zonas.filter((z) => tocadas.has(z.id)).flatMap((z) => z.niveles));
+  // En la planta de lo intervenido o justo debajo.
+  const cerca = (ns: readonly number[]) => ns.some((n) => niveles.has(n) || niveles.has(n + 1));
+  const cuenta = (s: SectorSi) => s.principal || s.zonas.some((z) => tocadas.has(z.id)) || cerca(s.niveles);
+  const elementos = j.elementos.filter((el) => {
+    const d = el.detalle;
+    switch (d.clase) {
+      case "sector":
+        return cuenta(d.sector);
+      case "exenta":
+        return tocadas.has(d.exenta.zona.id) || cerca(d.exenta.zona.niveles);
+      case "local":
+        return tocadas.has(d.local.zona.id);
+      case "no_local":
+        return tocadas.has(d.zona.id);
+      default:
+        return true;
+    }
+  });
+  const ids = new Set(elementos.map((el) => el.id));
+  return {
+    ...j,
+    elementos,
+    avisos: j.avisos.filter((a) => !a.elementoId || ids.has(a.elementoId)),
+    veredicto: elementos.some((x) => x.veredicto === "fail") ? "fail" : "ok",
+    comp: { ...j.comp, sectores: j.comp.sectores.filter(cuenta) },
+    existente: { pasaAVivienda: ex.deduccion.pasaAVivienda },
+  };
 }
 
 /** El elemento de un sector o de una zona, para el dibujo. */
@@ -71,7 +113,7 @@ function nombreSector(s: SectorSi, unifamiliar: boolean): string {
   return "Local";
 }
 
-export function justificarSi1(_estado: Si1Estado, p: ProyectoSi): JustificacionSi1 {
+function justificarSi1Edificio(_estado: Si1Estado, p: ProyectoSi): JustificacionSi1 {
   const e = edificioSi(p.edificio);
   const c = compartimentar(e);
   const unifamiliar = e.resumen.esUnifamiliar;
