@@ -1,4 +1,4 @@
-import type { DatosGenerales, Intervencion, JustificacionKey, Proyecto, TipoObraExistente } from "./tipos";
+import type { Alcance, DatosGenerales, Intervencion, JustificacionKey, Proyecto, TipoObraExistente } from "./tipos";
 import type { Edificio, ObraZona, UsoZona, Zona } from "../edificio/tipos";
 import type { CasoEdificio } from "../edificio/casos";
 import type { He4Estado } from "../../modules/he4/estado";
@@ -178,9 +178,75 @@ export function edificioParaModulo(dg: DatosGenerales, edificio: Edificio, key: 
   return soloZonas(edificio, queda);
 }
 
-/** El proyecto tal como lo ve una justificación (ver `edificioParaModulo`). */
-export function proyectoParaModulo(p: Proyecto, key: JustificacionKey): Proyecto {
+// ─── Lo existente, a la vista de los módulos (feature-30) ────────────────────
+
+/**
+ * Lo que un módulo necesita para redactar una obra en un edificio existente
+ * como intervención: qué se proyecta y qué existe y no se modifica. Solo con el
+ * asistente de alcance respondido (sin él, la reforma se redacta como hasta
+ * feature-29, y obra nueva nunca la tiene).
+ */
+export interface ObraExistente {
+  /** El edificio entero, con lo que no se toca (el módulo calcula sobre lo intervenido). */
+  edificio: Edificio;
+  /** Lo que El edificio dice del alcance (cambios de uso, ampliación…). */
+  deduccion: AlcanceEdificio;
+  /** Las respuestas del asistente. */
+  respuestas: Alcance;
+  intervencion: Intervencion;
+}
+
+/** El contexto de lo existente, si lo hay (ver `ObraExistente`). */
+export function obraExistenteDe(dg: DatosGenerales, edificio: Edificio): ObraExistente | undefined {
+  if (dg.intervencion === "obra_nueva" || !dg.alcance) return undefined;
+  return { edificio, deduccion: alcanceDeEdificio(dg, edificio), respuestas: dg.alcance, intervencion: dg.intervencion };
+}
+
+/**
+ * El edificio antes de la obra: sin lo nuevo y con lo que cambia de uso en su
+ * uso anterior (sin uso anterior, el de ahora). La parte de un local que pasa a
+ * vivienda vuelve al local del que se segrega: si en el mismo grupo de plantas
+ * queda una zona existente con el uso anterior, se le suma (era un local, no
+ * dos). Para comparar lo de antes con lo de después (REBT, SUA 8).
+ */
+export function edificioAntes(ex: ObraExistente): Edificio {
+  const obra = (z: Zona) => obraDeZona(z, ex.intervencion);
+  const cambia = (z: Zona): z is Zona & { usoAnterior: UsoZona } =>
+    obra(z) === "cambia_uso" && z.usoAnterior !== undefined && z.usoAnterior !== z.uso;
+  return {
+    ...ex.edificio,
+    grupos: ex.edificio.grupos.map((g) => {
+      const madreDe = (uso: UsoZona) => g.zonas.find((x) => x.uso === uso && obra(x) === "existente");
+      const zonas: Zona[] = [];
+      for (const z of g.zonas) {
+        if (obra(z) === "nueva") continue;
+        if (cambia(z)) {
+          if (madreDe(z.usoAnterior)) continue; // se suma a la zona de la que se segrega
+          const { unidades: _sinUnidades, ...resto } = z;
+          zonas.push({ ...resto, uso: z.usoAnterior });
+          continue;
+        }
+        const segregadas = g.zonas.filter((y) => cambia(y) && madreDe(y.usoAnterior) === z);
+        zonas.push(segregadas.length === 0 ? z : { ...z, superficieUtil_m2: z.superficieUtil_m2 + segregadas.reduce((acc, y) => acc + y.superficieUtil_m2, 0) });
+      }
+      return { ...g, zonas };
+    }),
+  };
+}
+
+/** Si una zona no se toca en la obra. */
+export function esExistente(z: Zona, ex: ObraExistente): boolean {
+  return obraDeZona(z, ex.intervencion) === "existente";
+}
+
+/** El proyecto tal como lo ve una justificación, con lo existente si lo hay. */
+export type ProyectoModulo = Proyecto & { existente?: ObraExistente };
+
+/** El proyecto tal como lo ve una justificación (ver `edificioParaModulo` y `ObraExistente`). */
+export function proyectoParaModulo(p: Proyecto, key: JustificacionKey): ProyectoModulo {
   const edificio = edificioParaModulo(p.datosGenerales, p.edificio, key);
+  const existente = obraExistenteDe(p.datosGenerales, p.edificio);
+  if (existente) return { ...p, edificio, existente };
   return edificio === p.edificio ? p : { ...p, edificio };
 }
 

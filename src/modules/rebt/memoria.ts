@@ -201,8 +201,90 @@ function tablaPrevision(j: JustificacionRebt): MemoriaDoc["tabla"] {
   return { cabecera: ["Concepto", "Base", "Criterio", "Potencia"], filas };
 }
 
+// ─── En un edificio existente (feature-30) ──────────────────────────────────
+
+/**
+ * Lo que se proyecta (las viviendas y los locales nuevos, su derivación y su
+ * contador) dentro de la instalación de enlace existente, que no se modifica si
+ * la carga del edificio no aumenta.
+ */
+function parrafosExistente(j: JustificacionRebt): Trozo[][] {
+  const ex = j.existente!;
+  const G = GRADO_REBT.datos;
+  const p: Trozo[][] = [];
+  p.push([
+    "La previsión de cargas se realiza de acuerdo con la ITC-BT-10 del Reglamento electrotécnico para baja tensión (RD 842/2002), para lo que se proyecta dentro de la instalación existente del edificio (art. 2.2). Las potencias que siguen son las mínimas reglamentarias: si se conoce una demanda real mayor, se prevé esta.",
+  ]);
+  const n = ex.viviendas.reduce((a, v) => a + v.cantidad, 0);
+  if (n > 0) {
+    p.push([
+      `${n === 1 ? "La vivienda nueva" : `Las ${n} viviendas nuevas`} (${lista(ex.viviendas.map((v) => `${n === 1 ? "" : `${v.cantidad} `}del tipo ${v.nombre}, de ${m2(v.superficie_m2)} útiles`))}) ${n === 1 ? "es" : "son"} de electrificación ${lista([...new Set(ex.viviendas.map((v) => `${NOMBRE_GRADO[v.grado]} ${textoMotivos(v)}`))])}, con una potencia prevista de `,
+      { v: lista([...new Set(ex.viviendas.map((v) => W(v.potencia_W)))]) },
+      ` a ${G.tension_V} V${n === 1 ? "" : " por vivienda"} (IGA de ${lista([...new Set(ex.viviendas.map((v) => `${v.iga_A} A`))])}) (ITC-BT-10 ap. 2.1 y 2.2; ITC-BT-25 ap. 2).`,
+    ]);
+  }
+  for (const l of ex.locales) {
+    p.push([
+      `${l.uso === "oficinas" ? "Las oficinas" : "El local"} nuev${l.uso === "oficinas" ? "as" : "o"} de ${l.plantas}, con ${m2(l.m2)}, ${l.uso === "local_sin_uso" ? "sin actividad definida, deja prevista " : "prevén "}`,
+      l.minimo ? `el mínimo de ${W(LOCALES_REBT.datos.minimoLocal_W)} por local` : `${LOCALES_REBT.datos.W_m2} W/m²`,
+      ": ",
+      { v: kW(l.p_W) },
+      ` (ap. ${j.clasificacion === "oficinas" ? "4.1" : "3.3"}).`,
+    ]);
+  }
+  const c = detalle(j, "contadores");
+  if (ex.contadoresNuevos > 0 && c) {
+    const uno = ex.contadoresNuevos === 1;
+    p.push([
+      `${uno ? "Se alimenta" : "Se alimentan"} con ${uno ? "una derivación individual nueva" : "derivaciones individuales nuevas"} desde la centralización de contadores existente, en la que se ${uno ? "dispone su contador" : `disponen sus ${ex.contadoresNuevos} contadores`} (ITC-BT-15 y ITC-BT-16); con ${uno ? "él" : "ellos"}, la centralización pasa a tener ${c.n} contadores (${lista(c.desglose.map(textoDesglose))})`,
+      c.exigeLocal && !c.cuarto ? `, más de ${CONTADORES_REBT.datos.localSiMasDe}: NO CUMPLE la ITC-BT-16 ap. 2.2, que pide local.` : ".",
+    ]);
+  }
+  const aumenta = ex.despues_W > ex.antes_W;
+  p.push(
+    aumenta
+      ? [
+          "Con la obra, la carga prevista del edificio pasa de ",
+          { v: kW(ex.antes_W) },
+          " a ",
+          { v: kW(ex.despues_W) },
+          ` (ITC-BT-10 ap. 3): aumenta, por lo que se comprueba que la línea general de alimentación y la caja general de protección existentes admiten ${num(ex.despues_A, 1)} A a ${CRITERIOS_REBT.datos.tensionTrifasica_V} V, o se refuerzan (ITC-BT-13 e ITC-BT-14).`,
+        ]
+      : [
+          "Con la obra, la carga prevista del edificio no aumenta: pasa de ",
+          { v: kW(ex.antes_W) },
+          " a ",
+          { v: kW(ex.despues_W) },
+          " (ITC-BT-10 ap. 3), por lo que la línea general de alimentación y la caja general de protección existentes no se modifican.",
+        ],
+  );
+  p.push([
+    `La instalación ${n + ex.locales.length === 1 ? "nueva" : "de cada unidad nueva"} no está en ninguno de los grupos que precisan proyecto: se documenta con una memoria técnica de diseño (ITC-BT-04 ap. 3.1 y 4).`,
+  ]);
+  return p;
+}
+
+function tablaExistente(j: JustificacionRebt): MemoriaDoc["tabla"] {
+  const ex = j.existente!;
+  const filas: string[][] = [];
+  for (const v of ex.viviendas) filas.push([`Vivienda ${v.nombre} (nueva)`, `${v.cantidad} × ${m2(v.superficie_m2)}`, NOMBRE_GRADO[v.grado], W(v.potencia_W)]);
+  for (const l of ex.locales) filas.push([`${l.uso === "oficinas" ? "Oficinas" : "Local"} (${l.plantas}, nuevo)`, m2(l.m2), l.minimo ? "mínimo" : `${LOCALES_REBT.datos.W_m2} W/m²`, W(l.p_W)]);
+  filas.push(["Carga del edificio antes de la obra", "", "ITC-BT-10 ap. 3", W(ex.antes_W)]);
+  filas.push(["Carga del edificio con la obra", "", "ITC-BT-10 ap. 3", W(ex.despues_W)]);
+  return { cabecera: ["Concepto", "Base", "Criterio", "Potencia"], filas };
+}
+
 export function memoriaRebt(j: JustificacionRebt): MemoriaDoc {
   const fuente = ["REBT (RD 842/2002), consolidado BOE 03-09-2025", "ITC-BT-04, 10, 16, 25 y 52", "guías técnicas BT-10 y BT-52", "datos de El edificio", `motor ${ENGINE_VERSION}`].join(" · ");
+  if (j.existente) {
+    return {
+      titulo: "Grado de electrificación y previsión de cargas",
+      norma: "REBT ITC-BT-10",
+      parrafos: parrafosExistente(j),
+      tabla: tablaExistente(j),
+      fuente: ["REBT (RD 842/2002), consolidado BOE 03-09-2025", "art. 2.2", "ITC-BT-04, 10, 13, 14, 15, 16 y 25", "guía técnica BT-10", "datos de El edificio", `motor ${ENGINE_VERSION}`].join(" · "),
+    };
+  }
   const parrafos = [parrafoLugar(j), parrafoGrado(j), parrafoCargas(j), parrafoTotal(j), parrafoContadores(j), parrafoDocumentacion(j)];
   return {
     titulo: "Grado de electrificación y previsión de cargas",

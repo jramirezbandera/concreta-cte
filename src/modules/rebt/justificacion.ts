@@ -24,7 +24,8 @@
 
 import type { Aviso } from "../../lib/cte/resultado";
 import { viviendasEnZona } from "../../lib/edificio/derivar";
-import type { Edificio, ViviendaTipo } from "../../lib/edificio/tipos";
+import type { Edificio, ViviendaTipo, Zona } from "../../lib/edificio/tipos";
+import { edificioAntes, obraDeZona, soloZonas } from "../../lib/proyecto/alcance";
 import type { Veredicto } from "../../lib/pdf/renderFicha";
 import { resolverHe4, he4EstadoDefaults, type He4Estado } from "../he4/estado";
 import { recargaDeHe6 } from "../he6/justificacion";
@@ -183,6 +184,27 @@ export interface JustificacionRebt extends JustificacionSiBase {
   /** Hay ascensor (el de El edificio o el que exige SUA 9). */
   ascensor: boolean;
   total_W: number;
+  /** En un edificio existente con el asistente respondido (feature-30). */
+  existente?: ExistenteRebt;
+}
+
+/**
+ * Lo intervenido dentro de la instalación existente (feature-30): las viviendas
+ * y los locales nuevos (los de las zonas nuevas o que cambian de uso), y la
+ * carga del edificio antes y después de la obra, que dice si la línea general
+ * de alimentación existente queda servida.
+ */
+export interface ExistenteRebt {
+  /** Las viviendas nuevas, con su previsión (la cantidad es la de la obra). */
+  viviendas: ViviendaRebt[];
+  /** Los locales u oficinas nuevos: su elemento de carga. */
+  locales: Extract<DetalleRebt, { clase: "local" }>[];
+  antes_W: number;
+  despues_W: number;
+  /** Intensidad en la LGA después de la obra [A]. */
+  despues_A: number;
+  /** Contadores que se añaden a la centralización existente. */
+  contadoresNuevos: number;
 }
 
 function redondear(v: number, dec = 0): number {
@@ -537,8 +559,35 @@ export function justificarRebt(estado: RebtEstado, p: ProyectoSi): Justificacion
     },
   });
 
+  // ── Lo existente: la carga antes y después, y lo nuevo (feature-30) ──────
+  let existente: ExistenteRebt | undefined;
+  const ex = p.existente;
+  if (ex && !unifamiliar) {
+    const nueva = (z: Zona) => {
+      const o = obraDeZona(z, ex.intervencion);
+      return o === "nueva" || o === "cambia_uso";
+    };
+    const antes = justificarRebt(estado, { ...p, edificio: edificioAntes(ex), existente: undefined });
+    const enObra = viviendasDe(soloZonas(p.edificio, nueva), false);
+    const viviendasNuevas = enObra.flatMap(({ tipo, cantidad }) => {
+      const v = viviendas.find((x) => x.tipoId === tipo.id);
+      return v ? [{ ...v, cantidad }] : [];
+    });
+    const idsNuevas = new Set(p.edificio.grupos.flatMap((g) => g.zonas.filter(nueva).map((z) => z.id)));
+    const localesNuevos = elementos.flatMap((x) => (x.detalle.clase === "local" && idsNuevas.has(x.detalle.zonaId) ? [x.detalle] : []));
+    existente = {
+      viviendas: viviendasNuevas,
+      locales: localesNuevos,
+      antes_W: antes.total_W,
+      despues_W: total_W,
+      despues_A: i_A,
+      contadoresNuevos: viviendasNuevas.reduce((a, v) => a + v.cantidad, 0) + localesNuevos.reduce((a, l) => a + l.locales, 0),
+    };
+  }
+
   const veredicto: Veredicto = elementos.some((x) => x.veredicto === "fail") ? "fail" : "ok";
   return {
+    ...(existente ? { existente } : {}),
     elementos,
     avisos,
     veredicto,

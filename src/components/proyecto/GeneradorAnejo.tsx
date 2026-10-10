@@ -3,12 +3,12 @@ import { useProyecto } from "../../lib/proyecto/ProyectoContext";
 import { estadoDe } from "../../lib/proyecto/progreso";
 import { estadoEfectivo, evaluarExpediente } from "../../lib/obra/evaluar";
 import { notasExcepcionesLocales } from "../../lib/proyecto/herencia";
-import { proyectoParaModulo } from "../../lib/proyecto/alcance";
+import { proyectoParaModulo, type ProyectoModulo } from "../../lib/proyecto/alcance";
 import { fichaConAlcance } from "../../lib/obra/alcanceTexto";
 import { justificacionRegistry } from "../../data/justificacionRegistry";
 import type { FichaData } from "../../lib/pdf/renderFicha";
 import type { PdfResult } from "../../lib/pdf/utils";
-import type { JustificacionKey, Proyecto } from "../../lib/proyecto/tipos";
+import type { JustificacionKey } from "../../lib/proyecto/tipos";
 import { PdfPreviewModal } from "../ui/PdfPreviewModal";
 import { showToast } from "../ui/Toast";
 import { formatearFecha } from "../../lib/ui/fecha";
@@ -63,7 +63,7 @@ interface Identificacion {
 type Adaptador = (
   inputs: Record<string, unknown>,
   id: Identificacion,
-  proyecto: Proyecto,
+  proyecto: ProyectoModulo,
 ) => Promise<{ data: FichaData; nodo: ReactNode }>;
 
 /** Ancho CSS del clon oculto: más resolución que la de pantalla para el raster. */
@@ -188,7 +188,7 @@ const ADAPTADORES: Partial<Record<JustificacionKey, Adaptador>> = {
       import("../../modules/hs4/SeccionHs4"),
     ]);
     const estado = { ...estadoMod.hs4EstadoDefaults, ...inputs } as typeof estadoMod.hs4EstadoDefaults;
-    const obra = { presionAcometida_kPa: proyecto.datosGenerales.presionAcometida_kPa };
+    const obra = just.obraHs4De(proyecto);
     const revisados = proyecto.justificaciones.hs4?.revisados ?? [];
     const j = just.justificarHs4(estado, proyecto.edificio, obra);
     const svg = seccion.tamanoDibujoHs4(j, proyecto.edificio);
@@ -214,10 +214,7 @@ const ADAPTADORES: Partial<Record<JustificacionKey, Adaptador>> = {
       import("../../modules/hs5/SeccionHs5"),
     ]);
     const estado = { ...estadoMod.hs5EstadoDefaults, ...inputs } as typeof estadoMod.hs5EstadoDefaults;
-    const obra = {
-      pluviometria: proyecto.datosGenerales.pluviometria,
-      cotaAlcantarillado_m: proyecto.datosGenerales.cotaAlcantarillado_m,
-    };
+    const obra = just.obraHs5De(proyecto);
     const revisados = proyecto.justificaciones.hs5?.revisados ?? [];
     const j = just.justificarHs5(estado, proyecto.edificio, obra);
     const svg = seccion.tamanoDibujoHs5(j, proyecto.edificio);

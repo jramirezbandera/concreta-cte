@@ -24,6 +24,7 @@ import {
   type ResultadoAparatoHS4,
   type ResultadoTramoHS4,
 } from "./calc";
+import type { ObraExistente, ProyectoModulo } from "../../lib/proyecto/alcance";
 import type { Hs4Estado } from "./estado";
 import { generarRedHs4, type LocalHs4, type RedHs4, type UnidadHs4 } from "./red";
 import { ALIMENTACION_TABLA_4_3, PRESIONES, rangoVelocidad } from "./tablas";
@@ -32,6 +33,28 @@ import { ALIMENTACION_TABLA_4_3, PRESIONES, rangoVelocidad } from "./tablas";
 export interface ObraHs4 {
   /** Presión de la red en la acometida [kPa] (dato de la compañía). */
   presionAcometida_kPa?: number;
+  /** En un edificio existente, lo que hay alrededor de lo intervenido (feature-30). */
+  existente?: ObraExistente;
+}
+
+/** Los datos de la obra de HS4, del proyecto tal como lo ve el módulo. */
+export function obraHs4De(p: Pick<ProyectoModulo, "datosGenerales" | "existente">): ObraHs4 {
+  return {
+    presionAcometida_kPa: p.datosGenerales.presionAcometida_kPa,
+    ...(p.existente ? { existente: p.existente } : {}),
+  };
+}
+
+/**
+ * Lo intervenido dentro de la instalación existente (feature-30): la batería de
+ * contadores del edificio entero, después de la obra, a la que se añaden los de
+ * las unidades nuevas.
+ */
+export interface ExistenteHs4 {
+  /** Los contadores de la batería con la obra hecha (el edificio entero). */
+  bateria: RedHs4["contadores"];
+  /** Si la batería es de planta baja o hay contadores por planta. */
+  porPlanta: boolean;
 }
 
 /** Presión de la red con la que se calcula si no consta en los datos de la obra. */
@@ -99,6 +122,8 @@ export interface JustificacionHs4 {
   presionSinDato: boolean;
   /** Presión con la que arranca la red: la de la red o la salida del grupo. */
   partida_kPa: number;
+  /** En un edificio existente con el asistente respondido (feature-30). */
+  existente?: ExistenteHs4;
   /** Puntos de consumo por id. */
   puntos: Map<string, PuntoHs4>;
   elementos: ElementoHs4[];
@@ -459,6 +484,13 @@ export function justificarHs4(estado: Hs4Estado, edificio: Edificio, obra: ObraH
   if (resultado && !resultado.arbolValido) veredicto = "fail";
   if (elementos.some((e) => e.veredicto === "fail")) veredicto = "fail";
 
+  // ── Lo existente: la batería del edificio entero (feature-30) ─────────────
+  const ex = obra.existente;
+  const existente: ExistenteHs4 | undefined =
+    ex && modo === "edificio"
+      ? { bateria: generarRedHs4(ex.edificio, estado).contadores, porPlanta: d.contadores === "por_planta" }
+      : undefined;
+
   return {
     modo,
     red,
@@ -467,6 +499,7 @@ export function justificarHs4(estado: Hs4Estado, edificio: Edificio, obra: ObraH
     presionRed_kPa,
     presionSinDato,
     partida_kPa,
+    ...(existente ? { existente } : {}),
     puntos,
     elementos,
     avisos,

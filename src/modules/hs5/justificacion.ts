@@ -31,9 +31,12 @@ import {
   type RedHs5,
   type VerticalHs5,
 } from "./red";
+import type { ObraExistente, ProyectoModulo } from "../../lib/proyecto/alcance";
 import {
   BAJANTES_TABLA_4_4,
+  capacidadAPendiente,
   COLECTORES_TABLA_4_5,
+  seleccionarDiametroPorPendiente,
   INTENSIDAD_TABLA_B_1,
   ISOYETAS,
   RAMALES_COLECTORES_TABLA_4_3,
@@ -50,6 +53,39 @@ export interface ObraHs5 {
   pluviometria?: { zona: ZonaPluviometrica; isoyeta: Isoyeta };
   /** Cota del alcantarillado en la acometida [m] (negativa: bajo la rasante). */
   cotaAlcantarillado_m?: number;
+  /** En un edificio existente, lo que hay alrededor de lo intervenido (feature-30). */
+  existente?: ObraExistente;
+}
+
+/** Los datos de la obra de HS5, del proyecto tal como lo ve el módulo. */
+export function obraHs5De(p: Pick<ProyectoModulo, "datosGenerales" | "existente">): ObraHs5 {
+  const dg = p.datosGenerales;
+  return {
+    pluviometria: dg.pluviometria,
+    cotaAlcantarillado_m: dg.cotaAlcantarillado_m,
+    ...(p.existente ? { existente: p.existente } : {}),
+  };
+}
+
+/**
+ * La red existente a la que acomete lo intervenido (feature-30): las UD que
+ * recibe con la obra hecha (las del colector general del edificio entero) y si
+ * su Ø, si consta, las admite (tabla 4.5).
+ */
+export interface RedExistenteHs5 {
+  /** UD que aporta lo intervenido. */
+  udObra: number;
+  /** UD que recibe el colector general existente con la obra hecha. */
+  udTotal: number;
+  /** Ø del colector existente; `null` si no consta. */
+  diametro_mm: number | null;
+  pendiente_pct: number;
+  /** Lo que admite ese Ø a esa pendiente (tabla 4.5). */
+  capacidad_ud: number | null;
+  /** El Ø mínimo que necesita para las UD con la obra hecha. */
+  minimo_mm: number | null;
+  /** Las pluviales no se tocan (lo dice el asistente): no se calculan. */
+  pluvialesSinTocar: boolean;
 }
 
 /** Lo que la franja y la memoria necesitan de cada elemento, además del contrato. */
@@ -76,7 +112,8 @@ export type DetalleHs5 =
       alcantarillado: DecisionesEfectivas["alcantarillado"];
       residuales_mm: number | null;
       pluviales_mm: number | null;
-    };
+    }
+  | { clase: "red_existente"; red: RedExistenteHs5 };
 
 export interface ElementoHs5 extends ElementoResultado {
   /** «Bajante A · fecales», «Colector general». */
@@ -101,6 +138,8 @@ export interface JustificacionHs5 {
   residuales: HS5Result | null;
   pluviales: ResultadoPluviales | null;
   intensidad: IntensidadHs5;
+  /** En un edificio existente con el asistente respondido (feature-30). */
+  existente?: RedExistenteHs5;
   elementos: ElementoHs5[];
   avisos: Aviso[];
   veredicto: Veredicto;
@@ -216,8 +255,11 @@ export function justificarHs5(estado: Hs5Estado, edificio: Edificio, obra: ObraH
   const intensidad: IntensidadHs5 = pv
     ? { valor_mm_h: intensidadDe(pv.zona, pv.isoyeta), zona: pv.zona, isoyeta: pv.isoyeta, supuesta: false }
     : { valor_mm_h: INTENSIDAD_TABLA_B_1.datos.referencia_mm_h, zona: null, isoyeta: null, supuesta: true };
+  // En un edificio existente, las pluviales solo si la obra toca cubiertas o su red (feature-30).
+  const ex = obra.existente;
+  const pluvialesSinTocar = ex !== undefined && ex.respuestas.pluviales === false;
   const pluviales =
-    red.cubierta.superficie_m2 > 0
+    red.cubierta.superficie_m2 > 0 && !pluvialesSinTocar
       ? calcPluviales({
           cubierta: red.cubierta,
           intensidad_mm_h: intensidad.valor_mm_h,
@@ -495,8 +537,41 @@ export function justificarHs5(estado: Hs5Estado, edificio: Edificio, obra: ObraH
     });
   }
 
+  // ── La red existente a la que acomete lo intervenido (feature-30) ──────────
+  let existente: RedExistenteHs5 | undefined;
+  if (ex && modo === "edificio") {
+    const colector = red.colectorId ? (porId.get(red.colectorId) ?? null) : null;
+    const udObra = colector?.udAcumuladas ?? 0;
+    const entero = justificarHs5({ ...estado, red: "edificio" }, ex.edificio, { ...obra, existente: undefined });
+    const colEntero = entero.red.colectorId ? entero.residuales?.porTramo.find((t) => t.id === entero.red.colectorId) : undefined;
+    const udTotal = colEntero?.udAcumuladas ?? udObra;
+    const pendiente_pct = estado.redExistentePendiente_pct > 0 ? estado.redExistentePendiente_pct : d.pendienteColector_pct;
+    // Un Ø que no está en la tabla cuenta como el tabulado inmediatamente menor.
+    const fila = COLECTORES_TABLA_4_5.datos.filas.filter((f) => f.diametro_mm <= estado.redExistente_mm).at(-1);
+    const diametro_mm = estado.redExistente_mm > 0 ? estado.redExistente_mm : null;
+    const capacidad_ud = fila ? capacidadAPendiente(fila, pendiente_pct) : null;
+    const minimo_mm = seleccionarDiametroPorPendiente(COLECTORES_TABLA_4_5.datos.filas, udTotal, pendiente_pct)?.diametro_mm ?? null;
+    existente = { udObra, udTotal, diametro_mm, pendiente_pct, capacidad_ud, minimo_mm, pluvialesSinTocar };
+  }
+
   // ── Conexión al alcantarillado ────────────────────────────────────────────
-  if (residuales || pluviales) {
+  if (existente && residuales) {
+    const r = existente;
+    // Lo existente solo bloquea si condiciona la obra: el colector no admite lo que se le añade.
+    const admite = r.capacidad_ud !== null && r.udTotal <= r.capacidad_ud;
+    elementos.push({
+      id: "conexion",
+      nombre: "Colector existente",
+      tipo: "conexion",
+      veredicto: r.diametro_mm === null ? "criterio" : admite ? "ok" : "fail",
+      valor: r.diametro_mm === null ? { texto: "sin el dato" } : { valor: r.diametro_mm, unidad: "mm" },
+      ...(r.capacidad_ud !== null ? { limite: { valor: r.capacidad_ud, unidad: "UD" } } : {}),
+      manda: { tipo: "decision_proyectista", decision: "red existente" },
+      cita: ["HS 5 · ap. 1.1", "tabla 4.5"],
+      detalle: { clase: "red_existente", red: r },
+    });
+    if (r.diametro_mm === null) avisos.push({ id: "red-existente-sin-dato", tipo: "supuesto", elementoId: "conexion", datos: {} });
+  } else if (residuales || pluviales) {
     const colRes = red.colectorId ? (porId.get(red.colectorId)?.diametro_mm ?? null) : null;
     elementos.push({
       id: "conexion",
@@ -535,5 +610,5 @@ export function justificarHs5(estado: Hs5Estado, edificio: Edificio, obra: ObraH
   if (residuales?.veredictoGlobal === "fail") veredicto = "fail";
   if (elementos.some((e) => e.veredicto === "fail")) veredicto = "fail";
 
-  return { modo, red, residualesInputs, residuales, pluviales, intensidad, elementos, avisos, veredicto };
+  return { modo, red, residualesInputs, residuales, pluviales, intensidad, ...(existente ? { existente } : {}), elementos, avisos, veredicto };
 }

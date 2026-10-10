@@ -32,9 +32,13 @@ describe("edificioParaModulo", () => {
     }
   });
 
-  it("sin zonas sin tocar devuelve el mismo proyecto", () => {
+  it("sin zonas sin tocar, el mismo edificio; con el asistente respondido, lo existente al lado (feature-30)", () => {
     const p = reforma({});
-    expect(proyectoParaModulo(p, "hs4")).toBe(p);
+    const v = proyectoParaModulo(p, "hs4");
+    expect(v.edificio).toBe(p.edificio);
+    expect(v.existente?.edificio).toBe(p.edificio);
+    const sinAsistente: Proyecto = { ...p, datosGenerales: { ...p.datosGenerales, alcance: undefined } };
+    expect(proyectoParaModulo(sinAsistente, "hs4")).toBe(sinAsistente);
   });
 
   it("quita lo existente a lo intervenido; SI 3 conserva las zonas comunes; SI 4 lo ve todo", () => {
@@ -44,8 +48,8 @@ describe("edificioParaModulo", () => {
     expect(ids(proyectoParaModulo(p, "hs4"))).toEqual([primera]);
     const si3 = proyectoParaModulo(p, "si3").edificio.grupos.flatMap((g) => g.zonas.map((z) => z.uso));
     expect(si3).toContain("zona_comun");
-    expect(proyectoParaModulo(p, "si4")).toBe(p);
-    expect(proyectoParaModulo(p, "sua8")).toBe(p);
+    expect(proyectoParaModulo(p, "si4").edificio).toBe(p.edificio);
+    expect(proyectoParaModulo(p, "sua8").edificio).toBe(p.edificio);
     expect(proyectoParaModulo(p, "hs4").edificio.grupos).toHaveLength(p.edificio.grupos.length);
   });
 });

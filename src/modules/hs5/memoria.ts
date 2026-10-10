@@ -76,6 +76,11 @@ function parrafoMetodo(j: JustificacionHs5): Trozo[] {
   const p: Trozo[] = [
     "La red de evacuación se ha dimensionado conforme a la sección HS 5 del DB-HS por el método de las unidades de desagüe.",
   ];
+  if (j.existente) {
+    // La acometida a la calle es la del edificio (feature-30).
+    if (j.residuales) p.push(" Lo intervenido acomete a la red de residuales existente del edificio.");
+    return p;
+  }
   if (j.pluviales && j.residuales) {
     p.push(
       j.red.decisiones.alcantarillado === "unitario"
@@ -161,7 +166,7 @@ function parrafoResiduales(j: JustificacionHs5): Trozo[] {
   const tipos = (vs: VerticalHs5[]) => [...new Map(vs.map((v) => [v.tipoId, v])).values()];
   if (viviendas.length > 0) {
     const ts = tipos(viviendas);
-    if (j.red.unifamiliar) {
+    if (j.red.unifamiliar || (j.existente && viviendas.length === 1)) {
       p.push("La vivienda suma ", { v: `${n0(ts[0].udUnidad)} UD` }, " (tabla 4.1).");
     } else if (ts.length === 1) {
       p.push(`Las viviendas tipo ${ts[0].nombre} suman `, { v: `${n0(ts[0].udUnidad)} UD` }, " cada una (tabla 4.1).");
@@ -187,7 +192,10 @@ function parrafoResiduales(j: JustificacionHs5): Trozo[] {
   if (vent && vent.detalle.clase === "ventilacion") {
     const v = vent.detalle;
     const limite = VENT_PRIMARIA.datos.maxPlantasSolo;
-    if (v.ventilacion === "primaria" && v.plantas < limite) {
+    if (j.existente && v.ventilacion === "primaria" && v.plantas < limite) {
+      // Lo intervenido acomete a la red existente y se ventila con ella (feature-30).
+      p.push(" Se ventila a través de la red existente, cuyas bajantes se prolongan sobre la cubierta como ventilación primaria, suficiente al tener el edificio menos de siete plantas.");
+    } else if (v.ventilacion === "primaria" && v.plantas < limite) {
       p.push(
         v.bajantes === 1
           ? " Se prolonga sobre la cubierta como ventilación primaria, suficiente al tener el edificio menos de siete plantas."
@@ -212,12 +220,12 @@ function parrafoColector(j: JustificacionHs5): Trozo[] {
     col.detalle.disposicion === "enterrado"
       ? "enterrados, con arquetas registrables,"
       : j.red.colgadoDe === "garaje" || j.red.colgadoDe === "sotano"
-        ? `colgados del techo del ${j.red.colgadoDe}`
+        ? `colgados del techo del ${j.red.colgadoDe === "sotano" ? "sótano" : "garaje"}`
         : "colgados bajo el forjado de la planta baja";
   const p: Trozo[] = [
     `Los colectores van ${donde} con pendiente del `,
     { v: `${fmt(t.pendiente_pct)} %` },
-    `. ${j.modo === "manual" ? col.nombre : "El colector general"} recoge `,
+    `. ${j.modo === "manual" ? col.nombre : j.existente ? "El colector de lo intervenido" : "El colector general"} recoge `,
     { v: `${n0(t.udAcumuladas)} UD` },
     " y se resuelve en ",
     { v: mm(t.diametro_mm) },
@@ -232,7 +240,27 @@ function parrafoColector(j: JustificacionHs5): Trozo[] {
   return p;
 }
 
+/** La red existente a la que acomete lo intervenido (feature-30). */
+function parrafoRedExistente(j: JustificacionHs5): Trozo[] {
+  const r = j.existente;
+  if (!r || !j.residuales) return [];
+  const p: Trozo[] = [
+    "Acomete al colector general existente, que con la obra hecha recibe ",
+    { v: `${n0(r.udTotal)} UD` },
+    `, ${n0(r.udObra)} de ellas de lo intervenido.`,
+  ];
+  if (r.diametro_mm === null) {
+    p.push(` Con esas unidades necesita al menos ${mm(r.minimo_mm)} al ${fmt(r.pendiente_pct)} % (tabla 4.5), lo que se comprueba antes de ejecutar la acometida.`);
+  } else if (r.capacidad_ud !== null && r.udTotal <= r.capacidad_ud) {
+    p.push(` Es de `, { v: mm(r.diametro_mm) }, ` al ${fmt(r.pendiente_pct)} %, que admite ${n0(r.capacidad_ud)} UD (tabla 4.5): no hay que modificarlo.`);
+  } else {
+    p.push(` Es de `, { v: mm(r.diametro_mm) }, ` al ${fmt(r.pendiente_pct)} %, que no las admite: hace falta al menos ${mm(r.minimo_mm)} (tabla 4.5).`);
+  }
+  return p;
+}
+
 function parrafoPluviales(j: JustificacionHs5): Trozo[] {
+  if (j.existente?.pluvialesSinTocar) return ["La intervención no actúa sobre las cubiertas ni sobre la red de pluviales existente, que no se modifica."];
   const pl = j.pluviales;
   if (!pl) return [];
   const i = j.intensidad;
@@ -309,9 +337,18 @@ function tablaResumen(j: JustificacionHs5): MemoriaHs5["tabla"] {
   }
   for (const el of j.elementos) {
     const det = el.detalle;
+    if (det.clase === "red_existente") {
+      const r = det.red;
+      filas.push([
+        `Colector existente · ${fmt(r.pendiente_pct)} %`,
+        `${n0(r.udTotal)} UD`,
+        r.capacidad_ud === null ? "—" : `${n0(r.capacidad_ud)} UD`,
+        r.diametro_mm === null ? `≥ ${r.minimo_mm ?? "—"}` : fmt(r.diametro_mm, undefined, 0),
+      ]);
+    }
     if (det.clase === "colector") {
       filas.push([
-        `${el.nombre} · ${fmt(det.tramo.pendiente_pct)} %`,
+        `${j.existente && j.modo !== "manual" ? "Colector de lo intervenido" : el.nombre} · ${fmt(det.tramo.pendiente_pct)} %`,
         `${n0(det.tramo.udAcumuladas)} UD`,
         det.tramo.capacidad_ud === null ? "—" : `${n0(det.tramo.capacidad_ud)} UD`,
         valorCorto(el).replace("Ø", ""),
@@ -367,6 +404,7 @@ export function memoriaHs5(j: JustificacionHs5): MemoriaHs5 {
     parrafoMetodo(j),
     parrafoResiduales(j),
     parrafoColector(j),
+    parrafoRedExistente(j),
     parrafoPluviales(j),
     parrafoEspeciales(j),
   ].filter((p) => p.length > 0);

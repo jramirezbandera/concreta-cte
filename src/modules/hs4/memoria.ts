@@ -42,6 +42,52 @@ function delTipo<T extends ElementoHs4["detalle"]["clase"]>(
 // Párrafos
 // -----------------------------------------------------------------------------
 
+/** «7 viviendas, el local y las zonas comunes». */
+function quienesDe(c: JustificacionHs4["red"]["contadores"]): string {
+  return listaY(
+    [
+      c.viviendas > 0 ? cuantos(c.viviendas, "vivienda", "viviendas", "f") : "",
+      c.oficinas > 0 ? (c.oficinas === 1 ? "la planta de oficinas" : `${c.oficinas} plantas de oficinas`) : "",
+      c.locales > 0 ? (c.locales === 1 ? "el local" : "los locales") : "",
+      c.comunes ? "las zonas comunes" : "",
+    ].filter(Boolean),
+  );
+}
+
+/**
+ * En un edificio existente (feature-30): lo que se proyecta (el contador y el
+ * montante de las unidades nuevas) dentro de la instalación que existe y no se
+ * modifica (acometida, tubo de alimentación, batería).
+ */
+function redExistente(j: JustificacionHs4, tub: string, dM: string | null): Trozo[] {
+  const red = j.red;
+  const ex = j.existente!;
+  if (red.unifamiliar) {
+    return [" La instalación interior, de ", tub, ...(dM ? [" ", { v: `${dM} mm` }] : []), ", parte del contador existente; la acometida y el contador no se modifican."];
+  }
+  const c = red.contadores;
+  const unidades = c.viviendas + c.oficinas + c.locales;
+  const sujeto =
+    c.viviendas === unidades
+      ? c.viviendas === 1 ? "La vivienda" : `Las ${c.viviendas} viviendas`
+      : unidades === 1 ? "La unidad" : `Las ${unidades} unidades`;
+  const plural = unidades > 1;
+  const suyo = plural ? "sus contadores" : "su contador";
+  const montante = plural ? "los montantes nuevos" : "el montante nuevo";
+  if (ex.porPlanta) {
+    return [
+      ` ${sujeto} se ${plural ? "abastecen" : "abastece"} del montante general existente, con ${suyo} en su planta, del que sale ${montante} de ${tub}`,
+      ...(dM ? [" ", { v: `${dM} mm` }] : []),
+      ". La acometida y el montante general existentes no se modifican.",
+    ];
+  }
+  return [
+    ` ${sujeto} se ${plural ? "abastecen" : "abastece"} de la batería de contadores existente en planta baja, en la que se ${plural ? "disponen" : "dispone"} ${suyo}, que pasa a tener ${ex.bateria.total} contadores —${quienesDe(ex.bateria)}—. De ella sale ${montante} de ${tub}`,
+    ...(dM ? [" ", { v: `${dM} mm` }] : []),
+    ". La acometida y el tubo de alimentación existentes no se modifican.",
+  ];
+}
+
 function parrafoRed(j: JustificacionHs4): Trozo[] {
   const p: Trozo[] = ["La instalación se ha dimensionado conforme a la sección HS 4 del DB-HS."];
   const ac = j.elementos.find((e) => e.detalle.clase === "acometida");
@@ -53,20 +99,14 @@ function parrafoRed(j: JustificacionHs4): Trozo[] {
     p.push(".");
     return p;
   }
+  const montantes = delTipo(j, "montante");
+  const dM = montantes.length > 0 ? listaY([...new Set(montantes.map((m) => valorCorto(m)))]) : null;
+  if (j.existente) return [...p, ...redExistente(j, tub, dM)];
   if (ac && ac.detalle.clase === "acometida") {
     p.push(" La acometida de polietileno ", { v: mm(ac.detalle.acometida.diametro_mm) });
   }
   const c = red.contadores;
-  const quienes = listaY(
-    [
-      c.viviendas > 0 ? cuantos(c.viviendas, "vivienda", "viviendas", "f") : "",
-      c.oficinas > 0 ? (c.oficinas === 1 ? "la planta de oficinas" : `${c.oficinas} plantas de oficinas`) : "",
-      c.locales > 0 ? (c.locales === 1 ? "el local" : "los locales") : "",
-      c.comunes ? "las zonas comunes" : "",
-    ].filter(Boolean),
-  );
-  const montantes = delTipo(j, "montante");
-  const dM = montantes.length > 0 ? listaY([...new Set(montantes.map((m) => valorCorto(m)))]) : null;
+  const quienes = quienesDe(c);
   if (red.unifamiliar) {
     p.push(` llega al contador general, del que sale la instalación interior de ${tub}.`);
   } else if (red.decisiones.contadores === "por_planta") {
@@ -133,7 +173,7 @@ function parrafoPresion(j: JustificacionHs4): Trozo[] {
   const donde = det.nivel !== null ? ` en la ${nombrePlanta(det.nivel)}` : "";
   const g = j.red.decisiones;
   const p: Trozo[] = [
-    `La presión de la red es de ${n0(j.presionRed_kPa)} kPa${j.presionSinDato ? " (supuesta: no consta el dato de la compañía)" : ""}`,
+    `La presión ${j.existente ? "disponible en la red existente" : "de la red"} es de ${n0(j.presionRed_kPa)} kPa${j.presionSinDato ? " (supuesta: no consta el dato de la compañía)" : ""}`,
   ];
   if (g.grupoPresion) p.push(`, y se dispone un grupo de presión que da ${n0(g.presionGrupo_kPa)} kPa a su salida`);
   if (a.presionResidual_kPa >= a.presionMinExigida_kPa) {
@@ -167,9 +207,14 @@ function parrafoOtros(j: JustificacionHs4): Trozo[] {
   const g = j.red.decisiones;
   p.push(
     g.aguaCaliente === "individual"
-      ? j.red.unifamiliar
-        ? "El agua caliente se produce en la propia vivienda; su producción se justifica con HE 4."
-        : "El agua caliente se produce de forma individual en cada unidad; su producción se justifica con HE 4."
+      ? j.existente
+        ? // En un edificio existente HE 4 puede no aplicarse: no se remite a él (feature-30).
+          j.red.unifamiliar || (j.red.contadores.viviendas === 1 && j.red.contadores.oficinas === 0)
+          ? "El agua caliente se produce en la propia vivienda."
+          : "El agua caliente se produce de forma individual en cada unidad."
+        : j.red.unifamiliar
+          ? "El agua caliente se produce en la propia vivienda; su producción se justifica con HE 4."
+          : "El agua caliente se produce de forma individual en cada unidad; su producción se justifica con HE 4."
       : "El agua caliente se produce de forma centralizada; su red de impulsión y retorno se justifica aparte.",
   );
   const locales = delTipo(j, "local");

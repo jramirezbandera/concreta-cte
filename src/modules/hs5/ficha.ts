@@ -88,6 +88,11 @@ function cuentas(el: ElementoHs5): { valor: string; limite: string } {
       return { valor: `${v} previsto`, limite: "criterio de proyecto" };
     case "garaje":
       return { valor: v, limite: det.bombeo ? "≥ 2 bombas" : "—" };
+    case "red_existente":
+      return {
+        valor: `${v} · ${fmt(det.red.udTotal, "UD")}`,
+        limite: det.red.capacidad_ud === null ? `≥ Ø${det.red.minimo_mm ?? "—"}` : `≤ ${fmt(det.red.capacidad_ud, "UD")}`,
+      };
     case "conexion":
       return {
         valor: v,

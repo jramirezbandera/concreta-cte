@@ -13,6 +13,7 @@ import type { DetalleElemento, EstadoPresentacion, MemoriaDoc } from "../../lib/
 import type { Aviso } from "../../lib/cte/resultado";
 import type { Edificio } from "../../lib/edificio/tipos";
 import type { FichaData } from "../../lib/pdf/renderFicha";
+import type { ObraExistente } from "../../lib/proyecto/alcance";
 import type { DatosGenerales, JustificacionKey, Proyecto } from "../../lib/proyecto/tipos";
 import type { DibujoSi } from "./seccion";
 import type { ElementoSi, JustificacionSiBase } from "./tipos";
@@ -32,6 +33,11 @@ export interface ProyectoSi {
    * solares de HE 4. Opcional: quien no lo pase, no lo tiene.
    */
   justificaciones?: Proyecto["justificaciones"];
+  /**
+   * En un edificio existente con el asistente respondido, lo que hay alrededor de
+   * lo intervenido (feature-30): `edificio` es lo que se calcula; esto, el entero.
+   */
+  existente?: ObraExistente;
 }
 
 export interface OpcionesFichaSi<E> {

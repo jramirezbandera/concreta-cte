@@ -35,14 +35,14 @@ import { renderFicha } from "../../lib/pdf/renderFicha";
 import { fichaConAlcance } from "../../lib/obra/alcanceTexto";
 import { notasExcepcionesLocales } from "../../lib/proyecto/herencia";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
-import { edificioParaModulo } from "../../lib/proyecto/alcance";
+import { edificioParaModulo, obraExistenteDe } from "../../lib/proyecto/alcance";
 import { ajustar } from "../../lib/ui/ajustar";
 import { fmt } from "../../lib/units/format";
 import { DecisionesHs5 } from "./DecisionesHs5";
 import { filasQueEntra } from "./entra";
 import { hs5EstadoDefaults, type Hs5Estado } from "./estado";
 import { toFichaData } from "./ficha";
-import { justificarHs5, type ObraHs5 } from "./justificacion";
+import { justificarHs5, obraHs5De, type ObraHs5 } from "./justificacion";
 import { memoriaHs5, textoPlano } from "./memoria";
 import { RedManual } from "./RedManual";
 import { calcularSeccion, tamanoDibujoHs5 } from "./seccion";
@@ -86,9 +86,13 @@ export function Hs5Module() {
   const deferredState = useDeferredValue(state);
   // En una obra existente, lo intervenido (feature-27).
   const edificio = edificioParaModulo(proyecto.datosGenerales, proyecto.edificio, "hs5");
-  const pluviometria = proyecto.datosGenerales.pluviometria;
-  const cotaAlcantarillado_m = proyecto.datosGenerales.cotaAlcantarillado_m;
-  const obra: ObraHs5 = useMemo(() => ({ pluviometria, cotaAlcantarillado_m }), [pluviometria, cotaAlcantarillado_m]);
+  // …y lo existente alrededor, para redactarlo como en La obra (feature-30).
+  const dg = proyecto.datosGenerales;
+  const edificioCompleto = proyecto.edificio;
+  const obra: ObraHs5 = useMemo(
+    () => obraHs5De({ datosGenerales: dg, existente: obraExistenteDe(dg, edificioCompleto) }),
+    [dg, edificioCompleto],
+  );
   const j = useMemo(() => justificarHs5(deferredState, edificio, obra), [deferredState, edificio, obra]);
   const manual = j.modo === "manual";
 
@@ -256,6 +260,7 @@ export function Hs5Module() {
         efectivas={j.red.decisiones}
         hayCocinas={hayCocinas}
         colgadoDe={j.red.colgadoDe}
+        redExistente={j.existente ?? null}
       />
     </>
   );

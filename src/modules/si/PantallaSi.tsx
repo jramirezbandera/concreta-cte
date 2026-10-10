@@ -32,7 +32,7 @@ import type { Edificio } from "../../lib/edificio/tipos";
 import { renderFicha } from "../../lib/pdf/renderFicha";
 import { fichaConAlcance } from "../../lib/obra/alcanceTexto";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
-import { edificioParaModulo } from "../../lib/proyecto/alcance";
+import { edificioParaModulo, obraExistenteDe } from "../../lib/proyecto/alcance";
 import { formatearFecha } from "../../lib/ui/fecha";
 import { ajustar } from "../../lib/ui/ajustar";
 import type { DefinicionSi } from "./definicion";
@@ -72,9 +72,11 @@ export function PantallaSi<E extends Record<string, unknown>, J extends Justific
   const edificioCompleto = proyecto.edificio;
   const edificio = edificioParaModulo(dg, edificioCompleto, def.key);
   const justificaciones = proyecto.justificaciones;
+  // Lo que hay alrededor de lo intervenido, para redactarlo como en La obra (feature-30).
+  const existente = useMemo(() => obraExistenteDe(dg, edificioCompleto), [dg, edificioCompleto]);
   const j = useMemo(
-    () => def.justificar(deferredState, { edificio, datosGenerales: dg, justificaciones }),
-    [def, deferredState, edificio, dg, justificaciones],
+    () => def.justificar(deferredState, { edificio, datosGenerales: dg, justificaciones, ...(existente ? { existente } : {}) }),
+    [def, deferredState, edificio, dg, justificaciones, existente],
   );
 
   // ── Avisos y estados ───────────────────────────────────────────────────────

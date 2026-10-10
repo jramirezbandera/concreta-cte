@@ -35,14 +35,14 @@ import { textoPlanoMemoria } from "../../lib/cte/memoria";
 import { renderFicha } from "../../lib/pdf/renderFicha";
 import { fichaConAlcance } from "../../lib/obra/alcanceTexto";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
-import { edificioParaModulo } from "../../lib/proyecto/alcance";
+import { edificioParaModulo, obraExistenteDe } from "../../lib/proyecto/alcance";
 import { ajustar } from "../../lib/ui/ajustar";
 import { fmt } from "../../lib/units/format";
 import { DecisionesHs4 } from "./DecisionesHs4";
 import { filasQueEntraHs4 } from "./entra";
 import { hs4EstadoDefaults, type Hs4Estado } from "./estado";
 import { toFichaData } from "./ficha";
-import { justificarHs4, type ObraHs4 } from "./justificacion";
+import { justificarHs4, obraHs4De, type ObraHs4 } from "./justificacion";
 import { memoriaHs4 } from "./memoria";
 import { RedManualHs4 } from "./RedManual";
 import { calcularSeccionHs4, tamanoDibujoHs4 } from "./seccion";
@@ -82,8 +82,13 @@ export function Hs4Module() {
   const deferredState = useDeferredValue(state);
   // En una obra existente, lo intervenido (feature-27).
   const edificio = edificioParaModulo(proyecto.datosGenerales, proyecto.edificio, "hs4");
-  const presionAcometida_kPa = proyecto.datosGenerales.presionAcometida_kPa;
-  const obra: ObraHs4 = useMemo(() => ({ presionAcometida_kPa }), [presionAcometida_kPa]);
+  // …y lo existente alrededor, para redactarlo como en La obra (feature-30).
+  const dg = proyecto.datosGenerales;
+  const edificioCompleto = proyecto.edificio;
+  const obra: ObraHs4 = useMemo(
+    () => obraHs4De({ datosGenerales: dg, existente: obraExistenteDe(dg, edificioCompleto) }),
+    [dg, edificioCompleto],
+  );
   const j = useMemo(() => justificarHs4(deferredState, edificio, obra), [deferredState, edificio, obra]);
   const manual = j.modo === "manual";
 

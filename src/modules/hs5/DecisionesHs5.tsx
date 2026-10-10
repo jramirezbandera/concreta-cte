@@ -10,6 +10,7 @@ import { resumenEdificio } from "../../lib/edificio/derivar";
 import type { Edificio } from "../../lib/edificio/tipos";
 import type { DisposicionColector } from "./calc";
 import type { Hs5Estado } from "./estado";
+import type { RedExistenteHs5 } from "./justificacion";
 import {
   decisionesHabituales,
   DECISIONES_POR_DEFECTO,
@@ -30,7 +31,12 @@ interface DecisionesHs5Props {
   hayCocinas: boolean;
   /** Dónde se cuelgan los colectores («garaje», «sotano»…), para el texto. */
   colgadoDe: "garaje" | "sotano" | "forjado_pb" | null;
+  /** En un edificio existente, la red a la que acomete lo intervenido (feature-30). */
+  redExistente?: RedExistenteHs5 | null;
 }
+
+/** Diámetros habituales de un colector existente; 0 = no consta. */
+const DIAMETROS_EXISTENTE = [0, 90, 110, 125, 160, 200];
 
 export function DecisionesHs5({
   state,
@@ -39,6 +45,7 @@ export function DecisionesHs5({
   efectivas: d,
   hayCocinas,
   colgadoDe,
+  redExistente,
 }: DecisionesHs5Props): JSX.Element {
   const h = decisionesHabituales(edificio);
   const r = resumenEdificio(edificio);
@@ -86,7 +93,7 @@ export function DecisionesHs5({
   const textoColectores =
     d.colectores === "colgado"
       ? colgadoDe === "garaje" || colgadoDe === "sotano"
-        ? `Por el techo del ${colgadoDe}: se registran sin romper nada.`
+        ? `Por el techo del ${colgadoDe === "sotano" ? "sótano" : colgadoDe}: se registran sin romper nada.`
         : "Bajo el forjado de la planta baja, en una cámara registrable."
       : sotano
         ? "Bajo el sótano quedan por debajo del alcantarillado: toda la red pediría bombeo."
@@ -191,6 +198,38 @@ export function DecisionesHs5({
         onChange={(v) => elegir("ventilacion", v)}
         texto={textoVentilacion}
       />
+      {redExistente && (
+        <Decision<number>
+          numero={hayCocinas ? 5 : 4}
+          pregunta="Colector existente al que acomete"
+          opciones={DIAMETROS_EXISTENTE.map((v) => ({ valor: v, label: v === 0 ? "No consta" : `Ø${v}` }))}
+          valor={state.redExistente_mm}
+          habitual={0}
+          onChange={(v) => setField("redExistente_mm", v)}
+          esHabitual={state.redExistente_mm === 0 && state.redExistentePendiente_pct === 2}
+          texto={
+            redExistente.diametro_mm === null
+              ? `Con la obra recibe ${redExistente.udTotal} UD: al ${redExistente.pendiente_pct} % necesita al menos Ø${redExistente.minimo_mm ?? "—"}.`
+              : redExistente.capacidad_ud !== null && redExistente.udTotal <= redExistente.capacidad_ud
+                ? `Admite las ${redExistente.udTotal} UD que recibe con la obra (hasta ${redExistente.capacidad_ud}).`
+                : `No admite las ${redExistente.udTotal} UD que recibe con la obra: hace falta Ø${redExistente.minimo_mm ?? "—"}.`
+          }
+          extra={
+            <div className="text-text-secondary mt-2 flex items-center justify-between gap-2 text-[12.5px]">
+              <span>Pendiente</span>
+              <div className="w-[150px]">
+                <Opciones<number>
+                  etiqueta="Pendiente del colector existente"
+                  pequenas
+                  valor={state.redExistentePendiente_pct}
+                  onChange={(v) => setField("redExistentePendiente_pct", v)}
+                  opciones={[1, 2, 4].map((p) => ({ valor: p, label: `${p} %` }))}
+                />
+              </div>
+            </div>
+          }
+        />
+      )}
       <div className="border-border-sub border-t pt-3 text-[12px]">
         <button
           type="button"

@@ -191,7 +191,7 @@ export function franjaDe(el: ElementoHs5, j: JustificacionHs5, estado: EstadoPre
       const colgadoDe = det.disposicion === "enterrado" ? null : (j.red.colgadoDe ?? "forjado_pb");
       const nota =
         colgadoDe === "garaje" || colgadoDe === "sotano"
-          ? `Colgado del techo del ${colgadoDe}, registrable, hasta la arqueta de salida.`
+          ? `Colgado del techo del ${colgadoDe === "sotano" ? "sótano" : colgadoDe}, registrable, hasta la arqueta de salida.`
           : colgadoDe === "forjado_pb"
             ? "Colgado bajo el forjado de la planta baja, registrable, hasta la arqueta de salida."
             : "Enterrado, con arquetas registrables, hasta la arqueta de salida.";
@@ -446,6 +446,28 @@ export function franjaDe(el: ElementoHs5, j: JustificacionHs5, estado: EstadoPre
       };
     }
 
+    case "red_existente": {
+      const r = det.red;
+      const admite = r.capacidad_ud !== null && r.udTotal <= r.capacidad_ud;
+      return {
+        ...base,
+        clase: "Red existente",
+        manda:
+          r.diametro_mm === null
+            ? `Lo que recibe con la obra hecha: ${n0(r.udTotal)} UD, de ellas ${n0(r.udObra)} de lo intervenido, que al ${fmt(r.pendiente_pct)} % piden al menos ${d(r.minimo_mm)} (tabla 4.5). Falta el Ø del colector existente.`
+            : admite
+              ? `Lo que recibe con la obra hecha: ${n0(r.udTotal)} UD, de ellas ${n0(r.udObra)} de lo intervenido; ${d(r.diametro_mm)} al ${fmt(r.pendiente_pct)} % admite ${n0(r.capacidad_ud ?? 0)} UD (tabla 4.5).`
+              : `Lo que recibe con la obra hecha: ${n0(r.udTotal)} UD, más de las ${r.capacidad_ud === null ? "que admite" : `${n0(r.capacidad_ud)} que admite`} ${d(r.diametro_mm)} al ${fmt(r.pendiente_pct)} %: hace falta al menos ${d(r.minimo_mm)} (tabla 4.5).`,
+        filas: [
+          { k: "Recibe con la obra", v: `${n0(r.udTotal)} UD` },
+          { k: "De lo intervenido", v: `${n0(r.udObra)} UD` },
+          { k: "Mínimo al " + fmt(r.pendiente_pct) + " %", v: d(r.minimo_mm) },
+          { k: "Pluviales", v: r.pluvialesSinTocar ? "no se modifican" : "se calculan" },
+        ],
+        nota: "La acometida a la calle es la del edificio y no se modifica.",
+      };
+    }
+
     case "conexion": {
       const unitario = det.alcantarillado === "unitario";
       return {
@@ -549,6 +571,12 @@ export function textoAviso(a: Aviso): TextoAviso {
       return {
         titulo: "Hay oficinas sin núcleos de aseos.",
         detalle: "No aportan aparatos a la red. Añade sus núcleos en El edificio.",
+      };
+    case "red-existente-sin-dato":
+      return {
+        titulo: "Falta el colector existente al que acomete la obra.",
+        detalle:
+          "Indica su diámetro y su pendiente en las decisiones: la memoria dice el mínimo que necesita para las unidades que recibe con la obra hecha, pero no comprueba que lo tenga.",
       };
   }
   if (a.id.startsWith("garaje-") && a.id.endsWith("-bombeo")) {

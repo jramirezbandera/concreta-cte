@@ -13,7 +13,8 @@ import { zonaClimaticaDe } from "../../data/zonasClimaticasHE";
 import { estadosElementos } from "../cte/estados";
 import type { DetalleElemento, MemoriaDoc } from "../cte/presentacion";
 import type { Aviso, ElementoResultado } from "../cte/resultado";
-import type { JustificacionKey, Proyecto, Veredicto } from "../proyecto/tipos";
+import type { ProyectoModulo } from "../proyecto/alcance";
+import type { JustificacionKey, Veredicto } from "../proyecto/tipos";
 import { hs1EstadoDefaults, type Hs1Estado } from "../../modules/hs1/estado";
 import { justificarHs1, obraHs1De, type JustificacionHs1 } from "../../modules/hs1/justificacion";
 import { filasQueEntraHs1 } from "../../modules/hs1/entra";
@@ -25,12 +26,12 @@ import { filasQueEntraHs3 } from "../../modules/hs3/entra";
 import { memoriaHs3 } from "../../modules/hs3/memoria";
 import * as textosHs3 from "../../modules/hs3/textos";
 import { hs4EstadoDefaults, type Hs4Estado } from "../../modules/hs4/estado";
-import { justificarHs4, type JustificacionHs4 } from "../../modules/hs4/justificacion";
+import { justificarHs4, obraHs4De, type JustificacionHs4 } from "../../modules/hs4/justificacion";
 import { filasQueEntraHs4 } from "../../modules/hs4/entra";
 import { memoriaHs4 } from "../../modules/hs4/memoria";
 import * as textosHs4 from "../../modules/hs4/textos";
 import { hs5EstadoDefaults, type Hs5Estado } from "../../modules/hs5/estado";
-import { justificarHs5, type JustificacionHs5 } from "../../modules/hs5/justificacion";
+import { justificarHs5, obraHs5De, type JustificacionHs5 } from "../../modules/hs5/justificacion";
 import { filasQueEntra as filasQueEntraHs5 } from "../../modules/hs5/entra";
 import { memoriaHs5 } from "../../modules/hs5/memoria";
 import * as textosHs5 from "../../modules/hs5/textos";
@@ -98,7 +99,7 @@ export interface ModuloObra {
   key: JustificacionKey;
   defaults: Record<string, unknown>;
   /** Justifica con las entradas efectivas, El edificio y los datos de la obra. */
-  calcular(estado: Record<string, unknown>, proyecto: Proyecto, revisados: readonly string[]): ModuloCalculado;
+  calcular(estado: Record<string, unknown>, proyecto: ProyectoModulo, revisados: readonly string[]): ModuloCalculado;
 }
 
 /** Lo que no cumple, con la franja del elemento, para los módulos sin texto propio. */
@@ -157,8 +158,7 @@ const hs4: ModuloObra = {
   key: "hs4",
   defaults: hs4EstadoDefaults as unknown as Record<string, unknown>,
   calcular(estado, p, revisados) {
-    const obra = { presionAcometida_kPa: p.datosGenerales.presionAcometida_kPa };
-    const j: JustificacionHs4 = justificarHs4(estado as unknown as Hs4Estado, p.edificio, obra);
+    const j: JustificacionHs4 = justificarHs4(estado as unknown as Hs4Estado, p.edificio, obraHs4De(p));
     return {
       veredicto: j.veredicto,
       elementos: j.elementos,
@@ -182,9 +182,7 @@ const hs5: ModuloObra = {
   key: "hs5",
   defaults: hs5EstadoDefaults as unknown as Record<string, unknown>,
   calcular(estado, p, revisados) {
-    const dg = p.datosGenerales;
-    const obra = { pluviometria: dg.pluviometria, cotaAlcantarillado_m: dg.cotaAlcantarillado_m };
-    const j: JustificacionHs5 = justificarHs5(estado as unknown as Hs5Estado, p.edificio, obra);
+    const j: JustificacionHs5 = justificarHs5(estado as unknown as Hs5Estado, p.edificio, obraHs5De(p));
     return {
       veredicto: j.veredicto,
       elementos: j.elementos,
