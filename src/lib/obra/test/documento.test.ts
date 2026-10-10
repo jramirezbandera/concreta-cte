@@ -58,12 +58,13 @@ function deCaso(caso: CasoEdificio): Proyecto {
 const tablas = (m: MemoriaCte) => cuadroInicial(m).flatMap((b) => (b.tipo === "tabla" ? [b.filas] : []));
 
 describe("el cuadro inicial", () => {
-  it("en la reforma: el tipo de obra y, con un pendiente, la numeración no se corre", () => {
+  it("en la reforma: el tipo de obra y la numeración fija", () => {
     const m = memoriaCte(deCaso("reforma_local_vivienda"));
     const [obra, cuadro] = tablas(m);
     expect(obra).toEqual([["—", "Cambio de uso y reforma", "Parcial", "Sí, de una parte del edificio"]]);
-    // SUA 1 aún no se redacta en la reforma: su sitio sigue siendo el 3.3.1.
-    expect(cuadro).toContainEqual(["SUA 1 Seguridad frente al riesgo de caídas", "Pendiente de redactar", "3.3.1"]);
+    // Desde feature-30 SUA 1 se redacta también en la reforma, en su sitio.
+    expect(cuadro).toContainEqual(["SUA 1 Seguridad frente al riesgo de caídas", "A lo intervenido", "3.3.1"]);
+    expect(m.pendientes).toEqual([]);
     expect(cuadro).toContainEqual(["SUA 2 Seguridad frente al riesgo de impacto o de atrapamiento", "A lo intervenido", "3.3.2"]);
     expect(m.apartados.find((a) => a.key === "sua2")!.encabezado).toMatch(/^3\.3\.2\. /);
     expect(cuadro).toContainEqual(["Protección frente al ruido DB HR", "A lo intervenido", "3.5"]);

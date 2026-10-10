@@ -90,7 +90,40 @@ function parrafoSistema(j: JustificacionSua8): Trozo[] {
   ];
 }
 
+/**
+ * Un edificio existente en el que la obra no cambia la evaluación (feature-30;
+ * K-INT.9, tabla 1.4 cotejada en imagen): basta dejarlo escrito.
+ */
+function parrafoSinVariacion(j: JustificacionSua8): Trozo[] {
+  const ex = j.existente!;
+  const c4 =
+    ex.c4 === ex.c4Antes
+      ? ex.c4 > 1
+        ? `; como el edificio conserva un uso al que esa tabla asigna C4 = ${fmt(ex.c4)}, se mantiene ese coeficiente, el más desfavorable, y el riesgo admisible Na no varía`
+        : `, que no cambia (C4 = ${fmt(ex.c4)}), por lo que el riesgo admisible Na no varía`
+      : `, que pasa de C4 = ${fmt(ex.c4Antes)} a C4 = ${fmt(ex.c4)}, por lo que el riesgo admisible Na aumenta`;
+  return [
+    `La intervención no modifica las dimensiones del edificio ni su entorno, por lo que la frecuencia esperada de impactos Ne no varía (SUA 8 ap. 1 pto 3). El coeficiente C4 depende del uso del edificio (ap. 1 pto 4, tabla 1.4)${c4}. La evaluación del ap. 1 es, por tanto, la del edificio preexistente, y el cambio de uso no aumenta la exigencia de protección. No se actúa sobre ninguna instalación de protección contra el rayo existente (DB-SUA, Introducción III, criterio 4).`,
+  ];
+}
+
 export function memoriaSua8(j: JustificacionSua8): MemoriaDoc {
+  if (j.existente?.sinVariacion) {
+    const mixto = j.existente.c4 === j.existente.c4Antes && j.existente.c4 > 1;
+    return {
+      titulo: "Seguridad frente al riesgo causado por la acción del rayo",
+      norma: "DB-SUA 8",
+      parrafos: [parrafoSinVariacion(j)],
+      fuente: [
+        "DB-SUA · SUA 8 (consolidado 14-jun-2022)",
+        "ap. 1, tabla 1.4",
+        "Introducción III, criterio 4",
+        ...(mixto ? ["coeficiente más desfavorable: comentario del Ministerio (DccSUA 15-jul-2024), no reglamentario"] : []),
+        "datos de El edificio",
+        `motor ${ENGINE_VERSION}`,
+      ].join(" · "),
+    };
+  }
   const parrafos = [parrafoNe(j), parrafoNa(j), parrafoConclusion(j), parrafoSistema(j)].filter((p) => p.length > 0);
   return {
     titulo: "Seguridad frente al riesgo causado por la acción del rayo",

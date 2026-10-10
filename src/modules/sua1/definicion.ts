@@ -59,6 +59,8 @@ function limite(el: ElementoSua1): string {
       return "tabla 1.2";
     case "limpieza":
       return "≤ 0,85 m desde el interior";
+    case "discontinuidades":
+      return "juntas ≤ 4 mm";
   }
 }
 

@@ -393,11 +393,27 @@ export function describirDibujoSi3(j: JustificacionSi3): string {
 
 export function memoriaSi3(j: JustificacionSi3): MemoriaDoc {
   const parrafos: Trozo[][] = [];
+  const ex = j.existente;
   for (const el of j.elementos) {
     const d = el.detalle;
     switch (d.clase) {
       case "ocupacion":
-        if (d.unifamiliar) {
+        if (ex) {
+          // Criterio 8 (feature-30): la ocupación de lo intervenido y su salida por los comunes existentes.
+          const viv = d.zonas.filter((o) => o.densidad_m2 !== null && o.zona.uso !== "local_sin_uso");
+          parrafos.push([
+            `La ocupación de la zona que se transforma en vivienda, con ${listaY([...new Set(viv.map((o) => `${o.densidad_m2} m²/persona`))])} de la tabla 2.1, es de `,
+            { v: personas(d.total) },
+            ". Sus ocupantes evacúan desde la puerta de la vivienda por los elementos comunes de evacuación del edificio existente hasta su salida. Al tratarse de transformar en uso Residencial Vivienda una zona de otro uso en un edificio de ese uso, no es preciso aplicar este DB a los elementos comunes de evacuación (DB-SI, Introducción III, criterio 8).",
+          ]);
+          if (ex.comunesReformados) {
+            parrafos.push([
+              `En las zonas comunes que se reforman, el DB se aplica a los elementos que modifica la reforma (criterio 9), con la ocupación del edificio entero: `,
+              { v: personas(ex.ocupacionEdificio) },
+              ".",
+            ]);
+          }
+        } else if (d.unifamiliar) {
           parrafos.push(["El edificio es una vivienda unifamiliar. El interior de una vivienda no es origen de evacuación (Anejo SI A), por lo que no hay recorridos de evacuación que limitar ni escaleras que proteger conforme a SI 3."]);
         } else {
           parrafos.push([
@@ -478,7 +494,13 @@ export function memoriaSi3(j: JustificacionSi3): MemoriaDoc {
     titulo: "Evacuación de ocupantes",
     norma: "DB-SI 3",
     parrafos,
-    fuente: ["DB-SI · SI 3 (consolidado 4-mar-2025)", "tablas 2.1, 3.1, 4.1, 4.2 y 5.1", "datos de El edificio", `motor ${ENGINE_VERSION}`].join(" · "),
+    fuente: [
+      "DB-SI · SI 3 (consolidado 4-mar-2025)",
+      ex ? (ex.comunesReformados ? "tablas 2.1 y 4.1 · ap. 6 y 7" : "tabla 2.1") : "tablas 2.1, 3.1, 4.1, 4.2 y 5.1",
+      ...(ex ? ["Introducción III, criterios 8 y 9"] : []),
+      "datos de El edificio",
+      `motor ${ENGINE_VERSION}`,
+    ].join(" · "),
   };
 }
 

@@ -131,3 +131,41 @@ describe("envolvente y aire (paso 3)", () => {
     expect(evaluarExpediente(p).porClave.hs6?.avisos.map((a) => a.id)).toContain("medicion-posterior");
   });
 });
+
+describe("SI y SUA (paso 4)", () => {
+  const p = reforma();
+  const t = texto(p);
+
+  it("SI 3: la ocupación de lo intervenido y, en el portal que se reforma, la del edificio entero", () => {
+    const si3 = apartado(t, "3.2.3. SI 3 Evacuación de ocupantes");
+    expect(si3).toContain("es de 5 personas");
+    expect(si3).toContain("no es preciso aplicar este DB a los elementos comunes de evacuación (DB-SI, Introducción III, criterio 8)");
+    expect(si3).toContain("La puerta de salida del edificio, para 40 personas");
+    expect(si3).not.toContain("La escalera es");
+    expect(si3).not.toContain("garaje");
+  });
+
+  it("SI 4: sin dotación propia; lo existente no se modifica", () => {
+    const si4 = apartado(t, "3.2.4. SI 4 Instalaciones de protección contra incendios");
+    expect(si4).toContain("El interior de la vivienda no es origen de evacuación");
+    expect(si4).toContain("las bocas de incendio equipadas del garaje");
+    expect(si4).toContain("criterio 10");
+    expect(si4).not.toContain("Se dispone bocas de incendio");
+  });
+
+  it("SUA 1 se redacta sobre lo intervenido", () => {
+    expect(memoriaCte(p).pendientes).toEqual([]);
+    const sua1 = apartado(t, "3.3.1. SUA 1 Seguridad frente al riesgo de caídas");
+    expect(sua1).toContain("En lo intervenido, el interior de la vivienda es de uso restringido");
+    expect(sua1).toContain("no requiere barreras de protección");
+    expect(sua1).not.toContain("La cubierta no es transitable");
+  });
+
+  it("SUA 8: la obra no cambia la evaluación ni pide pararrayos", () => {
+    const sua8 = apartado(t, "3.3.8. SUA 8 Seguridad frente al riesgo causado por la acción del rayo");
+    expect(sua8).toContain("la frecuencia esperada de impactos Ne no varía");
+    expect(sua8).toContain("se mantiene ese coeficiente, el más desfavorable");
+    expect(sua8).not.toContain("es necesaria la instalación");
+    expect(evaluarExpediente(p).porClave.sua8?.estado).not.toBe("no_cumple");
+  });
+});

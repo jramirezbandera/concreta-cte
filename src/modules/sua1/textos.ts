@@ -158,6 +158,8 @@ export function queEntraSua1(j: JustificacionSua1, estados: Record<string, Estad
         return { ...base, titulo: "Suelos de las oficinas", detalle: "uso Administrativo", trato: "clase 1 a 3" };
       case "limpieza":
         return { ...base, titulo: "Acristalamientos", detalle: `${d.plantas} · a más de 6 m`, trato: d.carpinteria === "practicable" ? "practicables" : "con fijos" };
+      case "discontinuidades":
+        return { ...base, titulo: "Pavimento", detalle: d.zonasComunes ? "zonas comunes que se reforman" : "interior de la vivienda", trato: d.zonasComunes ? "juntas ≤ 4 mm" : "uso restringido" };
     }
   });
 }
@@ -181,6 +183,8 @@ export function textoEtiquetaSua1(el: ElementoSi<unknown>): string {
       return "clase 1 a 3";
     case "limpieza":
       return d.carpinteria === "practicable" ? "practicables" : "con fijos";
+    case "discontinuidades":
+      return d.zonasComunes ? "juntas ≤ 4 mm" : "uso restringido";
   }
 }
 
@@ -201,6 +205,8 @@ export function resultadoListaSua1(el: ElementoSi<unknown>): string {
       return "clase 1 seco, 2 húmedo o escalera, 3 exterior";
     case "limpieza":
       return `${d.plantas} · ${d.carpinteria === "practicable" ? "hojas practicables o desmontables" : "fijos al alcance desde el interior"}`;
+    case "discontinuidades":
+      return d.zonasComunes ? "juntas ≤ 4 mm · salientes ≤ 12 mm · desniveles ≤ 5 cm con pendiente ≤ 25 %" : "interior de la vivienda, de uso restringido: no se exige";
   }
 }
 
@@ -333,6 +339,23 @@ export function franjaSua1(el: ElementoSi<unknown>, _j: JustificacionSua1, estad
           { k: "Exterior", v: "clase 3" },
         ],
         cita: "DB-SUA · SUA 1 ap. 1 · tablas 1.1 y 1.2",
+      };
+    case "discontinuidades":
+      return {
+        clase: "Discontinuidades del pavimento · ap. 2",
+        titulo: el.nombre,
+        valor: d.zonasComunes ? "≤ 4 mm" : "No se exige",
+        unidad: d.zonasComunes ? "de resalto en las juntas" : "uso restringido",
+        estado,
+        manda: d.zonasComunes
+          ? "Las zonas comunes que se reforman: el pavimento no tiene juntas con resalto de más de 4 mm, salientes de más de 12 mm ni desniveles de más de 5 cm sin pendiente ≤ 25 %."
+          : "El interior de la vivienda es de uso restringido: no le son de aplicación las condiciones del ap. 2.",
+        filas: [
+          { k: "Resalto de las juntas", v: "≤ 4 mm" },
+          { k: "Salientes puntuales", v: "≤ 12 mm" },
+          { k: "Desniveles de hasta 5 cm", v: "pendiente ≤ 25 %" },
+        ],
+        cita: "DB-SUA · SUA 1 ap. 2",
       };
     case "limpieza":
       return {

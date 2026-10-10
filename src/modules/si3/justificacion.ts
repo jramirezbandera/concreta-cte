@@ -18,6 +18,7 @@
 // =============================================================================
 
 import type { Aviso } from "../../lib/cte/resultado";
+import { obraDeZona } from "../../lib/proyecto/alcance";
 import { DENSIDADES_SI3 } from "../../lib/edificio/tablas";
 import type { Veredicto } from "../../lib/pdf/renderFicha";
 import type { ProyectoSi } from "../si/definicion";
@@ -92,6 +93,56 @@ export interface JustificacionSi3 extends JustificacionSiBase {
   /** Hay escalera común que se decide (no en la unifamiliar ni en un edificio de una planta). */
   conEscalera: boolean;
   conGaraje: boolean;
+  /** En un edificio existente con el asistente respondido (feature-30). */
+  existente?: ExistenteSi3;
+}
+
+/**
+ * Una zona que pasa a vivienda en un edificio de viviendas (DB-SI, Introducción
+ * III, criterio 8): no es preciso aplicar el DB a los elementos comunes de
+ * evacuación (feature-30; K-INT.15). Se justifica la ocupación de lo intervenido
+ * y, si se reforman zonas comunes, los elementos que modifica la reforma
+ * (criterio 9), con la ocupación del edificio entero.
+ */
+export interface ExistenteSi3 {
+  /** Ocupación del edificio entero, con la obra hecha. */
+  ocupacionEdificio: number;
+  /** Se reforman zonas comunes (el portal). */
+  comunesReformados: boolean;
+}
+
+/** Lo que se justifica con el criterio 8: la ocupación, el local y, si se reforman los comunes, puertas y señales. */
+const CON_CRITERIO_8: ReadonlySet<string> = new Set(["ocupacion", "local"]);
+const COMUNES_REFORMADOS: ReadonlySet<string> = new Set(["puertas", "senalizacion"]);
+
+export function justificarSi3(estado: Si3Estado, p: ProyectoSi): JustificacionSi3 {
+  const ex = p.existente;
+  if (!ex || !ex.deduccion.viviendaEnEdificioDeViviendas) return justificarSi3Edificio(estado, p);
+  const comunesReformados = ex.edificio.grupos.some((g) =>
+    g.zonas.some((z) => (z.uso === "zona_comun" || z.uso === "vestibulo") && obraDeZona(z, ex.intervencion) !== "existente"),
+  );
+  const garajeTocado = ex.edificio.grupos.some((g) => g.zonas.some((z) => z.uso === "garaje" && obraDeZona(z, ex.intervencion) !== "existente"));
+  // Lo que evacúa por los comunes reformados, con la ocupación del edificio entero.
+  const entero = justificarSi3Edificio(estado, { ...p, edificio: ex.edificio, existente: undefined });
+  const j = justificarSi3Edificio(estado, p);
+  const queda = (el: ElementoSi3): boolean => CON_CRITERIO_8.has(el.detalle.clase) || (comunesReformados && COMUNES_REFORMADOS.has(el.detalle.clase));
+  const elementos = [
+    ...j.elementos.filter((el) => CON_CRITERIO_8.has(el.detalle.clase)),
+    // El garaje que no se toca no entra en la puerta ni en las señales del portal.
+    ...entero.elementos
+      .filter((el) => comunesReformados && COMUNES_REFORMADOS.has(el.detalle.clase))
+      .map((el): ElementoSi3 => (!garajeTocado && "garaje" in el.detalle ? { ...el, detalle: { ...el.detalle, garaje: false } as ElementoSi3["detalle"] } : el)),
+  ].filter(queda);
+  const ids = new Set(elementos.map((el) => el.id));
+  const oc = entero.elementos.find((el) => el.detalle.clase === "ocupacion")?.detalle;
+  const veredicto: Veredicto = elementos.some((el) => el.veredicto === "fail") ? "fail" : "ok";
+  return {
+    ...j,
+    elementos,
+    avisos: j.avisos.filter((a) => !a.elementoId || ids.has(a.elementoId)),
+    veredicto,
+    existente: { ocupacionEdificio: oc && oc.clase === "ocupacion" ? oc.total : 0, comunesReformados },
+  };
 }
 
 const RANGO: Record<ProteccionEscalera, number> = { no_protegida: 0, compartimentada: 0, protegida: 1, especialmente_protegida: 2 };
@@ -140,7 +191,7 @@ export function habitualesSi3(e: EdificioSi): DecisionesSi3 {
   };
 }
 
-export function justificarSi3(estado: Si3Estado, p: ProyectoSi): JustificacionSi3 {
+function justificarSi3Edificio(estado: Si3Estado, p: ProyectoSi): JustificacionSi3 {
   const e = edificioSi(p.edificio);
   const c = compartimentar(e);
   const habituales = habitualesSi3(e);

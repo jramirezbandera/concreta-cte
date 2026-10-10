@@ -25,6 +25,15 @@ function parrafoUsos(j: JustificacionSua1): Trozo[] {
   const p: Trozo[] = ["Se justifica la exigencia básica SUA 1 mediante la aplicación de la Sección SUA 1 del DB-SUA (texto consolidado de 14-06-2022). "];
   if (c.unifamiliar) {
     p.push("El edificio es una vivienda unifamiliar, de uso Residencial Vivienda: todas sus zonas, incluido el garaje, son interior de la vivienda, de ", { v: "uso restringido" }, " y uso privado (Anejo A).");
+  } else if (c.residencial && j.existente) {
+    // Lo intervenido en un edificio existente (feature-30).
+    p.push(
+      "El edificio es de uso Residencial Vivienda. En lo intervenido, el interior de la vivienda es de ",
+      { v: "uso restringido" },
+      j.existente.zonasComunes ? " y las zonas comunes que se reforman, de " : "",
+      ...(j.existente.zonasComunes ? [{ v: "uso general" }] : []),
+      "; en Residencial Vivienda todas las zonas son de uso privado (Anejo A).",
+    );
   } else if (c.residencial) {
     p.push(
       "El edificio es de uso Residencial Vivienda: el interior de las viviendas es de ",
@@ -49,7 +58,7 @@ function parrafoResbaladicidad(j: JustificacionSua1): Trozo[] {
   const c = j.contexto;
   const p: Trozo[] = [];
   if (c.residencial) {
-    p.push("El uso Residencial Vivienda no figura entre los del apartado 1 de SUA 1: no se exige clase de resbaladicidad a sus suelos, ni al aparcamiento (SUA 1-1 pto 1).");
+    p.push(`El uso Residencial Vivienda no figura entre los del apartado 1 de SUA 1: no se exige clase de resbaladicidad a sus suelos${j.existente ? "" : ", ni al aparcamiento"} (SUA 1-1 pto 1).`);
   }
   if (c.oficinas) {
     if (p.length > 0) p.push(" ");
@@ -74,7 +83,14 @@ function parrafoDiscontinuidades(j: JustificacionSua1): Trozo[] {
   if (c.unifamiliar) {
     return ["Al ser toda la vivienda de uso restringido, no le son de aplicación las condiciones de las discontinuidades del pavimento (SUA 1-2 pto 1)."];
   }
-  const zonas = c.residencial ? (c.oficinas ? "En las zonas comunes, el garaje y las oficinas" : "En las zonas comunes y el garaje") : "En las oficinas, el vestíbulo y el garaje";
+  if (j.existente && !j.existente.zonasComunes && c.residencial) {
+    return ["El interior de la vivienda es de uso restringido: no le son de aplicación las condiciones de las discontinuidades del pavimento (SUA 1-2 pto 1)."];
+  }
+  const zonas = j.existente
+    ? "En las zonas comunes que se reforman"
+    : c.residencial
+      ? (c.oficinas ? "En las zonas comunes, el garaje y las oficinas" : "En las zonas comunes y el garaje")
+      : "En las oficinas, el vestíbulo y el garaje";
   const esc = c.residencial
     ? "Solo hay escalones aislados o dos consecutivos en el interior de las viviendas, en las zonas comunes o en el acceso al edificio, y nunca en el itinerario accesible (SUA 1-2 pto 3)."
     : "No hay escalones aislados ni dos consecutivos en zonas de circulación, salvo en el acceso o la salida del edificio y fuera del itinerario accesible (SUA 1-2 pto 3).";
@@ -87,6 +103,9 @@ function parrafoDiscontinuidades(j: JustificacionSua1): Trozo[] {
 function parrafoBarreras(j: JustificacionSua1): Trozo[] {
   const c = j.contexto;
   const xs = detalles(j, "barreras");
+  if (j.existente && xs.length === 0) {
+    return ["Lo intervenido no tiene desniveles, huecos ni aberturas con una diferencia de cota mayor que 55 cm, por lo que no requiere barreras de protección (SUA 1-3.1 pto 1)."];
+  }
   const p: Trozo[] = [
     "Se disponen barreras de protección en los desniveles, huecos y aberturas con diferencia de cota mayor que 55 cm (SUA 1-3.1 pto 1), de altura ≥ 0,90 m donde la diferencia de cota no excede de 6 m y ≥ 1,10 m en el resto, medida desde el suelo o desde la línea de inclinación de la escalera (SUA 1-3.2.1).",
   ];
@@ -99,7 +118,7 @@ function parrafoBarreras(j: JustificacionSua1): Trozo[] {
       ` (mínimo ${m(b.min_m)}).`,
     );
   }
-  if (xs.length === 0) p.push(" El edificio no tiene plantas con el suelo a más de 55 cm sobre la rasante.");
+  if (xs.length === 0) p.push(j.existente ? " Lo intervenido no tiene desniveles con una diferencia de cota mayor que 55 cm." : " El edificio no tiene plantas con el suelo a más de 55 cm sobre la rasante.");
   p.push(" Las barreras resisten la fuerza horizontal del DB SE-AE, apartado 3.2.1 (SUA 1-3.2.2).");
   if (c.residencial) {
     p.push(
@@ -110,7 +129,7 @@ function parrafoBarreras(j: JustificacionSua1): Trozo[] {
       ` En las zonas de uso público las barreras no tienen aberturas por las que pase una esfera de ${cm(B.esferaOtrosUsosPublico_cm, 0)} (SUA 1-3.2.3) y los desniveles de hasta 55 cm se señalizan con diferenciación visual y táctil a partir de 25 cm del borde (SUA 1-3.1 pto 2).`,
     );
   }
-  if (c.cubierta !== "plana_transitable") {
+  if (c.cubierta !== "plana_transitable" && !j.existente?.cubiertaSinTocar) {
     p.push(
       " La cubierta no es transitable: solo es accesible para mantenimiento, queda fuera del ámbito del DB-SUA (Introducción II) y se dota de los medios de seguridad para su conservación conforme al RD 1627/1997 y al RD 486/1997.",
     );

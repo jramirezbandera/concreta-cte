@@ -13,6 +13,7 @@
 //     supone Comercial (como en el DB-SI) y se avisa solo si cambia algo.
 // =============================================================================
 
+import { edificioAntes } from "../../lib/proyecto/alcance";
 import type { Aviso } from "../../lib/cte/resultado";
 import type { Veredicto } from "../../lib/pdf/renderFicha";
 import type { ProyectoSi } from "../si/definicion";
@@ -86,6 +87,19 @@ export interface JustificacionSua8 extends JustificacionSiBase {
   /** Las dimensiones de la planta con las que se calcula y si se suponen. */
   planta: { largo_m: number; ancho_m: number; supuesta: boolean };
   h_m: number;
+  /** En un edificio existente con el asistente respondido (feature-30). */
+  existente?: ExistenteSua8;
+}
+
+/**
+ * La evaluación antes y después de la obra (feature-30; K-INT.9). Si la obra no
+ * cambia Ne y no reduce Na, la evaluación es la del edificio preexistente y el
+ * cambio de uso no aumenta la exigencia de protección.
+ */
+export interface ExistenteSua8 {
+  sinVariacion: boolean;
+  c4Antes: number;
+  c4: number;
 }
 
 interface Entradas {
@@ -120,6 +134,26 @@ function conclusion(r: ResultadoSua8): string {
 }
 
 export function justificarSua8(estado: Sua8Estado, p: ProyectoSi): JustificacionSua8 {
+  const j = justificarSua8Edificio(estado, p);
+  const ex = p.existente;
+  if (!ex) return j;
+  const antes = justificarSua8Edificio(estado, { ...p, edificio: edificioAntes(ex), existente: undefined });
+  const c4 = (j: JustificacionSua8): number => {
+    const d = j.elementos.find((el) => el.detalle.clase === "na")?.detalle;
+    return d && d.clase === "na" ? d.c4 : 1;
+  };
+  const sinVariacion = Math.abs(j.resultado.ne - antes.resultado.ne) < 1e-9 && j.resultado.na >= antes.resultado.na - 1e-9;
+  // Sin variación, la necesidad de protección (si la hay) es del edificio preexistente: no bloquea la obra.
+  const elementos = sinVariacion ? j.elementos.map((el): ElementoSua8 => (el.id === "proteccion" ? { ...el, veredicto: "ok" } : el)) : j.elementos;
+  return {
+    ...j,
+    elementos,
+    veredicto: elementos.some((x) => x.veredicto === "fail") ? "fail" : "ok",
+    existente: { sinVariacion, c4Antes: c4(antes), c4: c4(j) },
+  };
+}
+
+function justificarSua8Edificio(estado: Sua8Estado, p: ProyectoSi): JustificacionSua8 {
   const e = edificioSua(p.edificio);
   const tipoCubierta = p.edificio.cubierta.tipo;
   // Lo habitual de todo menos la instalación, que depende del resultado.

@@ -15,6 +15,7 @@
 //   - el local sin uso se deja previsto: se dotará con su actividad.
 // =============================================================================
 
+import { edificioAntes } from "../../lib/proyecto/alcance";
 import type { Aviso } from "../../lib/cte/resultado";
 import type { Veredicto } from "../../lib/pdf/renderFicha";
 import type { ProyectoSi } from "../si/definicion";
@@ -63,6 +64,45 @@ export interface JustificacionSi4 extends JustificacionSiBase {
   decisiones: DecisionesSi4;
   habituales: DecisionesSi4;
   comp: Compartimentacion;
+  /** En un edificio existente con el asistente respondido (feature-30). */
+  existente?: ExistenteSi4;
+}
+
+/**
+ * Lo que la obra cambia en la dotación del edificio (feature-30; K-INT.14 y 15):
+ * la tabla 1.1 aplicada al edificio antes de la obra y después. Lo que ya se
+ * exigía existe y no se modifica; solo lo que la obra hace exigible se dispone.
+ */
+export interface ExistenteSi4 {
+  /** Instalaciones exigidas antes de la obra, por id de elemento. */
+  antes: ReadonlySet<string>;
+  /** Plantas con extintor antes de la obra. */
+  extintoresAntes: ReadonlySet<number>;
+  /** Lo que se interviene pasa a vivienda (su interior no es origen de evacuación). */
+  pasaAVivienda: boolean;
+}
+
+/** Ids de lo que la tabla 1.1 exige en una justificación. */
+function exigidas(j: Pick<JustificacionSi4, "elementos">): Set<string> {
+  return new Set(
+    j.elementos.flatMap((el) => ((el.detalle.clase === "dotacion" || el.detalle.clase === "hidrantes") && el.detalle.exige ? [el.id] : [])),
+  );
+}
+
+export function justificarSi4(estado: Si4Estado, p: ProyectoSi): JustificacionSi4 {
+  const j = justificarSi4Edificio(estado, p);
+  const ex = p.existente;
+  if (!ex) return j;
+  const antes = justificarSi4Edificio(estado, { ...p, edificio: edificioAntes(ex), existente: undefined });
+  const ext = antes.elementos.find((el) => el.detalle.clase === "extintores")?.detalle;
+  return {
+    ...j,
+    existente: {
+      antes: exigidas(antes),
+      extintoresAntes: new Set(ext && ext.clase === "extintores" ? ext.plantas.map((pl) => pl.nivel) : []),
+      pasaAVivienda: ex.deduccion.pasaAVivienda,
+    },
+  };
 }
 
 const T = DOTACION_TABLA_1_1.datos;
@@ -86,7 +126,7 @@ function conOrigenes(z: ZonaSi): boolean {
   return true;
 }
 
-export function justificarSi4(estado: Si4Estado, p: ProyectoSi): JustificacionSi4 {
+function justificarSi4Edificio(estado: Si4Estado, p: ProyectoSi): JustificacionSi4 {
   const e = edificioSi(p.edificio);
   const c = compartimentar(e);
   const d = resolverSi4(estado);

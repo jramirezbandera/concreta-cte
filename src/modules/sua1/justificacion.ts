@@ -153,7 +153,9 @@ export type DetalleSua1 =
       fallos: FalloRampa[];
     }
   | { clase: "resbaladicidad"; usoPublico: boolean }
-  | { clase: "limpieza"; plantas: string; niveles: number[]; carpinteria: Carpinteria };
+  | { clase: "limpieza"; plantas: string; niveles: number[]; carpinteria: Carpinteria }
+  /** En un edificio existente (feature-30): el pavimento de lo intervenido (SUA 1 ap. 2). */
+  | { clase: "discontinuidades"; zonasComunes: boolean };
 
 export type ElementoSua1 = ElementoSi<DetalleSua1>;
 
@@ -177,7 +179,16 @@ export interface ContextoSua1 {
   barrerasAltas: boolean;
 }
 
+/** En un edificio existente con el asistente respondido (feature-30). */
+export interface ExistenteSua1 {
+  /** Se reforman zonas comunes (uso general). */
+  zonasComunes: boolean;
+  /** La obra no toca la cubierta: no se describe. */
+  cubiertaSinTocar: boolean;
+}
+
 export interface JustificacionSua1 extends JustificacionSiBase {
+  existente?: ExistenteSua1;
   elementos: ElementoSua1[];
   decisiones: DecisionesSua1;
   habituales: DecisionesSua1;
@@ -479,7 +490,15 @@ export function justificarSua1(estado: Sua1Estado, p: ProyectoSi): Justificacion
       },
     });
   }
-  if (p.edificio.cubierta.tipo === "plana_transitable") {
+  // En un edificio existente, lo que se aplica a lo intervenido (feature-30).
+  const ex = p.existente;
+  const existente: ExistenteSua1 | undefined = ex
+    ? {
+        zonasComunes: e.zonas.some((z) => z.uso === "zona_comun" || z.uso === "vestibulo"),
+        cubiertaSinTocar: ex.respuestas.envolvente !== undefined && !ex.respuestas.envolvente.includes("cubiertas"),
+      }
+    : undefined;
+  if (p.edificio.cubierta.tipo === "plana_transitable" && !existente?.cubiertaSinTocar) {
     const cota = e.alturaCubierta_m;
     const min_m = alturaBarreraMin_m(cota) ?? SUA1_BARRERAS.datos.alturaHasta6m_m;
     const altura_m = cota > SUA1_BARRERAS.datos.umbralCota_m ? d.barreraAlta_m : d.barreraBaja_m;
@@ -596,8 +615,23 @@ export function justificarSua1(estado: Sua1Estado, p: ProyectoSi): Justificacion
     });
   }
 
+  // ── El pavimento de lo intervenido (edificio existente) ──────────────────
+  if (existente) {
+    elementos.push({
+      id: "discontinuidades",
+      nombre: "Discontinuidades del pavimento",
+      tipo: "suelo",
+      veredicto: "ok",
+      valor: { texto: existente.zonasComunes ? "zonas comunes" : "uso restringido" },
+      manda: { tipo: "decision_proyectista", decision: "discontinuidades" },
+      cita: ["SUA 1 · ap. 2"],
+      detalle: { clase: "discontinuidades", zonasComunes: existente.zonasComunes },
+    });
+  }
+
   const veredicto: Veredicto = elementos.some((x) => x.veredicto === "fail") ? "fail" : "ok";
   return {
+    ...(existente ? { existente } : {}),
     elementos,
     avisos,
     veredicto,
