@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { justificacionRegistry } from "../../../data/justificacionRegistry";
-import { fuenteCorta, SECCIONES } from "../memoria";
+import { cuadroInicial, fuenteCorta, memoriaCte, numeroFijo, SECCIONES, type MemoriaCte } from "../memoria";
+import { edificioDeCaso, type CasoEdificio } from "../../edificio/casos";
+import { obraDeCaso } from "../../proyecto/alcance";
+import { crearProyectoDemo } from "../../proyecto/demo";
+import type { Proyecto } from "../../proyecto/tipos";
+import { ESTUDIO_VACIO, firmantesDe, membreteDe, parseEstudio, type Estudio } from "../../estudio/estudio";
 
 // =============================================================================
 // feature-29: el esqueleto del documento. Cada justificación tiene su sitio
@@ -39,5 +44,80 @@ describe("fuenteCorta", () => {
   it("deja lo que no es versión: fechas de comentarios y del Catálogo", () => {
     const f = "DB-SUA · SUA 9 · comentarios del Ministerio (15-jul-2024, no reglamentarios) · CEC (marzo 2010)";
     expect(fuenteCorta(f)).toBe(f);
+  });
+});
+
+// ─── El cuadro inicial y la numeración fija (pasos 1 y 2) ──────────────────────
+
+function deCaso(caso: CasoEdificio): Proyecto {
+  const p: Proyecto = { ...crearProyectoDemo("2026-10-10T10:00:00.000Z"), edificio: edificioDeCaso(caso), justificaciones: {} };
+  p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso(caso) ?? {}) };
+  return p;
+}
+
+const tablas = (m: MemoriaCte) => cuadroInicial(m).flatMap((b) => (b.tipo === "tabla" ? [b.filas] : []));
+
+describe("el cuadro inicial", () => {
+  it("en la reforma: el tipo de obra y, con un pendiente, la numeración no se corre", () => {
+    const m = memoriaCte(deCaso("reforma_local_vivienda"));
+    const [obra, cuadro] = tablas(m);
+    expect(obra).toEqual([["—", "Cambio de uso y reforma", "Parcial", "Sí, de una parte del edificio"]]);
+    // SUA 1 aún no se redacta en la reforma: su sitio sigue siendo el 3.3.1.
+    expect(cuadro).toContainEqual(["SUA 1 Seguridad frente al riesgo de caídas", "Pendiente de redactar", "3.3.1"]);
+    expect(cuadro).toContainEqual(["SUA 2 Seguridad frente al riesgo de impacto o de atrapamiento", "A lo intervenido", "3.3.2"]);
+    expect(m.apartados.find((a) => a.key === "sua2")!.encabezado).toMatch(/^3\.3\.2\. /);
+    expect(cuadro).toContainEqual(["Protección frente al ruido DB HR", "A lo intervenido", "3.5"]);
+  });
+
+  it("en obra nueva, con la fase del documento", () => {
+    const p = deCaso("unifamiliar");
+    p.datosGenerales = { ...p.datosGenerales, documento: { fase: "ejecucion" } };
+    const [obra, cuadro] = tablas(memoriaCte(p));
+    expect(obra).toEqual([["Proyecto de ejecución", "Obra nueva", "No procede", "No"]]);
+    expect(cuadro[0]).toEqual(["Seguridad estructural DB SE", "Con Concreta estructura", "3.1"]);
+  });
+
+  it("el número fijo de cada justificación", () => {
+    expect(numeroFijo("si1")).toBe("3.2.1");
+    expect(numeroFijo("sua9")).toBe("3.3.9");
+    expect(numeroFijo("hr")).toBe("3.5");
+    expect(numeroFijo("rebt")).toBe("4.1.1");
+  });
+});
+
+// ─── Los datos del estudio y el membrete (pasos 4 y 5) ─────────────────────────
+
+describe("el estudio", () => {
+  const ana = { id: "a", nombre: "Ana Pérez", titulacion: "Arquitecta", colegiacion: "Colegiada nº 1 del COA Málaga" };
+  const luis = { id: "b", nombre: "Luis Gil", titulacion: "Arquitecto" };
+  const marta = { id: "c", nombre: "Marta Ruiz", titulacion: "Arquitecta técnica" };
+  const estudio: Estudio = { firmantes: [ana, luis, marta], direccion: "C/ Larios 1, Málaga", telefonos: "600 000 000", correo: "a@b.es" };
+  const conFirma = (firmantes?: string[]) => ({ nombre: "Casa", datosGenerales: { documento: firmantes ? { firmantes } : {} } }) as unknown as Proyecto;
+
+  it("se lee con cautela: lo que no tiene forma se descarta", () => {
+    expect(parseEstudio(null)).toEqual({ firmantes: [] });
+    expect(parseEstudio({ firmantes: [{ id: "x" }, { id: "y", nombre: "  Eva  ", titulacion: 3 }, "z"], direccion: " " })).toEqual({
+      firmantes: [{ id: "y", nombre: "Eva", titulacion: "" }],
+    });
+  });
+
+  it("firma la primera persona si no se elige; como mucho dos; los que ya no están, fuera", () => {
+    expect(firmantesDe(estudio, conFirma()).map((f) => f.id)).toEqual(["a"]);
+    expect(firmantesDe(estudio, conFirma(["c", "b"])).map((f) => f.id)).toEqual(["c", "b"]);
+    expect(firmantesDe(estudio, conFirma(["a", "b", "c"]))).toHaveLength(2);
+    expect(firmantesDe(estudio, conFirma(["borrado"])).map((f) => f.id)).toEqual(["a"]);
+    expect(firmantesDe({ firmantes: [] }, conFirma())).toEqual([]);
+  });
+
+  it("el membrete: una fila por firmante, la del contacto, y el pie", () => {
+    const m = membreteDe(estudio, conFirma(["a", "b"]));
+    expect(m.cabecera).toEqual([
+      ["Ana Pérez, Arquitecta", "Colegiada nº 1 del COA Málaga"],
+      ["Luis Gil, Arquitecto", ""],
+      ["C/ Larios 1, Málaga", "Tlf: 600 000 000 · a@b.es"],
+    ]);
+    expect(m.pie).toBe("Casa");
+    const conTitulo = { nombre: "Casa", datosGenerales: { documento: { titulo: " PROYECTO DE EJECUCIÓN " } } } as unknown as Proyecto;
+    expect(membreteDe(ESTUDIO_VACIO, conTitulo)).toEqual({ cabecera: [], pie: "PROYECTO DE EJECUCIÓN", proyecto: "Casa" });
   });
 });

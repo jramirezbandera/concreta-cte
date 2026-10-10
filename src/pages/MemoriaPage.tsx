@@ -6,7 +6,17 @@ import { useDrawer } from "../components/layout/AppShell";
 import { useExportarMemoria } from "../components/obra/useExportarMemoria";
 import { useProyecto } from "../lib/proyecto/ProyectoContext";
 import { entregables } from "../lib/obra/entrega";
-import { CAPITULOS, fuenteCorta, memoriaCte, textoPlanoMemoriaCte, type ApartadoMemoria, type Capitulo } from "../lib/obra/memoria";
+import {
+  CAPITULOS,
+  cuadroInicial,
+  fuenteCorta,
+  memoriaCte,
+  textoPlanoMemoriaCte,
+  type ApartadoMemoria,
+  type BloqueMemoria,
+  type Capitulo,
+  type MemoriaCte,
+} from "../lib/obra/memoria";
 import type { MemoriaDoc } from "../lib/cte/presentacion";
 import { getJustificacion } from "../data/justificacionRegistry";
 
@@ -66,6 +76,48 @@ function Parrafos({ doc }: { doc: MemoriaDoc }): JSX.Element {
       )}
       {doc.fuente && <p className="text-text-disabled mb-1 font-mono text-[10.5px] leading-relaxed">{fuenteCorta(doc.fuente)}</p>}
     </>
+  );
+}
+
+/** El tipo de obra y dónde se justifica cada exigencia, como abren el capítulo 3 el Word y el PDF (feature-29). */
+function CuadroInicial({ m }: { m: MemoriaCte }): JSX.Element {
+  return (
+    <div className="mb-6">
+      {cuadroInicial(m).map((b: BloqueMemoria, k) =>
+        b.tipo === "tabla" ? (
+          <table key={k} className="mt-1.5 mb-3 w-full border-collapse">
+            <thead>
+              <tr>
+                {b.cabecera.map((c) => (
+                  <th
+                    key={c}
+                    scope="col"
+                    className="border-border-main text-text-secondary border-b p-1.5 text-left text-[10px] font-semibold tracking-[0.05em] uppercase"
+                  >
+                    {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {b.filas.map((f, i) => (
+                <tr key={i}>
+                  {f.map((c, j) => (
+                    <td key={j} className="border-border-sub border-b p-1.5 text-left text-[12px]">
+                      {c}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : b.tipo === "parrafo" ? (
+          <p key={k} className="mb-1">
+            {b.texto}
+          </p>
+        ) : null,
+      )}
+    </div>
   );
 }
 
@@ -202,9 +254,12 @@ export function MemoriaPage(): JSX.Element {
             {grupos.map((g, i) => (
               <div key={g.grupo} className="mb-6 last:mb-2">
                 {g.capitulo !== grupos[i - 1]?.capitulo && (
-                  <p className="text-text-primary mb-4 text-[15px] font-semibold">
-                    {g.capitulo}. {CAPITULOS[g.capitulo]}
-                  </p>
+                  <>
+                    <p className="text-text-primary mb-4 text-[15px] font-semibold">
+                      {g.capitulo}. {CAPITULOS[g.capitulo]}
+                    </p>
+                    {g.capitulo === 3 && <CuadroInicial m={m} />}
+                  </>
                 )}
                 <h2 className="text-text-disabled border-border-main mb-4 border-b pb-1.5 text-[10.5px] font-semibold tracking-[0.09em] uppercase">
                   {g.grupo}

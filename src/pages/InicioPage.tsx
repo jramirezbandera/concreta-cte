@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { Copy, FileDown, FolderOpen, Plus, Trash2, Upload } from "lucide-react";
 import { ThemeToggle } from "../components/theme/ThemeToggle";
 import { ToastContainer, showToast } from "../components/ui/Toast";
+import { TuEstudio } from "../components/estudio/TuEstudio";
 import {
   cargarProyecto,
   duplicarProyecto,
@@ -327,6 +328,8 @@ export function InicioPage(): JSX.Element {
             </table>
           </div>
         )}
+
+        <TuEstudio />
       </main>
 
       <ToastContainer />

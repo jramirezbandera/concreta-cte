@@ -2,6 +2,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
 import { bloquesMemoria, memoriaCte, nombreArchivoMemoria } from "../../lib/obra/memoria";
 import { descargarBlob, descargarUrl } from "../../lib/export/descargar";
+import { membreteDe } from "../../lib/estudio/estudio";
+import { useEstudio } from "../../lib/estudio/useEstudio";
 import type { PdfResult } from "../../lib/pdf/utils";
 import { PdfPreviewModal } from "../ui/PdfPreviewModal";
 import { showToast } from "../ui/Toast";
@@ -23,6 +25,7 @@ export interface ExportarMemoria {
 
 export function useExportarMemoria(): ExportarMemoria {
   const { proyecto } = useProyecto();
+  const [estudio] = useEstudio();
   const [ocupado, setOcupado] = useState<"word" | "pdf" | null>(null);
   const [pdf, setPdf] = useState<PdfResult | null>(null);
 
@@ -39,7 +42,7 @@ export function useExportarMemoria(): ExportarMemoria {
     setOcupado("word");
     try {
       const { memoriaDocx } = await import("../../lib/docx/render");
-      const blob = await memoriaDocx(bloques(), proyecto.nombre);
+      const blob = await memoriaDocx(bloques(), membreteDe(estudio, proyecto));
       descargarBlob(blob, nombreArchivoMemoria(proyecto.nombre, "docx"));
     } catch {
       showToast("No se pudo generar el Word de la memoria", { autoDismiss: 4000 });
@@ -52,7 +55,7 @@ export function useExportarMemoria(): ExportarMemoria {
     setOcupado("pdf");
     try {
       const { renderMemoriaPdf } = await import("../../lib/pdf/memoria");
-      setPdf(renderMemoriaPdf(bloques(), proyecto.nombre));
+      setPdf(renderMemoriaPdf(bloques(), membreteDe(estudio, proyecto)));
     } catch {
       showToast("No se pudo generar el PDF de la memoria", { autoDismiss: 4000 });
     } finally {

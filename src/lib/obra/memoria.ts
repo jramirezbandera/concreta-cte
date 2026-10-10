@@ -15,7 +15,9 @@
 
 import type { MemoriaDoc } from "../cte/presentacion";
 import { textoParrafo } from "../cte/memoria";
-import type { JustificacionKey, Proyecto } from "../proyecto/tipos";
+import type { Aplicabilidad, JustificacionKey, Proyecto, TipoObraExistente } from "../proyecto/tipos";
+import { tiposDeObra } from "../proyecto/alcance";
+import { NOMBRE_FASE } from "../estudio/estudio";
 import { notaAlcance, type NotaAlcance } from "./alcanceTexto";
 import { evaluarExpediente, type EvaluacionJustificacion } from "./evaluar";
 import { aplicabilidadEfectiva } from "../proyecto/aplicabilidad";
@@ -118,6 +120,9 @@ export function fuenteCorta(fuente: string): string {
 interface ApartadoBase {
   key: JustificacionKey;
   codigo: string;
+  aplicabilidad: Aplicabilidad;
+  /** Sin número: «SI 1 Propagación interior»; el de la sección si no tiene título propio. */
+  titulo: string;
   /** «3.2.1. SI 1 Propagación interior»; si no tiene título propio, el de su sección. */
   encabezado: string;
   /** Su sección: «3.2. Seguridad en caso de incendio DB SI». */
@@ -143,12 +148,21 @@ export type ApartadoMemoria =
       conLaGlobal?: boolean;
     });
 
+/** La fila del tipo de obra con que abre el capítulo, como la que abre el SI en las memorias del estudio. */
+export interface ObraMemoria {
+  tipoProyecto: string;
+  tipoObras: string;
+  alcance: string;
+  cambioUso: string;
+}
+
 export interface MemoriaCte {
   titulo: string;
   proyecto: string;
+  obra: ObraMemoria;
   apartados: ApartadoMemoria[];
-  /** Lo que la herramienta aún no redacta (o no tiene nada que redactar). */
-  pendientes: { codigo: string; label: string }[];
+  /** Lo que la herramienta aún no redacta (o no tiene nada que redactar), con el número que le toca. */
+  pendientes: { key: JustificacionKey; codigo: string; label: string; numero: string }[];
 }
 
 /** «DB-HS2» → «DB-HS 2», «DB-HE0 / DB-HE1» → «DB-HE 0 / DB-HE 1»: como los redactados (feature-28). */
@@ -172,7 +186,7 @@ type ApartadoSinColocar = ApartadoMemoria;
 
 function apartadoDe(ev: EvaluacionJustificacion, p: Proyecto): ApartadoSinColocar | null {
   const e = ev.entrada;
-  const base = { key: ev.key, codigo: e.codigo, grupo: "", capitulo: 3 as Capitulo, sinTitulo: false };
+  const base = { key: ev.key, codigo: e.codigo, aplicabilidad: ev.aplicabilidad, titulo: "", grupo: "", capitulo: 3 as Capitulo, sinTitulo: false };
   // En una obra existente, a qué se aplica (feature-27).
   const n = notaAlcance(p, ev.key);
   const alcance = n ? { alcance: n } : {};
@@ -231,6 +245,17 @@ function apartadoDe(ev: EvaluacionJustificacion, p: Proyecto): ApartadoSinColoca
   }
 }
 
+/**
+ * El número de una justificación en el documento: fijo, por su sitio en la
+ * sección, haya o no apartado (un pendiente no corre la numeración de los
+ * demás). La sección entera si no tiene subapartados.
+ */
+export function numeroFijo(key: JustificacionKey): string {
+  const s = SECCIONES.find((x) => x.keys.includes(key));
+  if (!s) return "—";
+  return s.sinSubapartados ? s.numero : `${s.numero}.${s.keys.indexOf(key) + 1}`;
+}
+
 /** La memoria del expediente, apartado a apartado, en el orden y con la numeración del documento. */
 export function memoriaCte(p: Proyecto): MemoriaCte {
   const porClave = new Map<JustificacionKey, ApartadoSinColocar>();
@@ -238,23 +263,66 @@ export function memoriaCte(p: Proyecto): MemoriaCte {
   for (const ev of evaluarExpediente(p).justificaciones) {
     const a = apartadoDe(ev, p);
     if (a) porClave.set(ev.key, a);
-    else pendientes.push({ codigo: ev.entrada.codigo, label: ev.entrada.label });
+    else pendientes.push({ key: ev.key, codigo: ev.entrada.codigo, label: ev.entrada.label, numero: numeroFijo(ev.key) });
   }
   const apartados: ApartadoMemoria[] = [];
   for (const s of SECCIONES) {
     const deLaSeccion = s.keys.flatMap((k) => porClave.get(k) ?? []);
     const sinTitulo = s.sinSubapartados === true && deLaSeccion.length === 1;
-    deLaSeccion.forEach((a, i) => {
+    for (const a of deLaSeccion) {
       porClave.delete(a.key);
       const grupo = `${s.numero}. ${s.titulo}`;
-      const titulo = TITULOS[a.key] ?? a.encabezado;
-      apartados.push({ ...a, capitulo: s.capitulo, grupo, sinTitulo, encabezado: sinTitulo ? grupo : `${s.numero}.${i + 1}. ${titulo}` });
-    });
+      const titulo = sinTitulo ? s.titulo : (TITULOS[a.key] ?? a.encabezado);
+      apartados.push({ ...a, capitulo: s.capitulo, grupo, sinTitulo, titulo, encabezado: sinTitulo ? grupo : `${numeroFijo(a.key)}. ${titulo}` });
+    }
   }
   // Una justificación nueva que aún no tiene sitio en el documento: al final, sin número.
-  for (const a of porClave.values()) apartados.push({ ...a, capitulo: 4, grupo: "Otras justificaciones" });
-  return { titulo: TITULO_MEMORIA, proyecto: p.nombre, apartados, pendientes };
+  for (const a of porClave.values()) apartados.push({ ...a, capitulo: 4, grupo: "Otras justificaciones", titulo: a.encabezado });
+  return { titulo: TITULO_MEMORIA, proyecto: p.nombre, obra: obraDe(p), apartados, pendientes };
 }
+
+const NOMBRE_OBRA: Record<TipoObraExistente, string> = { reforma: "reforma", ampliacion: "ampliación", cambio_uso: "cambio de uso" };
+
+/** «Cambio de uso y reforma». */
+function tipoObras(p: Proyecto): string {
+  const tipos = tiposDeObra(p.datosGenerales).map((t) => NOMBRE_OBRA[t]);
+  if (tipos.length === 0) return "Obra nueva";
+  const t = tipos.length === 1 ? tipos[0] : `${tipos.slice(0, -1).join(", ")} y ${tipos.at(-1)}`;
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+function obraDe(p: Proyecto): ObraMemoria {
+  const dg = p.datosGenerales;
+  const fase = dg.documento?.fase;
+  const a = dg.alcance;
+  const nueva = dg.intervencion === "obra_nueva";
+  const cambia = tiposDeObra(dg).includes("cambio_uso");
+  return {
+    tipoProyecto: fase ? NOMBRE_FASE[fase] : "—",
+    tipoObras: tipoObras(p),
+    alcance: nueva ? "No procede" : !a ? "Pendiente del asistente de alcance" : a.integral ? "Integral" : "Parcial",
+    cambioUso: !cambia ? "No" : a?.cambioUsoCaracteristico ? "Sí, del uso característico" : "Sí, de una parte del edificio",
+  };
+}
+
+/** Cómo se aplica cada exigencia, en una palabra o dos, para el cuadro inicial. */
+function comoSeAplica(a: ApartadoMemoria): string {
+  if (a.tipo === "externo") return `Con ${a.destino}`;
+  switch (a.aplicabilidad) {
+    case "aplica":
+      return "Se aplica";
+    case "aplica_reformado":
+      return "A lo intervenido";
+    case "aplica_flexibilidad":
+      return "Con flexibilidad";
+    case "no_aplica":
+      return "No aplica";
+    default:
+      return "Se aplica";
+  }
+}
+
+
 
 // ── Bloques: lo que comparten el Word, el PDF y el texto copiado ────────────
 
@@ -282,6 +350,35 @@ function textoExterno(a: Extract<ApartadoMemoria, { tipo: "externo" }>): string 
 }
 
 /**
+ * Lo que abre el capítulo 3 (feature-29): el tipo de obra, como la tabla con que
+ * abren el SI las memorias del estudio, y dónde se justifica cada exigencia.
+ */
+export function cuadroInicial(m: MemoriaCte): BloqueMemoria[] {
+  const o = m.obra;
+  return [
+    {
+      tipo: "tabla",
+      cabecera: ["Tipo de proyecto", "Tipo de obras", "Alcance de las obras", "Cambio de uso"],
+      filas: [[o.tipoProyecto, o.tipoObras, o.alcance, o.cambioUso]],
+    },
+    { tipo: "parrafo", texto: "Cada exigencia se justifica en el apartado que se indica:" },
+    {
+      tipo: "tabla",
+      cabecera: ["Exigencia", "Aplicación", "Apartado"],
+      // En el orden del documento, con los pendientes en su sitio.
+      filas: SECCIONES.flatMap((s) =>
+        s.keys.flatMap((k) => {
+          const a = m.apartados.find((x) => x.key === k);
+          if (a) return [[a.titulo, comoSeAplica(a), numeroFijo(k)]];
+          const pe = m.pendientes.find((x) => x.key === k);
+          return pe ? [[TITULOS[k] ?? `${pe.codigo} ${pe.label}`, "Pendiente de redactar", numeroFijo(k)]] : [];
+        }),
+      ),
+    },
+  ];
+}
+
+/**
  * La memoria como bloques: el capítulo (H1), el DB (H2) y la sección (H3), con
  * la numeración del documento (feature-29). El proyecto y la fecha no van en el
  * cuerpo: el título del proyecto va al pie del Word y del PDF.
@@ -294,6 +391,7 @@ export function bloquesMemoria(m: MemoriaCte): BloqueMemoria[] {
     if (a.capitulo !== capitulo) {
       capitulo = a.capitulo;
       b.push({ tipo: "titulo", nivel: 1, texto: `${capitulo}. ${CAPITULOS[capitulo]}` });
+      if (capitulo === 3) b.push(...cuadroInicial(m));
     }
     if (a.grupo !== grupo) {
       grupo = a.grupo;

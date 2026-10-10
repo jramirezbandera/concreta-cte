@@ -9,15 +9,21 @@
 //      índice automático funciona y, al pegar con «Combinar formato», Word
 //      adopta la plantilla de destino.
 //   2. A4 vertical explícito (sin `sectPr`, Word en-US abre en Letter).
-//   3. Una sola sección.
+//   3. Una sola sección, con la cabecera del estudio y el pie con el título
+//      del proyecto y «Página N» (feature-29), como sus memorias.
 //
 // Se carga bajo demanda: la librería no entra en el bundle de La obra.
 // =============================================================================
 
 import {
+  AlignmentType,
+  BorderStyle,
   Document,
+  Footer,
+  Header,
   HeadingLevel,
   Packer,
+  PageNumber,
   PageOrientation,
   Paragraph,
   ShadingType,
@@ -25,10 +31,13 @@ import {
   TableCell,
   TableLayoutType,
   TableRow,
+  TabStopPosition,
+  TabStopType,
   TextRun,
   WidthType,
 } from "docx";
 import type { BloqueMemoria } from "../obra/memoria";
+import type { Membrete } from "../estudio/estudio";
 import { planificarDocx, type BloquePlan, type EstiloParrafo, type FilaPlan } from "./plan";
 
 /** A4 vertical en twips (1/1440") y márgenes de 2 cm. */
@@ -125,7 +134,64 @@ function tabla(b: Extract<BloquePlan, { tipo: "tabla" }>): Table {
   });
 }
 
-export function documentoMemoria(bloques: BloqueMemoria[], proyecto: string): Document {
+const MEMBRETE = 16; // 8 pt
+const SIN_BORDE = { style: BorderStyle.NONE, size: 0, color: "auto" } as const;
+
+/** La cabecera como la del estudio: tabla de dos columnas sin bordes y una raya debajo. */
+function cabecera(m: Membrete): Header | undefined {
+  if (m.cabecera.length === 0) return undefined;
+  const filas = m.cabecera.map(
+    ([izq, der]) =>
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: 55, type: WidthType.PERCENTAGE },
+            borders: { top: SIN_BORDE, bottom: SIN_BORDE, left: SIN_BORDE, right: SIN_BORDE },
+            children: [new Paragraph({ spacing: { before: 0, after: 0 }, children: [new TextRun({ text: izq, size: MEMBRETE })] })],
+          }),
+          new TableCell({
+            width: { size: 45, type: WidthType.PERCENTAGE },
+            borders: { top: SIN_BORDE, bottom: SIN_BORDE, left: SIN_BORDE, right: SIN_BORDE },
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.RIGHT,
+                spacing: { before: 0, after: 0 },
+                children: [new TextRun({ text: der, size: MEMBRETE, bold: true })],
+              }),
+            ],
+          }),
+        ],
+      }),
+  );
+  return new Header({
+    children: [
+      new Table({
+        rows: filas,
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: { top: SIN_BORDE, bottom: SIN_BORDE, left: SIN_BORDE, right: SIN_BORDE, insideHorizontal: SIN_BORDE, insideVertical: SIN_BORDE },
+      }),
+      new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: NEGRO, space: 1 } }, spacing: { after: 120 } }),
+    ],
+  });
+}
+
+/** El pie: el título del proyecto y, a la derecha, «Página N» con el campo de Word. */
+function pie(m: Membrete): Footer {
+  return new Footer({
+    children: [
+      new Paragraph({
+        tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+        border: { top: { style: BorderStyle.SINGLE, size: 4, color: NEGRO, space: 1 } },
+        children: [
+          new TextRun({ text: m.pie, size: MEMBRETE }),
+          new TextRun({ children: ["	Página ", PageNumber.CURRENT], size: MEMBRETE }),
+        ],
+      }),
+    ],
+  });
+}
+
+export function documentoMemoria(bloques: BloqueMemoria[], membrete: Membrete): Document {
   const plan = planificarDocx(bloques);
   const children: (Paragraph | Table)[] = [];
   for (const b of plan.bloques) {
@@ -140,13 +206,18 @@ export function documentoMemoria(bloques: BloqueMemoria[], proyecto: string): Do
   return new Document({
     styles: ESTILOS,
     title: plan.titulo,
-    subject: `Justificación del CTE · ${proyecto}`,
+    subject: `Justificación del CTE · ${membrete.proyecto}`,
     creator: "Concreta Memorias",
     lastModifiedBy: "Concreta Memorias",
     description: "Memoria CTE redactada a partir del cálculo con Concreta Memorias",
     keywords: "CTE, DB-HS, DB-HE, memoria justificativa, instalaciones",
     sections: [
       {
+        headers: (() => {
+          const h = cabecera(membrete);
+          return h ? { default: h } : undefined;
+        })(),
+        footers: { default: pie(membrete) },
         properties: {
           page: {
             size: { width: A4.width, height: A4.height, orientation: PageOrientation.PORTRAIT },
@@ -160,6 +231,6 @@ export function documentoMemoria(bloques: BloqueMemoria[], proyecto: string): Do
 }
 
 /** El .docx de la memoria, como blob. */
-export async function memoriaDocx(bloques: BloqueMemoria[], proyecto: string): Promise<Blob> {
-  return Packer.toBlob(documentoMemoria(bloques, proyecto));
+export async function memoriaDocx(bloques: BloqueMemoria[], membrete: Membrete): Promise<Blob> {
+  return Packer.toBlob(documentoMemoria(bloques, membrete));
 }

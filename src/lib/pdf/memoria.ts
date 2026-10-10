@@ -1,16 +1,15 @@
 // =============================================================================
 // La memoria CTE en PDF (feature-16 §F). Los mismos bloques que el Word
 // (`bloquesMemoria`), maquetados con jsPDF: A4, márgenes del anejo, tablas con
-// `drawTable` y el pie legal (motor y página) en todas las hojas. No llama a
-// Date: la fecha llega formateada dentro de los bloques.
+// `drawTable`, y en todas las hojas la cabecera del estudio y el pie con el
+// título del proyecto y la página, como las memorias del estudio (feature-29).
 // =============================================================================
 
 import jsPDF from "jspdf";
 import { repartirAnchos } from "../docx/plan";
 import { nombreArchivoMemoria, type BloqueMemoria } from "../obra/memoria";
-import { ENGINE_VERSION } from "../version";
+import type { Membrete } from "../estudio/estudio";
 import {
-  drawFootersAllPages,
   drawTable,
   ensureSpace,
   FOOTER_RESERVE,
@@ -76,10 +75,46 @@ function tabla(doc: jsPDF, cabecera: string[], filas: string[][], y: number): nu
   return drawTable(doc, { x: M, y, cols, rows: filas, M }) + 2;
 }
 
+/**
+ * Cabecera y pie en todas las hojas: a la izquierda quien firma y la dirección,
+ * a la derecha la colegiación y el contacto; abajo, el título del proyecto y
+ * «Página N». La cabecera vive en el margen superior (8–24 mm): el cuerpo de
+ * cada hoja empieza en M + 10.
+ */
+function membreteEnCadaHoja(doc: jsPDF, m: Membrete): void {
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) {
+    doc.setPage(i);
+    if (m.cabecera.length > 0) {
+      let y = 10;
+      for (const [izq, der] of m.cabecera) {
+        doc.setFontSize(8);
+        setGray(doc, 60);
+        doc.setFont("helvetica", "normal");
+        doc.text(pdfStr(izq), M, y);
+        doc.setFont("helvetica", "bold");
+        doc.text(pdfStr(der), PAGE_W - M, y, { align: "right" });
+        y += 3.6;
+      }
+      setGray(doc, 120);
+      doc.setLineWidth(0.2);
+      doc.line(M, y - 1.6, PAGE_W - M, y - 1.6);
+    }
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    setGray(doc, 90);
+    const pagina = `Página ${i}`;
+    const ancho = CW - doc.getTextWidth(pagina) - 6;
+    const pie = (doc.splitTextToSize(pdfStr(m.pie), ancho) as string[])[0] ?? "";
+    doc.text(pie, M, PAGE_H - 8);
+    doc.text(pagina, PAGE_W - M, PAGE_H - 8, { align: "right" });
+  }
+}
+
 /** El documento jsPDF de la memoria (separado de la URL para poder leerlo en los tests). */
-export function componerMemoriaPdf(bloques: BloqueMemoria[], proyecto: string): jsPDF {
+export function componerMemoriaPdf(bloques: BloqueMemoria[], membrete: Membrete): jsPDF {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-  let y = M + 6;
+  let y = M + 10;
   for (const b of bloques) {
     switch (b.tipo) {
       case "titulo":
@@ -105,16 +140,16 @@ export function componerMemoriaPdf(bloques: BloqueMemoria[], proyecto: string): 
         break;
     }
   }
-  drawFootersAllPages(doc, { engineVersion: ENGINE_VERSION, proyecto }, M);
+  membreteEnCadaHoja(doc, membrete);
   return doc;
 }
 
-export function renderMemoriaPdf(bloques: BloqueMemoria[], proyecto: string): PdfResult {
-  const doc = componerMemoriaPdf(bloques, proyecto);
+export function renderMemoriaPdf(bloques: BloqueMemoria[], membrete: Membrete): PdfResult {
+  const doc = componerMemoriaPdf(bloques, membrete);
   const blob = doc.output("blob");
   return {
     blobUrl: URL.createObjectURL(blob),
-    filename: nombreArchivoMemoria(proyecto, "pdf"),
+    filename: nombreArchivoMemoria(membrete.proyecto, "pdf"),
     pageCount: doc.getNumberOfPages(),
   };
 }

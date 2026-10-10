@@ -36,7 +36,9 @@ import { derivarContexto } from "../lib/proyecto/derivar";
 import { CASOS_EDIFICIO, edificioDeCaso, type CasoEdificio } from "../lib/edificio/casos";
 import { ProyectoContext } from "../lib/proyecto/ProyectoContext";
 import { crearProyecto, setProyectoActivo } from "../lib/proyecto/storage";
-import type { DatosGenerales, Intervencion, ZonaRadon } from "../lib/proyecto/tipos";
+import type { DatosGenerales, DocumentoProyecto, FaseProyecto, Intervencion, ZonaRadon } from "../lib/proyecto/tipos";
+import { useEstudio } from "../lib/estudio/useEstudio";
+import { firmantesDe, MAX_FIRMANTES_PROYECTO, NOMBRE_FASE } from "../lib/estudio/estudio";
 import { intensidadDe } from "../modules/hs5/pluviales";
 import { ISOYETAS, type Isoyeta, type ZonaPluviometrica } from "../modules/hs5/tablas";
 import type { ClaseKs, NivelFreatico, TerrenoTipo, ZonaEolica, ZonaPluviometricaHs1 } from "../modules/hs1/tipos";
@@ -295,6 +297,86 @@ function NotaRadon(props: {
 /** Normaliza para comparar nombres (sin acentos ni mayúsculas). */
 function clave(s: string): string {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+}
+
+const FASE_OPTIONS: { value: "" | FaseProyecto; label: string }[] = [
+  { value: "", label: "Sin indicar" },
+  ...(Object.keys(NOMBRE_FASE) as FaseProyecto[]).map((f) => ({ value: f, label: NOMBRE_FASE[f] })),
+];
+
+/**
+ * Lo que el documento dice de sí mismo (feature-29): el título del pie, la
+ * fase, el emplazamiento, el promotor y quién firma, de entre las personas de
+ * «Tu estudio» (Inicio). Todo opcional.
+ */
+function SeccionDocumento(props: {
+  dg: DatosGenerales;
+  setDg: (f: (prev: DatosGenerales) => DatosGenerales) => void;
+}): JSX.Element {
+  const [estudio] = useEstudio();
+  const doc = props.dg.documento ?? {};
+  const setDoc = (cambio: Partial<DocumentoProyecto>) =>
+    props.setDg((prev) => ({ ...prev, documento: { ...prev.documento, ...cambio } }));
+  const firman = firmantesDe(estudio, { datosGenerales: props.dg }).map((f) => f.id);
+  const alternar = (id: string) => {
+    const lista = firman.includes(id) ? firman.filter((x) => x !== id) : [...firman, id];
+    setDoc({ firmantes: lista.slice(0, MAX_FIRMANTES_PROYECTO) });
+  };
+  const texto = (id: string, label: string, clave: "titulo" | "emplazamiento" | "refCatastral" | "promotor", placeholder: string) => (
+    <div className="py-1">
+      <InputLabel htmlFor={id} label={label} />
+      <input
+        id={id}
+        type="text"
+        value={doc[clave] ?? ""}
+        onChange={(e) => setDoc({ [clave]: e.target.value })}
+        placeholder={placeholder}
+        className={`${INPUT_CLS} mt-1`}
+      />
+    </div>
+  );
+  return (
+    <CollapsibleSection label="Documento">
+      <p className="text-text-disabled py-1 text-[11.5px] leading-snug">
+        Para la cabecera y el pie de la memoria y la portada del anejo. Sin título, el pie lleva el nombre del proyecto.
+      </p>
+      {texto("dg-doc-titulo", "Título para el pie", "titulo", "PROYECTO DE EJECUCIÓN PARA VIVIENDA UNIFAMILIAR AISLADA")}
+      <Field id="dg-doc-fase" label="Fase" ancho>
+        <SelectInput<"" | FaseProyecto>
+          id="dg-doc-fase"
+          value={doc.fase ?? ""}
+          options={FASE_OPTIONS}
+          onChange={(v) => setDoc({ fase: v === "" ? undefined : v })}
+        />
+      </Field>
+      {texto("dg-doc-emplazamiento", "Emplazamiento", "emplazamiento", "Calle Camelia nº 145, Benalmádena")}
+      {texto("dg-doc-catastral", "Referencia catastral", "refCatastral", "—")}
+      {texto("dg-doc-promotor", "Promotor", "promotor", "—")}
+      <fieldset className="py-1">
+        <legend className="text-text-secondary mb-1 text-[13px]">Firma</legend>
+        {estudio.firmantes.length === 0 ? (
+          <p className="text-text-disabled text-[11.5px] leading-snug">
+            Añade en Inicio, en «Tu estudio», quién firma: sale en la cabecera de la memoria.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-1">
+            {estudio.firmantes.map((f) => {
+              const marcado = firman.includes(f.id);
+              const lleno = !marcado && firman.length >= MAX_FIRMANTES_PROYECTO;
+              return (
+                <label key={f.id} className={`flex items-center gap-2 text-[13px] ${lleno ? "text-text-disabled" : "text-text-primary"}`}>
+                  <input type="checkbox" checked={marcado} disabled={lleno} onChange={() => alternar(f.id)} />
+                  {f.nombre}
+                  {f.titulacion && <span className="text-text-secondary">, {f.titulacion}</span>}
+                </label>
+              );
+            })}
+            <p className="text-text-disabled text-[11px]">Una persona o dos.</p>
+          </div>
+        )}
+      </fieldset>
+    </CollapsibleSection>
+  );
 }
 
 export function FormDatosGeneralesPage({ modo }: { modo: "crear" | "editar" }): JSX.Element {
@@ -762,6 +844,8 @@ export function FormDatosGeneralesPage({ modo }: { modo: "crear" | "editar" }): 
                 />
               </Field>
             </CollapsibleSection>
+
+            <SeccionDocumento dg={dg} setDg={setDg} />
           </div>
 
           <div className="min-w-0">

@@ -3,13 +3,15 @@ import { Link } from "react-router";
 import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
 import { antesDeEntregar } from "../../lib/obra/entrega";
+import { useEstudio } from "../../lib/estudio/useEstudio";
 import { RotuloSeccion } from "./LoQueSeJustifica";
 
 // =============================================================================
 // «Antes de entregar» (feature-16 §C): lo que no cumple, en rojo, y los avisos
 // sin revisar, en ámbar, con el código de su módulo y el texto que redacta el
 // módulo. Cada uno lleva al módulo, que es donde se ve en el dibujo y se marca
-// como revisado o se arregla.
+// como revisado o se arregla. Sin datos del estudio, un aviso más: la memoria
+// sale sin cabecera (feature-29).
 // =============================================================================
 
 const CAJA =
@@ -22,10 +24,22 @@ const AMBAR =
 export function AntesDeEntregar(): JSX.Element {
   const { proyecto } = useProyecto();
   const pendientes = antesDeEntregar(proyecto);
+  const [estudio] = useEstudio();
+  const sinEstudio = estudio.firmantes.length === 0;
 
   return (
     <section aria-label="Antes de entregar">
       <RotuloSeccion>Antes de entregar</RotuloSeccion>
+      {sinEstudio && (
+        <Link to="/" className={`${CAJA} ${AMBAR} text-text-primary mb-2`}>
+          <AlertTriangle size={14} className="text-state-warn mt-0.5 shrink-0" aria-hidden="true" />
+          <span className="min-w-0">
+            <span className="sr-only">Por revisar: </span>
+            <b className="font-semibold">Documento</b> · Sin datos del estudio.{" "}
+            <span className="text-text-secondary">La memoria sale sin cabecera: añade en Inicio, en «Tu estudio», quién firma.</span>
+          </span>
+        </Link>
+      )}
       {pendientes.length === 0 ? (
         <p className="border-border-main bg-bg-primary text-text-secondary flex items-start gap-2 rounded border px-3 py-[9px] text-[12.5px]">
           <CheckCircle2 size={14} className="text-state-ok mt-0.5 shrink-0" aria-hidden="true" />

@@ -147,6 +147,28 @@ export interface DatosGenerales {
    * (feature-27). Sin él, la intervención se queda con la nota «alcance pendiente».
    */
   alcance?: Alcance;
+  /** Lo que el documento dice de sí mismo: título del pie, fase, promotor, firmantes (feature-29). */
+  documento?: DocumentoProyecto;
+}
+
+/** Fase del proyecto, como la nombra el documento. */
+export type FaseProyecto = "basico" | "ejecucion" | "basico_ejecucion";
+
+/**
+ * Los datos del documento (feature-29): van al pie del Word y del PDF, a la
+ * portada del anejo y al cuadro inicial de la memoria. Todo opcional: sin
+ * ellos, la memoria sale igual, con el nombre del proyecto en el pie.
+ */
+export interface DocumentoProyecto {
+  /** Para el pie: «PROYECTO DE EJECUCIÓN PARA VIVIENDA UNIFAMILIAR AISLADA». */
+  titulo?: string;
+  fase?: FaseProyecto;
+  /** «Calle Camelia nº 145, Benalmádena». */
+  emplazamiento?: string;
+  refCatastral?: string;
+  promotor?: string;
+  /** Quién firma: ids de las personas del estudio, una o dos. Sin dato, la primera. */
+  firmantes?: string[];
 }
 
 /**
