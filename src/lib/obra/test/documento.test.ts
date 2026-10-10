@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { justificacionRegistry } from "../../../data/justificacionRegistry";
-import { cuadroInicial, fuenteCorta, memoriaCte, numeroFijo, SECCIONES, type MemoriaCte } from "../memoria";
+import { cuadroInicial, fuenteCorta, memoriaCte, numeroFijo, SECCIONES, sinSupuestos, textoPlanoMemoriaCte, type MemoriaCte } from "../memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../edificio/casos";
 import { obraDeCaso } from "../../proyecto/alcance";
 import { crearProyectoDemo } from "../../proyecto/demo";
@@ -119,5 +119,34 @@ describe("el estudio", () => {
     expect(m.pie).toBe("Casa");
     const conTitulo = { nombre: "Casa", datosGenerales: { documento: { titulo: " PROYECTO DE EJECUCIÓN " } } } as unknown as Proyecto;
     expect(membreteDe(ESTUDIO_VACIO, conTitulo)).toEqual({ cabecera: [], pie: "PROYECTO DE EJECUCIÓN", proyecto: "Casa" });
+  });
+});
+
+// ─── Lo supuesto fuera del texto (paso 7) ──────────────────────────────────────
+
+describe("sinSupuestos", () => {
+  it("quita las marcas de lo supuesto y las coletillas «a falta de…»", () => {
+    expect(sinSupuestos("forman un sector de 655 m² (supuestos)")).toBe("forman un sector de 655 m²");
+    expect(sinSupuestos("de 504 m² construidos (supuestos a partir de la superficie útil)")).toBe("de 504 m² construidos");
+    expect(sinSupuestos("zona pluviométrica de promedios I (supuesta, del lado de la seguridad) y")).toBe("zona pluviométrica de promedios I y");
+    expect(sinSupuestos("La presión de la red es de 250 kPa (supuesta: no consta el dato de la compañía).")).toBe("La presión de la red es de 250 kPa.");
+    expect(sinSupuestos("planta de 14,5 m × 14,5 m (supuesta cuadrada, con la superficie de la cubierta) y")).toBe("planta de 14,5 m × 14,5 m y");
+    expect(sinSupuestos("recirculación del 10 % (estimación), se recoge")).toBe("recirculación del 10 %, se recoge");
+    expect(sinSupuestos("de 100 mm/h, a falta de la del emplazamiento, por debajo")).toBe("de 100 mm/h, por debajo");
+    expect(sinSupuestos("el mayor valor del mapa de la figura 1.1, a falta del leído para el municipio; una")).toBe("el mayor valor del mapa de la figura 1.1; una");
+  });
+
+  it("deja lo que no es una marca: «supuestos» de la norma y el Ld por defecto del DB-HR", () => {
+    const he6 = "no está en ninguno de los supuestos de edificios existentes de la Sección";
+    expect(sinSupuestos(he6)).toBe(he6);
+    const hr = "Ld = 60 dBA (valor por defecto del DB para áreas de predominio residencial, a falta de datos oficiales).";
+    expect(sinSupuestos(hr)).toBe(hr);
+  });
+
+  it("en la memoria de los casos no queda ninguna marca", () => {
+    for (const c of ["unifamiliar", "plurifamiliar", "plurifamiliar_locales", "oficinas", "reforma_local_vivienda"] as CasoEdificio[]) {
+      const t = textoPlanoMemoriaCte(memoriaCte(deCaso(c)));
+      expect(t).not.toMatch(/\(supuest|\(estimación\)|a falta de la del emplazamiento|a falta del leído/);
+    }
   });
 });

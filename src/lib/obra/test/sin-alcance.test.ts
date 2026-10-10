@@ -12,7 +12,8 @@ import antes from "./foto-antes.json";
 // el programa «HULC o CE3X»: solo cambiaron las filas de HE1 y HE0 y la huella
 // de la memoria de los 40 proyectos.
 // Regenerada en feature-28 (rótulos «DB-HS 2» con espacio) y en feature-29
-// (capítulos, numeración, fuentes cortas y cuadro inicial): solo cambió la
+// (capítulos, numeración, fuentes cortas, cuadro inicial y sin «supuestos»):
+// solo cambió la
 // huella de la memoria de los 40 proyectos.
 // =============================================================================
 

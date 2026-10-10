@@ -117,6 +117,21 @@ export function fuenteCorta(fuente: string): string {
     .join(" · ");
 }
 
+/**
+ * Lo supuesto no se imprime en la memoria como si fuera del proyecto
+ * (feature-29, paso 7): fuera las marcas «(supuestos)», «(estimación)» y las
+ * coletillas «a falta de…». Cada supuesto ya es un aviso en «Antes de
+ * entregar», donde el proyectista lo confirma; la ficha y la pantalla del
+ * módulo lo siguen diciendo. El Ld por defecto de HR no se toca: es el
+ * criterio del propio DB-HR.
+ */
+export function sinSupuestos(t: string): string {
+  return t
+    .replace(/ \(supuest[oa]s?\b[^)]*\)/g, "")
+    .replace(/ \(estimación\)/g, "")
+    .replace(/, a falta de(?:l)? (?:la del emplazamiento|leído para el municipio)/g, "");
+}
+
 interface ApartadoBase {
   key: JustificacionKey;
   codigo: string;
@@ -404,8 +419,8 @@ export function bloquesMemoria(m: MemoriaCte): BloqueMemoria[] {
     }
     switch (a.tipo) {
       case "redactado":
-        for (const p of a.doc.parrafos) b.push({ tipo: "parrafo", texto: textoParrafo(p) });
-        if (a.doc.tabla) b.push({ tipo: "tabla", cabecera: a.doc.tabla.cabecera, filas: a.doc.tabla.filas });
+        for (const p of a.doc.parrafos) b.push({ tipo: "parrafo", texto: sinSupuestos(textoParrafo(p)) });
+        if (a.doc.tabla) b.push({ tipo: "tabla", cabecera: a.doc.tabla.cabecera, filas: a.doc.tabla.filas.map((f) => f.map(sinSupuestos)) });
         if (a.doc.fuente) b.push({ tipo: "nota", texto: fuenteCorta(a.doc.fuente) });
         break;
       case "no_cumple":

@@ -11,6 +11,7 @@ import {
   cuadroInicial,
   fuenteCorta,
   memoriaCte,
+  sinSupuestos,
   textoPlanoMemoriaCte,
   type ApartadoMemoria,
   type BloqueMemoria,
@@ -34,10 +35,10 @@ function Parrafos({ doc }: { doc: MemoriaDoc }): JSX.Element {
         <p key={i} className="mb-3">
           {p.map((t, j) =>
             typeof t === "string" ? (
-              <span key={j}>{t}</span>
+              <span key={j}>{sinSupuestos(t)}</span>
             ) : (
               <span key={j} className="text-accent font-mono text-[12.5px]">
-                {t.v}
+                {sinSupuestos(t.v)}
               </span>
             ),
           )}
@@ -66,7 +67,7 @@ function Parrafos({ doc }: { doc: MemoriaDoc }): JSX.Element {
                     key={i}
                     className={`border-border-sub border-b p-1.5 ${i === 0 ? "text-left text-[12.5px]" : "text-right font-mono text-[11.5px]"}`}
                   >
-                    {c}
+                    {sinSupuestos(c)}
                   </td>
                 ))}
               </tr>
