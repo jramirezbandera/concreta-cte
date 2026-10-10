@@ -98,8 +98,8 @@ describe("tablas «Norma | Proyecto» (feature-31)", () => {
     const filas = [["Cuarto de instalaciones (S1)", "riesgo bajo", "no se exige", "no interviene", "R 120 · EI 120 · puerta EI2 45-C5", "R 120 · EI 120 · puerta EI2 45-C5", "Cumple"]];
     const a = anchosDeTabla(head, filas);
     expect(a.reduce((x, y) => x + y, 0)).toBe(100);
-    // «Cumple»: 6 caracteres a 1,5 mm más 3 mm de márgenes, sobre 174 mm.
-    expect(a[6]).toBeGreaterThanOrEqual(Math.ceil(((6 * 1.5 + 3) * 100) / 174));
+    // «Cumple»: 6 caracteres a 1,8 mm (Arial en negrita) más 3 mm de márgenes, sobre 174 mm.
+    expect(a[6]).toBeGreaterThanOrEqual(Math.ceil(((6 * 1.8 + 3) * 100) / 174));
     expect(repartirAnchos([40, 12, 16, 19, 33, 33, 6])[6]).toBeLessThan(a[6]);
   });
 

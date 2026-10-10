@@ -122,9 +122,9 @@ export function repartirAnchos(pesos: number[]): number[] {
   return [ancho0, ...resto];
 }
 
-/** El ancho útil del A4 [mm] y lo que ocupa cada carácter a 8 pt, con los márgenes de la celda. */
+/** El ancho útil del A4 [mm] y lo que ocupa cada carácter a 8 pt (medido en Word con Arial en negrita), con los márgenes de la celda. */
 const ANCHO_UTIL_MM = 174;
-const MM_POR_CARACTER = 1.5;
+const MM_POR_CARACTER = 1.8;
 const MARGEN_CELDA_MM = 3;
 
 /**

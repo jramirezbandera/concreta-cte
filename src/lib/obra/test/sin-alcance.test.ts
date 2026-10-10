@@ -14,7 +14,8 @@ import antes from "./foto-antes.json";
 // Regenerada en feature-28 (rótulos «DB-HS 2» con espacio) y en feature-29
 // (capítulos, numeración, fuentes cortas, cuadro inicial y sin «supuestos»):
 // solo cambió la
-// huella de la memoria de los 40 proyectos.
+// huella de la memoria de los 40 proyectos. Y en feature-31 (tablas «Norma |
+// Proyecto» de SI, SUA y HR), lo mismo.
 // =============================================================================
 
 describe("sin asistente de alcance, nada cambia", () => {
