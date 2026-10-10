@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { textoPlanoMemoria } from "../../../lib/cte/memoria";
+import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
 import { crearProyectoDemo } from "../../../lib/proyecto/demo";
 import { sua3 } from "../definicion";
@@ -67,9 +67,10 @@ describe("SUA3 · memoria, ficha y dibujo", () => {
     for (const c of CASOS) {
       const j = caso(c);
       const texto = textoPlanoMemoria(sua3.memoria(j));
-      expect(texto).toMatch(/140 N/);
-      expect(texto).toMatch(/desbloqueo desde el exterior/);
-      if (c !== "oficinas") expect(texto).toMatch(/No existen aseos accesibles/);
+      expect(texto).toMatch(/≤ 140 N/);
+      expect(texto).toMatch(/Desbloqueo de .*\tdesde el exterior\tdesde el exterior\tCumple/);
+      expect(texto).toMatch(/UNE-EN 12046-2:2000/);
+      if (c !== "oficinas") expect(texto).toMatch(/al ser de uso privado todas sus zonas/);
       if (c === "unifamiliar") expect(texto).not.toMatch(/25 N/);
       const dibujo = sua3.dibujo(j, edificioDeCaso(c));
       expect(dibujo.etiquetas.map((e) => e.elementoId).sort()).toEqual(j.elementos.map((e) => e.id).sort());
@@ -78,5 +79,27 @@ describe("SUA3 · memoria, ficha y dibujo", () => {
       expect(ficha.edicionDB).toBe("DB-SUA (consolidado 14-jun-2022)");
       expect(sua3.frase(j).length).toBeGreaterThan(20);
     }
+  });
+
+  it("la tabla «Norma | Proyecto» lleva el desbloqueo, la llamada y las fuerzas; el texto no las repite (feature-31)", () => {
+    const m = sua3.memoria(caso("plurifamiliar_locales"));
+    const t = m.tablas![0];
+    expect(t.cabecera).toEqual(["Parámetro", "Norma", "Proyecto", "Cumple"]);
+    expect(t.filas).toContainEqual(["Fuerza de apertura, itinerario accesible (resistentes al fuego)", "≤ 65 N", "≤ 65 N", "Cumple"]);
+    expect(t.filas).toContainEqual(["Llamada de asistencia en aseos accesibles", "no se exige", "no se exige", "Cumple"]);
+    // Tras los tres párrafos de SUA 3; antes del local sin uso.
+    expect(t.tras).toBe(3);
+    expect(textoParrafo(m.parrafos[3])).toMatch(/^El local sin uso/);
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).not.toMatch(/\d+ N/);
+    expect(texto).toMatch(/^Las puertas de los baños y aseos de las viviendas tienen dispositivo de bloqueo/);
+    expect(texto).toMatch(/Son puertas de salida la del portal, la de cada vivienda/);
+  });
+
+  it("oficinas: la luz desde dentro y la llamada de asistencia, que sí se exigen", () => {
+    const filas = sua3.memoria(caso("oficinas")).tablas![0].filas;
+    expect(filas).toContainEqual(["Control de la luz de los aseos de las oficinas", "desde el interior", "desde el interior", "Cumple"]);
+    expect(filas).toContainEqual(["Llamada de asistencia en aseos accesibles", "se exige", "se dispone", "Cumple"]);
+    expect(sua3.memoria(caso("plurifamiliar", { pestillos: "sin_pestillo" })).tablas![0].filas[0]).toEqual(["Desbloqueo de los baños y aseos de las viviendas", "no se exige", "sin bloqueo interior", "Cumple"]);
   });
 });

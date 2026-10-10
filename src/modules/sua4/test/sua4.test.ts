@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { textoPlanoMemoria } from "../../../lib/cte/memoria";
+import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
 import type { Edificio } from "../../../lib/edificio/tipos";
 import { crearProyectoDemo } from "../../../lib/proyecto/demo";
@@ -119,10 +119,8 @@ describe("SUA4 · memoria, ficha y dibujo", () => {
       const j = caso(c);
       const texto = textoPlanoMemoria(sua4.memoria(j));
       expect(texto).toMatch(/alumbrado de emergencia/);
-      if (c !== "unifamiliar") {
-        expect(texto).toMatch(/100 lux en las zonas interiores/);
-        expect(texto).toMatch(/1 lux en el eje central/);
-      }
+      expect(texto).toMatch(/Iluminancia en el eje central \(1\)\t≥ 1 lux\t≥ 1 lux\tCumple/);
+      if (c !== "unifamiliar") expect(texto).toMatch(/Iluminancia en zonas interiores\t≥ 100 lux/);
       const dibujo = sua4.dibujo(j, edificioDeCaso(c));
       expect(dibujo.etiquetas.map((e) => e.elementoId).sort()).toEqual(j.elementos.map((e) => e.id).sort());
       expect(dibujo.marcas.some((m) => m.tipo === "icono" && m.icono === "luz")).toBe(true);
@@ -131,5 +129,41 @@ describe("SUA4 · memoria, ficha y dibujo", () => {
       expect(ficha.edicionDB).toBe("DB-SUA (consolidado 14-jun-2022)");
       expect(sua4.frase(j).length).toBeGreaterThan(20);
     }
+  });
+
+  it("cada tabla tras su párrafo: alumbrado normal, dotación, emergencia y señales (feature-31)", () => {
+    const m = sua4.memoria(caso("plurifamiliar_locales"));
+    expect(m.tablas!.map((t) => [t.rotulo, t.tras])).toEqual([
+      ["Alumbrado normal", 1],
+      ["Dotación de alumbrado de emergencia", 2],
+      ["Alumbrado de emergencia", 3],
+      ["Señales de seguridad", 4],
+    ]);
+    const [normal, dotacion, emergencia, senales] = m.tablas!;
+    expect(normal.cabecera).toEqual(["Parámetro", "Norma", "Proyecto", "Cumple"]);
+    expect(normal.filas).toContainEqual(["Iluminancia en el aparcamiento", "≥ 50 lux", "≥ 50 lux", "Cumple"]);
+    expect(normal.filas).toContainEqual(["Uniformidad media", "≥ 40 %", "≥ 40 %", "Cumple"]);
+    expect(dotacion.cabecera).toEqual(["Zona o elemento", "Exige", "Por qué (ap. 2.1)"]);
+    expect(dotacion.filas).toContainEqual(["Aparcamiento, con sus pasillos y escaleras", "sí", "504 m² construidos, más de 100 m² (c)"]);
+    // El pasillo de los trasteros de 50 m² o menos, aparte y por criterio (S12).
+    expect(dotacion.filas).toContainEqual(["El pasillo de los trasteros", "por criterio", "recorrido hasta la salida de planta (b)"]);
+    expect(dotacion.filas.at(-1)).toEqual(["Interior de las viviendas", "no", "no es origen de evacuación (Anejo SI A)"]);
+    expect(emergencia.filas).toContainEqual(["Autonomía", "≥ 1 h", "≥ 1 h", "Cumple"]);
+    expect(emergencia.notas).toHaveLength(2);
+    expect(senales.filas).toContainEqual(["Luminancia del color de seguridad", "≥ 2 cd/m²", "≥ 2 cd/m²", "Cumple"]);
+    // El texto no repite las cifras de las tablas.
+    const texto = m.parrafos.map(textoParrafo).join(" ");
+    expect(texto).not.toMatch(/\d lux|\d h\b|cd\/m²|\d+:1|\d+ %|504 m²|2,00 m/);
+    expect(texto).toMatch(/medida a nivel del suelo y, en el aparcamiento, en toda su superficie/);
+  });
+
+  it("unifamiliar: sin tabla de dotación (el párrafo ya es corto); sin emergencia, sin tablas de emergencia", () => {
+    const m = sua4.memoria(caso("unifamiliar"));
+    expect(m.tablas!.map((t) => t.rotulo)).toEqual(["Alumbrado normal", "Alumbrado de emergencia", "Señales de seguridad"]);
+    expect(m.tablas![0].filas).toEqual([
+      ["Iluminancia en pasillos de la vivienda", "≥ 100 lux", "≥ 100 lux", "Cumple"],
+      ["Iluminancia en el garaje de la vivienda", "≥ 50 lux", "≥ 50 lux", "Cumple"],
+    ]);
+    expect(sua4.memoria(caso("unifamiliar", { garajeVivienda: "no" })).tablas!.map((t) => t.rotulo)).toEqual(["Alumbrado normal"]);
   });
 });
