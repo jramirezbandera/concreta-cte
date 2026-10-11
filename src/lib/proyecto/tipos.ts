@@ -6,6 +6,7 @@ import type { ClaseKs, NivelFreatico, TerrenoTipo, ZonaEolica, ZonaPluviometrica
 import type { Edificio, TipoCubierta } from "../edificio/tipos";
 import type { ResumenEdificio } from "../edificio/derivar";
 import type { VerificacionEnergetica } from "../energia/verificacion";
+import type { HabitabilidadObra } from "../habitabilidad/norma";
 
 // Modelo de datos del EXPEDIENTE (feature-6 §A, UX-RECONCEPT §2–§3): el producto deja de ser
 // "5 calculadoras con sidebar" y pasa a ser gestor de expedientes de justificación CTE.
@@ -33,7 +34,7 @@ export type JustificacionKey =
   | "hs1" | "hs2"
   | "si1" | "si2" | "si3" | "si4" | "si5" | "si6"
   | "sua1" | "sua2" | "sua3" | "sua4" | "sua5" | "sua6" | "sua7" | "sua8" | "sua9"
-  | "hr" | "he4" | "he5" | "he6" | "rebt" | "he0he1_global" | "dbse";
+  | "hr" | "he4" | "he5" | "he6" | "rebt" | "hab" | "he0he1_global" | "dbse";
 
 // -----------------------------------------------------------------------------
 // LOS EJES DEL PROYECTO (§2): edificio × intervención × atributos → checklist
@@ -149,6 +150,11 @@ export interface DatosGenerales {
   alcance?: Alcance;
   /** Lo que el documento dice de sí mismo: título del pie, fase, promotor, firmantes (feature-29). */
   documento?: DocumentoProyecto;
+  /**
+   * La norma de habitabilidad que declara el proyectista (feature-32): una o dos,
+   * municipal y autonómica. Sin ella, el apartado de habitabilidad no se redacta.
+   */
+  habitabilidad?: HabitabilidadObra;
 }
 
 /** Fase del proyecto, como la nombra el documento. */

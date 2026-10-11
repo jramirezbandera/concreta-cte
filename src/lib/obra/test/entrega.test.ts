@@ -98,16 +98,16 @@ describe("antesDeEntregar", () => {
 describe("entregables", () => {
   it("el Demo: todo listo", () => {
     expect(entregables(demo())).toEqual({
-      memoria: { listos: 26, total: 26, noCumplen: [] },
-      fichas: { listos: 24, total: 24, noCumplen: [] },
+      memoria: { listos: 27, total: 27, noCumplen: [] },
+      fichas: { listos: 25, total: 25, noCumplen: [] },
       esquemas: { listos: 2, total: 2, noCumplen: [], claves: ["hs5", "hs4"] },
     });
   });
 
   it("lo que no cumple no cuenta como listo", () => {
     expect(entregables(conHs4Fallando())).toEqual({
-      memoria: { listos: 25, total: 26, noCumplen: ["HS4"] },
-      fichas: { listos: 23, total: 24, noCumplen: ["HS4"] },
+      memoria: { listos: 26, total: 27, noCumplen: ["HS4"] },
+      fichas: { listos: 24, total: 25, noCumplen: ["HS4"] },
       esquemas: { listos: 1, total: 2, noCumplen: ["HS4"], claves: ["hs5"] },
     });
   });
@@ -146,6 +146,7 @@ describe("memoriaCte", () => {
       "HE5:redactado",
       "HE6:redactado",
       "REBT:redactado",
+      "HAB:redactado",
     ]);
     const enc = (k: string) => m.apartados.find((a) => a.key === k)!.encabezado;
     expect(enc("hs5")).toBe("3.4.5. HS 5 Evacuación de aguas");
@@ -158,6 +159,7 @@ describe("memoriaCte", () => {
     // SE y HR son la sección entera: sin título propio.
     expect(m.apartados.find((a) => a.key === "hr")).toMatchObject({ sinTitulo: true, encabezado: "3.5. Protección frente al ruido DB HR" });
     expect(m.apartados.find((a) => a.key === "dbse")).toMatchObject({ sinTitulo: true, encabezado: "3.1. Seguridad estructural DB SE" });
+    expect(m.apartados.find((a) => a.key === "hab")).toMatchObject({ sinTitulo: true, encabezado: "4.2. Habitabilidad" });
   });
 
   it("lo que no cumple sale como pendiente, sin su texto", () => {
@@ -190,6 +192,7 @@ describe("memoriaCte", () => {
       "3.5. Protección frente al ruido DB HR",
       "3.6. Ahorro de energía DB HE",
       "4.1. Reglamento electrotécnico para baja tensión (REBT)",
+      "4.2. Habitabilidad",
     ]);
     // Ni el proyecto en el cuerpo, ni la jerga de la ficha en las fuentes.
     expect(b.some((x) => x.tipo === "parrafo" && x.texto.startsWith("Demo — "))).toBe(false);

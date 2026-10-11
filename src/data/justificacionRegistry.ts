@@ -2,7 +2,7 @@ import type { ComponentType } from "react";
 import {
   Wind, Droplets, Waves, Thermometer, FlaskConical, Radiation, CloudRain, BrickWallFire, Truck, Columns3, FireExtinguisher, Flame, DoorOpen,
   Footprints, ShieldAlert, LockKeyhole, Lightbulb, Users, Car, CloudLightning, Accessibility, Trash2,
-  ShowerHead, SolarPanel, Zap, EvCharger, Ear, Gauge, Weight, LifeBuoy,
+  ShowerHead, SolarPanel, Zap, EvCharger, Ear, Gauge, Weight, LifeBuoy, SunMedium,
 } from "lucide-react";
 import type { JustificacionKey } from "../lib/proyecto/tipos";
 
@@ -418,6 +418,20 @@ export const justificacionRegistry: JustificacionEntry[] = [
     shipped: true,
     route: "rebt/prevision",
     icon: Zap,
+    schemaVersion: "1",
+  },
+  // ── Habitabilidad (feature-32): la norma la declara el proyectista ─────────
+  {
+    key: "hab",
+    codigo: "HAB",
+    label: "Habitabilidad",
+    grupo: "Habitabilidad",
+    db: "Habitabilidad",
+    edicionDB: "Norma de habitabilidad declarada por el proyectista",
+    formato: "checker",
+    shipped: true,
+    route: "habitabilidad",
+    icon: SunMedium,
     schemaVersion: "1",
   },
   // ── Externas (se resuelven fuera de la app; La obra referencia el documento) ─

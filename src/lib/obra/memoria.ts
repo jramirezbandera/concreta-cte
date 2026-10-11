@@ -57,6 +57,7 @@ export const SECCIONES: readonly SeccionDocumento[] = [
   { capitulo: 3, numero: "3.5", titulo: "Protección frente al ruido DB HR", keys: ["hr"], sinSubapartados: true },
   { capitulo: 3, numero: "3.6", titulo: "Ahorro de energía DB HE", keys: ["he0he1_global", "he1", "he4", "he5", "he6"] },
   { capitulo: 4, numero: "4.1", titulo: "Reglamento electrotécnico para baja tensión (REBT)", keys: ["rebt"] },
+  { capitulo: 4, numero: "4.2", titulo: "Habitabilidad", keys: ["hab"], sinSubapartados: true },
 ];
 
 /**

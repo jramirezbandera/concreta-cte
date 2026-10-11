@@ -289,6 +289,14 @@ export const REGLAS_ATRIBUTOS: readonly ReglaAtributo[] = [
       "privado con una zona de aparcamiento de 10 plazas o menos (HE 6 ap. 1 pto 2 a).",
     cita: "DB-HE 6, ámbito de aplicación",
   },
+  // ── Habitabilidad (feature-32) ────────────────────────────────────────────
+  {
+    key: "hab",
+    cuando: (a) => !a.tieneViviendas,
+    resultado: "no_aplica",
+    nota: "Habitabilidad: no se justifica — el edificio no tiene uso de vivienda.",
+    cita: "Norma de habitabilidad del municipio",
+  },
   // ── DB-HR · Protección frente al ruido (feature-25) ────────────────────────
   {
     // Ámbito (research/verificacion-hr.md, bloque A): el del CTE salvo recintos

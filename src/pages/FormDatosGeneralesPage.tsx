@@ -26,6 +26,7 @@ import { useNavigate } from "react-router";
 import { CollapsibleSection } from "../components/ui/CollapsibleSection";
 import { Field, InputLabel, NumberInput, SelectInput } from "../components/ui/InputLabel";
 import { AsistenteAlcance } from "../components/proyecto/AsistenteAlcance";
+import { SeccionHabitabilidad } from "../components/proyecto/SeccionHabitabilidad";
 import { obraDeCaso } from "../lib/proyecto/alcance";
 import { SelectorMunicipio } from "../components/proyecto/SelectorMunicipio";
 import { BotonMapa, EnlaceVisor } from "../components/proyecto/MapaNormativo";
@@ -846,6 +847,8 @@ export function FormDatosGeneralesPage({ modo }: { modo: "crear" | "editar" }): 
             </CollapsibleSection>
 
             <SeccionDocumento dg={dg} setDg={setDg} />
+
+            <SeccionHabitabilidad dg={dg} setDg={setDg} />
           </div>
 
           <div className="min-w-0">

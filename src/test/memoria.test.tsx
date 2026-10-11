@@ -29,7 +29,7 @@ describe("«/p/demo/memoria»", () => {
     await renderApp(`#/p/${DEMO_ID}/memoria`);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Cumplimiento del CTE" }, { timeout: 20000 })).toBeInTheDocument();
-    expect(screen.getByText("26 de 26 apartados listos")).toBeInTheDocument();
+    expect(screen.getByText("27 de 27 apartados listos")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "3.4.5. HS 5 Evacuación de aguas" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "3.3.6. SUA 6 Seguridad frente al riesgo de ahogamiento" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "3.4.1. HS 1 Protección frente a la humedad" })).toBeInTheDocument();
@@ -40,9 +40,10 @@ describe("«/p/demo/memoria»", () => {
     expect(screen.getByRole("heading", { name: "3.6.5. HE 6 Dotaciones mínimas para la infraestructura de recarga de vehículos eléctricos" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "4.1.1. ITC-BT-10 Grado de electrificación y previsión de cargas" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "3.5. Protección frente al ruido DB HR" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "4.2. Habitabilidad" })).toBeInTheDocument();
     // Desde feature-25 (HR) no queda nada por redactar.
     expect(screen.queryByText(/Aún sin redactar/)).toBeNull();
-    expect(screen.getByRole("link", { name: /Memoria CTE/ })).toHaveTextContent("26/26");
+    expect(screen.getByRole("link", { name: /Memoria CTE/ })).toHaveTextContent("27/27");
 
     // user-event pone su propio portapapeles: se espía después de crearlo.
     const user = userEvent.setup();

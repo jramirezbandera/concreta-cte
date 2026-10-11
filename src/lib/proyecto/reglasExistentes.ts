@@ -576,6 +576,31 @@ function rebt(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
   );
 }
 
+const HAB = "Habitabilidad";
+const CITA_HAB = "Norma de habitabilidad del municipio";
+
+/**
+ * Habitabilidad (feature-32): la norma es municipal y no dice nada de los
+ * edificios existentes; se justifica lo que la obra crea o cambia (criterio):
+ * las viviendas que resultan del cambio de uso o de la ampliación y las que
+ * cambian su distribución o sus huecos.
+ */
+function hab(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
+  if (caso === "cambio_uso_caracteristico") {
+    return aplica(`${HAB}: se justifican las condiciones de habitabilidad de todas las viviendas del edificio, que cambia su uso característico.`, CITA_HAB);
+  }
+  if (caso === "cambio_uso_parcial" && c.edificio.pasaAVivienda) {
+    return reformado(`${HAB}: se justifican las condiciones de habitabilidad de las viviendas que resultan del cambio de uso.`, CITA_HAB);
+  }
+  if (caso === "ampliacion") {
+    return reformado(`${HAB}: se justifican las condiciones de habitabilidad de las viviendas de la parte ampliada.`, CITA_HAB);
+  }
+  if (caso === "reforma" && (tocaInterior(c.alcance, ["distribucion"]) || tocaEnvolvente(c.alcance, ["huecos"]))) {
+    return reformado(`${HAB}: se justifican las condiciones de habitabilidad de las viviendas cuya distribución o cuyos huecos se modifican.`, CITA_HAB);
+  }
+  return noAplica(`${HAB}: no se justifica — la intervención no crea viviendas ni modifica su distribución ni sus huecos.`, CITA_HAB);
+}
+
 function dbse(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
   const cita = "CTE Parte I, art. 2.4";
   if (caso === "ampliacion" || c.alcance.estructura !== false) {
@@ -673,6 +698,7 @@ export const REGLAS_EXISTENTES: Partial<Record<JustificacionKey, Regla>> = {
   he5,
   he6,
   rebt,
+  hab,
   dbse,
 };
 

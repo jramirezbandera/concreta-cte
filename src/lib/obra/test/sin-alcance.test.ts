@@ -15,7 +15,8 @@ import antes from "./foto-antes.json";
 // (capítulos, numeración, fuentes cortas, cuadro inicial y sin «supuestos»):
 // solo cambió la
 // huella de la memoria de los 40 proyectos. Y en feature-31 (tablas «Norma |
-// Proyecto» de SI, SUA y HR), lo mismo.
+// Proyecto» de SI, SUA y HR), lo mismo. En feature-32 (habitabilidad) se añade
+// la fila «hab» y cambia la huella de la memoria; nada más.
 // =============================================================================
 
 describe("sin asistente de alcance, nada cambia", () => {

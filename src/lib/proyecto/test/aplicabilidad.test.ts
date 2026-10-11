@@ -23,7 +23,7 @@ const TODAS_LAS_KEYS: JustificacionKey[] = [
   "hs1", "hs2",
   "si1", "si2", "si3", "si4", "si5", "si6",
   "sua1", "sua2", "sua3", "sua4", "sua5", "sua6", "sua7", "sua8", "sua9",
-  "hr", "he4", "he5", "he6", "rebt", "he0he1_global", "dbse",
+  "hr", "he4", "he5", "he6", "rebt", "hab", "he0he1_global", "dbse",
 ];
 
 const KEYS_EXTERNAS: JustificacionKey[] = ["he0he1_global", "dbse"];
@@ -72,7 +72,7 @@ function proyecto(
 }
 
 describe("aplicabilidadBase — cobertura del expediente", () => {
-  it("devuelve las 25 claves del union, todas con aplicabilidad definida", () => {
+  it("devuelve las 30 claves del union, todas con aplicabilidad definida", () => {
     const base = aplicabilidadBase(dg());
     for (const key of TODAS_LAS_KEYS) {
       expect(base[key], `falta la clave ${key}`).toBeDefined();
@@ -303,7 +303,8 @@ describe("propiedades generales del motor", () => {
   it("todas las reglas de atributos declaran nota y cita no vacías", () => {
     for (const regla of REGLAS_ATRIBUTOS) {
       expect(regla.nota.length).toBeGreaterThan(20);
-      expect(regla.cita).toMatch(/ámbito de aplicación/);
+      // Habitabilidad no es del CTE: su cita es la norma del municipio (feature-32).
+      expect(regla.cita).toMatch(regla.key === "hab" ? /^Norma de habitabilidad/ : /ámbito de aplicación/);
     }
   });
 });

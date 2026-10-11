@@ -15,6 +15,8 @@ import { hs5EstadoDefaults, type Hs5Estado } from "../../modules/hs5/estado";
 import { hs6EstadoDefaults, type Hs6Estado } from "../../modules/hs6/estado";
 import { hs1EstadoDefaults, type Hs1Estado } from "../../modules/hs1/estado";
 import { he1EstadoDefaults, type He1Estado } from "../../modules/he1/estado";
+import { habEstadoDefaults, type EstanciaHab, type HabEstado } from "../../modules/hab/estado";
+import { COMPUTAN_HABITUAL, type TipoEstancia } from "../habitabilidad/norma";
 import type { ZonaClimatica } from "../../modules/he1/tablas";
 import {
   LETRAS_INVIERNO,
@@ -76,6 +78,49 @@ const DATOS_GENERALES_DEMO: DatosGenerales = {
   terrenoTipo: "IV",
   nivelFreatico: { tipo: "no_detectado", reconocimiento_m: 10 },
   permeabilidadTerreno: "medio",
+  // Habitabilidad (feature-32): NORMA DE DEMOSTRACIÓN, como el estudio
+  // geotécnico. No es la de Cáceres: la herramienta no trae normas municipales
+  // sin cotejar, y el rótulo lo dice para que no pase a una memoria real.
+  habitabilidad: {
+    normas: [
+      {
+        id: "demo",
+        referencia: "Norma de demostración (sustituir por la del municipio)",
+        ambito: "municipal",
+        iluminacion: { fraccion: 0.1, mide: "hueco" },
+        ventilacion: "conjunta",
+        computan: [...COMPUTAN_HABITUAL],
+      },
+    ],
+  },
+};
+
+/** Una estancia del Demo: [id, nombre, tipo, Su, hueco]. */
+type FilaEstancia = [string, string, TipoEstancia, number, number | null];
+
+function estancias(filas: FilaEstancia[]): EstanciaHab[] {
+  return filas.map(([id, nombre, tipo, util_m2, hueco_m2]) => ({ id, nombre, tipo, util_m2, hueco_m2, acristalada_m2: null, practicable_m2: null }));
+}
+
+/** Las estancias de las viviendas tipo A y B del Demo (planos de demostración). */
+const ESTANCIAS_DEMO: HabEstado["estancias"] = {
+  A: estancias([
+    ["e1", "Estar-comedor", "estar_comedor", 26, 4.2],
+    ["e2", "Cocina", "cocina", 10, 1.6],
+    ["d1", "Dormitorio principal", "dormitorio", 14, 2.1],
+    ["d2", "Dormitorio 2", "dormitorio", 11, 1.8],
+    ["d3", "Dormitorio 3", "dormitorio", 9, 1.5],
+    ["b1", "Baño 1", "bano", 5, null],
+    ["b2", "Baño 2", "bano", 4, null],
+  ]),
+  B: estancias([
+    ["e1", "Estar-comedor", "estar_comedor", 22, 3.6],
+    ["e2", "Cocina", "cocina", 8, 1.2],
+    ["d1", "Dormitorio principal", "dormitorio", 13, 2],
+    ["d2", "Dormitorio 2", "dormitorio", 9, 1.5],
+    ["b1", "Baño", "bano", 5, null],
+    ["a1", "Aseo", "aseo", 2.5, null],
+  ]),
 };
 
 // -----------------------------------------------------------------------------
@@ -177,6 +222,7 @@ export function crearProyectoDemo(nowIso: string): Proyecto {
       hs5: justificacionDemo(hs5Inputs),
       hs6: justificacionDemo(hs6Inputs),
       he1: justificacionDemo(he1Inputs),
+      hab: justificacionDemo(structuredClone({ ...habEstadoDefaults, estancias: ESTANCIAS_DEMO })),
     },
   };
 }

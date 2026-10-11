@@ -157,6 +157,7 @@ export const ALCANCE_MODULO: Partial<Record<JustificacionKey, "intervenido" | "c
   sua3: "intervenido",
   sua4: "intervenido",
   sua7: "intervenido",
+  hab: "intervenido",
   si3: "con_comunes",
   sua9: "con_comunes",
 };

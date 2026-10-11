@@ -21,7 +21,7 @@ const KEYS_ESPERADAS = [
   "hs1", "hs2",
   "si1", "si2", "si3", "si4", "si5", "si6",
   "sua1", "sua2", "sua3", "sua4", "sua5", "sua6", "sua7", "sua8", "sua9",
-  "hr", "he4", "he5", "he6", "rebt",
+  "hr", "he4", "he5", "he6", "rebt", "hab",
   "he0he1_global", "dbse",
   "smoke",
 ] as const;
@@ -147,6 +147,7 @@ describe("justificacionesPorGrupo", () => {
       "Ruido (DB-HR)",
       "Ahorro de energía (DB-HE)",
       "Electricidad (REBT)",
+      "Habitabilidad",
       "Desarrollo",
     ]);
     // Contenido shipped exacto de los grupos Salubridad y DB-SI, en orden numérico declarado.
