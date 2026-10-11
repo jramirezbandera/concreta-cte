@@ -14,7 +14,7 @@ import { PisosSeccion } from "../../components/edificio/PisosSeccion";
 import type { EstadoPresentacion } from "../../lib/cte/presentacion";
 import { estadosElementos } from "../../lib/cte/estados";
 import type { Edificio } from "../../lib/edificio/tipos";
-import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL } from "../../lib/svg/paletaSeccion";
+import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL, halo } from "../../lib/svg/paletaSeccion";
 import type { SvgMode } from "../../lib/svg/helpers";
 import type { JustificacionHs1 } from "./justificacion";
 import { calcularSeccionHs1, type SeccionHs1Geo } from "./seccion";
@@ -90,8 +90,6 @@ export function SeccionHs1({
       </>,
     );
   };
-
-  const yR = s.yRasante;
 
   return (
     <svg
@@ -183,8 +181,10 @@ export function SeccionHs1({
           </>,
         )}
 
-      {/* La rasante, rotulada */}
-      <text x={s.ancho - 4} y={yR - 6} fontSize={10} textAnchor="end" fontFamily={FUENTE_SANS} fill={P.texto3}>
+      {/* El terreno, rotulado abajo a la derecha: junto a la rasante está la
+          fachada y no cabe. En papel, sobre un recuadro para que el rayado no lo cruce. */}
+      {mode === "pdf" && <rect x={s.ancho - 50} y={s.alto - 17} width={47} height={14} fill={P.fondo} />}
+      <text x={s.ancho - 6} y={s.alto - 6} fontSize={10} textAnchor="end" fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode, P.fondo)}>
         terreno
       </text>
 

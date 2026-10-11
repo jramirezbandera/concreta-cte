@@ -54,3 +54,14 @@ export const PALETA_PAPEL: PaletaSeccion = {
 
 export const FUENTE_MONO = "Geist Mono, ui-monospace, SFMono-Regular, Menlo, monospace";
 export const FUENTE_SANS = "Geist Sans, Geist, system-ui, sans-serif";
+
+/**
+ * Halo de un rótulo que cae sobre líneas o rayados: un trazo del color del fondo
+ * por DEBAJO del relleno (`paint-order`), para que el texto se lea sin tapar el
+ * dibujo con un recuadro. Solo en pantalla: svg2pdf no entiende `paint-order` y
+ * en papel el trazo taparía la letra.
+ */
+export function halo(mode: "screen" | "pdf", color = PALETA_PANTALLA.fondo, grosor = 3) {
+  if (mode === "pdf") return {};
+  return { paintOrder: "stroke", stroke: color, strokeWidth: grosor, strokeLinejoin: "round" } as const;
+}

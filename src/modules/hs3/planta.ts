@@ -231,9 +231,10 @@ function viviendaDe(j: JustificacionHs3, t: TipoVentilacion, prefijo: string): P
     puertas.push({ x: cx, y: r.arriba ? P.Y_PASILLO : P.Y_BAJA });
     if (!r.humedo) {
       admisiones.push({ x: cx, y: r.arriba ? P.Y_TOP : P.Y_FONDO, elementoId: r.elementoId! });
+      // Arriba, la flecha arranca bajo el nombre y el «entra por aireador»: si no, los cruza.
       flechas.push(
         r.arriba
-          ? { x1: cx, y1: P.Y_TOP + 12, x2: cx, y2: P.Y_PASILLO - 8 }
+          ? { x1: cx, y1: P.Y_TOP + 44, x2: cx, y2: P.Y_PASILLO - 8 }
           : { x1: cx, y1: P.Y_FONDO - 12, x2: cx, y2: P.Y_BAJA + 8 },
       );
     } else {

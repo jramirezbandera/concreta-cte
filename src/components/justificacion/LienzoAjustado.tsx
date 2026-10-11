@@ -48,7 +48,7 @@ export function LienzoAjustado({
 
   const estrecho = anchoMin !== undefined && caja.ancho < anchoMin;
   return (
-    <div className="canvas-dot-grid bg-bg-primary relative flex min-h-[360px] flex-1 flex-col p-5 max-lg:min-h-[420px]">
+    <div className="canvas-dot-grid bg-bg-primary relative flex min-h-[360px] flex-1 flex-col p-5 max-lg:min-h-[420px] lg:min-h-[max(460px,54vh)]">
       {/* La caja medida no depende del dibujo (va en absoluto dentro): si el SVG
           la empujara, cada medida agrandaría el dibujo y este a la caja. En
           estrecho solo cuenta el ancho, que no depende del contenido. */}

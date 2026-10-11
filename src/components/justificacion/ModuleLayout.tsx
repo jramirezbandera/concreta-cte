@@ -397,7 +397,9 @@ export function ModuleLayout({
         onMenuOpen={openDrawer}
       />
 
-      <div className="scroll-hide flex min-h-0 flex-1 flex-col overflow-y-auto lg:overflow-hidden">
+      {/* En pantallas bajas (muchos avisos), se desplaza el módulo entero: el
+          panel no baja del alto mínimo del dibujo y su franja, así nada se recorta. */}
+      <div className="scroll-hide flex min-h-0 flex-1 flex-col overflow-y-auto">
         {/* Cabecera: veredicto + una frase + pestañas. */}
         <header className="border-border-main flex shrink-0 flex-wrap items-end gap-x-6 gap-y-3 border-b px-6 pt-4 pb-3.5">
           <div className="flex min-w-0 flex-[1_1_480px] flex-col gap-1.5">
@@ -497,7 +499,7 @@ export function ModuleLayout({
           id={`${tabsId}-panel`}
           role="tabpanel"
           aria-labelledby={`${tabsId}-${vista}`}
-          className="flex min-h-0 flex-1 flex-col max-lg:flex-none lg:flex-row"
+          className="flex min-h-0 flex-1 flex-col max-lg:flex-none lg:min-h-[calc(max(460px,54vh)_+_160px)] lg:flex-row"
         >
           {vista === "memoria" ? (
             memoria && "texto" in memoria ? (
@@ -524,7 +526,11 @@ export function ModuleLayout({
                     {dibujo.cabecera}
                   </div>
                   {dibujo.lienzo}
-                  {dibujo.franja}
+                  {/* La franja cede alto al dibujo: si no cabe, se desplaza ella
+                      y el dibujo no encoge hasta dejar los rótulos ilegibles. */}
+                  <div className="scroll-hide flex min-h-0 shrink flex-col lg:min-h-[112px] lg:overflow-y-auto">
+                    {dibujo.franja}
+                  </div>
                 </aside>
               ) : (
                 <section

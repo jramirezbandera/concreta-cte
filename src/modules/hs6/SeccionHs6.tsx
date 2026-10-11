@@ -10,7 +10,7 @@ import { estadosElementos } from "../../lib/cte/estados";
 import type { EstadoPresentacion } from "../../lib/cte/presentacion";
 import type { Edificio } from "../../lib/edificio/tipos";
 import type { SvgMode } from "../../lib/svg/helpers";
-import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL } from "../../lib/svg/paletaSeccion";
+import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL, halo } from "../../lib/svg/paletaSeccion";
 import type { JustificacionHs6 } from "./justificacion";
 import { calcularSeccionHs6, SECCION_HS6, zonasPbDe, type SeccionHs6Geo } from "./seccion";
 import { describirSeccionHs6, textoEtiqueta } from "./textos";
@@ -249,11 +249,11 @@ export function SeccionHs6({
         ))}
       </g>
       {s.radon.map((r, i) => (
-        <text key={`rt-${i}`} x={r.x + 6} y={r.y0 - 2} fontSize={10} fontFamily={FUENTE_MONO} fill={P.texto3}>
+        <text key={`rt-${i}`} x={r.x + 6} y={r.y0 - 2} fontSize={10} fontFamily={FUENTE_MONO} fill={P.texto3} {...halo(mode)}>
           Rn
         </text>
       ))}
-      <text x={s.ancho} y={s.alto - 4} fontSize={10.5} textAnchor="end" fontFamily={FUENTE_SANS} fill={P.texto3}>
+      <text x={s.ancho - 4} y={s.alto - 4} fontSize={10.5} textAnchor="end" fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode)}>
         {s.rotuloTerreno}
       </text>
 

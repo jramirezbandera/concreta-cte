@@ -13,7 +13,7 @@
 
 import { useId, type JSX, type ReactNode } from "react";
 import { PisosSeccion } from "../../components/edificio/PisosSeccion";
-import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL } from "../../lib/svg/paletaSeccion";
+import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL, halo } from "../../lib/svg/paletaSeccion";
 import type { EstadoPresentacion } from "../../lib/cte/presentacion";
 import type { SvgMode } from "../../lib/svg/helpers";
 import type { Edificio } from "../../lib/edificio/tipos";
@@ -288,10 +288,10 @@ export function SeccionHs5({
         stroke={P.wall}
         strokeWidth={1}
       />
-      <text x={4} y={s.arqueta.y + s.arqueta.lado + 34} fontSize={10.5} fontFamily={SANS} fill={P.texto2}>
+      <text x={4} y={s.arqueta.y + s.arqueta.lado + 34} fontSize={10.5} fontFamily={SANS} fill={P.texto2} {...halo(mode)}>
         {s.arqueta.texto[0]}
       </text>
-      <text x={4} y={s.arqueta.y + s.arqueta.lado + 47} fontSize={10.5} fontFamily={SANS} fill={P.texto2}>
+      <text x={4} y={s.arqueta.y + s.arqueta.lado + 47} fontSize={10.5} fontFamily={SANS} fill={P.texto2} {...halo(mode)}>
         {s.arqueta.texto[1]}
       </text>
       {s.arquetaPluviales && (

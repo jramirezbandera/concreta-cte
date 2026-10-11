@@ -11,7 +11,7 @@
 
 import { useId, type JSX, type ReactNode } from "react";
 import { PisosSeccion } from "../../components/edificio/PisosSeccion";
-import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL } from "../../lib/svg/paletaSeccion";
+import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL, halo } from "../../lib/svg/paletaSeccion";
 import { estadosElementos } from "../../lib/cte/estados";
 import type { EstadoPresentacion } from "../../lib/cte/presentacion";
 import type { Edificio } from "../../lib/edificio/tipos";
@@ -212,7 +212,7 @@ export function SeccionHs4({
               +{s.bateria.contadores - 8}
             </text>
           )}
-          <text x={s.bateria.x} y={s.bateria.y - 6} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto2}>
+          <text x={s.bateria.x} y={s.bateria.y - 6} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto2} {...halo(mode)}>
             {s.bateria.texto}
           </text>
         </g>
@@ -258,7 +258,7 @@ export function SeccionHs4({
                 fill="none"
               />
               <circle cx={30} cy={s.acometida.y} r={4} fill={P.fondo} stroke={P.caja} strokeWidth={1.4} />
-              <text x={4} y={s.acometida.y - 6} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3}>
+              <text x={4} y={s.acometida.y - 6} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode)}>
                 Acometida
               </text>
               {golpe(`M0 ${s.acometida.y}H${s.acometida.xGrupo}`)}
@@ -290,7 +290,7 @@ export function SeccionHs4({
           b.elementoId,
           <>
             <line x1={S.X1} y1={b.y + 7} x2={S.G_X0 - 6} y2={b.y + 7} stroke={P.wall} strokeWidth={1} strokeDasharray="2 4" />
-            <text x={S.G_X0} y={b.y - 5} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3}>
+            <text x={S.G_X0} y={b.y - 5} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode)}>
               {b.rotulo}
             </text>
             <rect x={S.G_X0} y={b.y} width={b.w} height={14} rx={2} fill={r.fill} opacity={r.opacity} />
@@ -303,7 +303,7 @@ export function SeccionHs4({
           "b-red",
           "presion-red",
           <>
-            <text x={S.G_X0} y={s.barraRed.y - 5} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3}>
+            <text x={S.G_X0} y={s.barraRed.y - 5} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode)}>
               {s.barraRed.rotulo}
             </text>
             <rect
@@ -318,7 +318,7 @@ export function SeccionHs4({
         )}
       {s.barraGrupo && (
         <g>
-          <text x={S.G_X0} y={s.barraGrupo.y - 5} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3}>
+          <text x={S.G_X0} y={s.barraGrupo.y - 5} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode)}>
             {s.barraGrupo.rotulo}
           </text>
           <rect x={S.G_X0} y={s.barraGrupo.y} width={s.barraGrupo.w} height={14} rx={2} fill={P.accent} opacity={0.35} />

@@ -11,7 +11,7 @@ import { useId, type JSX, type ReactNode } from "react";
 import { estadosElementos } from "../../lib/cte/estados";
 import type { EstadoPresentacion } from "../../lib/cte/presentacion";
 import type { SvgMode } from "../../lib/svg/helpers";
-import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL, type PaletaSeccion } from "../../lib/svg/paletaSeccion";
+import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL, halo, type PaletaSeccion } from "../../lib/svg/paletaSeccion";
 import { calcularDibujoHe1, type DibujoHe1Geo, type DibujoHorizontal, type DibujoMuro, type DibujoVentana, type PatronCapa } from "./dibujo";
 import type { JustificacionHe1 } from "./justificacion";
 import { describirDibujoHe1, textoEtiqueta } from "./textos";
@@ -212,7 +212,7 @@ function Muro({ g, c }: { g: DibujoMuro; c: Ctx }): JSX.Element {
       })}
       <polyline points={g.curva} fill="none" stroke={P.accent} strokeWidth={1.8} strokeLinejoin="round" />
       {g.temperaturas.map((t, i) => (
-        <text key={`t-${i}`} x={t.x} y={t.y} fontSize={10} textAnchor={t.ancla} fontFamily={FUENTE_MONO} fill={P.accent}>
+        <text key={`t-${i}`} x={t.x} y={t.y} fontSize={10} textAnchor={t.ancla} fontFamily={FUENTE_MONO} fill={P.accent} {...halo(c.mode, P.fondo, 3.5)}>
           {t.texto}
         </text>
       ))}

@@ -243,7 +243,8 @@ function Vivienda({ s, P, uid, borde, pulsable, tinte, sel }: PartesProps<Planta
           </>,
         ),
       )}
-      <text x={L.X_BARRAS + L.W_BARRAS + 14} y={L.Y_SALE + 30} fontSize={10} fontFamily={FUENTE_SANS} fill={P.texto3}>
+      {/* Bajo la cifra del equilibrio, ajustado al borde derecho del dibujo. */}
+      <text x={L.W - 6} y={L.Y_SALE + 30} fontSize={10} textAnchor="end" fontFamily={FUENTE_SANS} fill={P.texto3}>
         la campana va aparte
       </text>
     </g>

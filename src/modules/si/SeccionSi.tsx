@@ -14,7 +14,7 @@ import { useId, type JSX, type ReactNode } from "react";
 import { PisosSeccion } from "../../components/edificio/PisosSeccion";
 import type { EstadoPresentacion } from "../../lib/cte/presentacion";
 import { SECCION_BASE } from "../../lib/edificio/seccion";
-import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL, type PaletaSeccion } from "../../lib/svg/paletaSeccion";
+import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL, halo, type PaletaSeccion } from "../../lib/svg/paletaSeccion";
 import type { SvgMode } from "../../lib/svg/helpers";
 import type { DibujoSi, IconoSi, MarcaSi, TonoZona } from "./seccion";
 
@@ -335,11 +335,6 @@ export function SeccionSi({
                 strokeDasharray={marcada ? c.dash : "4 3"}
               />
             )}
-            {m.rotulo && !z.enBanda && (
-              <text x={z.x0 + 6} y={z.y0 + 13} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3}>
-                {m.rotulo}
-              </text>
-            )}
           </>,
         );
       })}
@@ -388,26 +383,50 @@ export function SeccionSi({
               m.elementoId,
               <>
                 {interactivo && m.elementoId !== undefined && <rect x={m.x - 11} y={m.y - 11} width={22} height={22} fill="transparent" />}
-                <Icono icono={m.icono} x={m.x} y={m.y} color={c.stroke} P={P} />
+                <g data-rotulo="">
+                  <Icono icono={m.icono} x={m.x} y={m.y} color={c.stroke} P={P} />
+                </g>
               </>,
             );
           }
           case "texto":
             return (
-              <text key={m.key} x={m.x} y={m.y} fontSize={10} textAnchor={m.ancla ?? "start"} fontFamily={FUENTE_SANS} fill={P.texto3}>
+              <text key={m.key} x={m.x} y={m.y} fontSize={10} textAnchor={m.ancla ?? "start"} fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode, P.fondo)}>
                 {m.texto}
               </text>
             );
         }
       })}
+      {/* Los nombres de las zonas, encima de escaleras, flechas y líneas: con el
+          halo del color de su zona, lo que los cruza no los tapa. */}
+      <g pointerEvents="none">
+        {zonas.map((m) =>
+          m.rotulo && !m.zona.enBanda ? (
+            <text
+              key={`rot-${m.key}`}
+              x={m.zona.x0 + 6}
+              y={m.zona.y0 + 13}
+              fontSize={9.5}
+              fontFamily={FUENTE_SANS}
+              fill={P.texto3}
+              {...halo(mode, tonos[m.tono])}
+            >
+              {m.rotulo}
+            </text>
+          ) : null,
+        )}
+      </g>
       <defs>
         <marker id={`${uid}-punta`} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0 0L8 4L0 8z" fill={P.texto2} />
         </marker>
       </defs>
 
-      {/* La rasante, rotulada */}
-      <text x={s.ancho - 4} y={s.yRasante - 6} fontSize={10} textAnchor="end" fontFamily={FUENTE_SANS} fill={P.texto3}>
+      {/* El terreno, rotulado abajo a la derecha (como en HS6): junto a la rasante
+          van las salidas, el camión, los hidrantes, las rampas y sus cifras. En
+          papel, sin halo, sobre un recuadro del fondo para que el rayado no lo cruce. */}
+      {mode === "pdf" && <rect x={s.ancho - 50} y={s.alto - 17} width={47} height={14} fill={P.fondo} />}
+      <text x={s.ancho - 6} y={s.alto - 6} fontSize={10} textAnchor="end" fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode, P.fondo)}>
         terreno
       </text>
 

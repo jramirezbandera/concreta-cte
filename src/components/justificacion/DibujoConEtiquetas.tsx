@@ -1,4 +1,4 @@
-import type { JSX, ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type JSX, type ReactNode } from "react";
 import { TEXTO_ESTADO, type EstadoPresentacion } from "../../lib/cte/presentacion";
 
 // =============================================================================
@@ -50,33 +50,106 @@ const CHIP_ALTO = 26;
 const CHIP_FIJO = 2 * 7 + 6 + 5 + 2;
 const CHIP_CARACTER = 7.25;
 const HOLGURA = 4;
-/** Saltos verticales que se prueban, en alturas de chip, cuando dos se pisan. */
-const SALTOS = [0, 1, -1, 2, -2];
+/**
+ * Huecos que se prueban, en orden, cuando el chip choca: [dx, dy] en medios
+ * anchos de chip y en alturas de chip. Primero arriba y abajo; luego a un lado
+ * (el chip queda junto a su ancla); luego más lejos en vertical.
+ */
+const HUECOS: [number, number][] = [
+  [0, 0],
+  [0, 1],
+  [0, -1],
+  [1, 0],
+  [-1, 0],
+  [0, 2],
+  [0, -2],
+  [1, 1],
+  [-1, 1],
+  [1, -1],
+  [-1, -1],
+  [0, 3],
+  [0, -3],
+];
+/** Para no tapar un rótulo del dibujo solo se aleja el chip hasta aquí (índice en HUECOS). */
+const HUECOS_POR_ROTULO = 5;
+/** Lo que un chip puede rozar un rótulo sin taparlo [px]: la caja del texto incluye su interlineado. */
+const ROCE = 4;
+
+/** Un rectángulo [px] en coordenadas del lienzo: centro y medidas. */
+interface Caja {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+const solape = (a: Caja, b: Caja, holgura: number): number => {
+  const sx = (a.w + b.w) / 2 + holgura - Math.abs(a.x - b.x);
+  const sy = (a.h + b.h) / 2 + holgura - Math.abs(a.y - b.y);
+  return sx > 0 && sy > 0 ? sx * sy : 0;
+};
 
 /**
  * Centro de cada chip [px]. Las anclas vienen del dibujo, pero los chips miden
  * lo mismo a cualquier escala: con el dibujo estrecho, dos anclas vecinas se
- * pisan. En orden, cada chip que choca con uno ya colocado se escalona arriba o
- * abajo; si no cabe en ningún salto, se queda en su ancla.
+ * pisan. En orden, cada chip busca el primer hueco que no choque con otro chip
+ * ni tape un rótulo del dibujo (`rotulos`); si no lo hay cerca, uno que solo no
+ * choque con otro chip; y si tampoco, el que menos se pise.
  */
-function colocar(etiquetas: EtiquetaDibujo[], ancho: number, alto: number, viewW: number, viewH: number) {
-  const puestas: { x: number; y: number; w: number }[] = [];
+function colocar(
+  etiquetas: EtiquetaDibujo[],
+  ancho: number,
+  alto: number,
+  viewW: number,
+  viewH: number,
+  rotulos: readonly Caja[],
+) {
+  const puestas: Caja[] = [];
   return etiquetas.map((e) => {
-    const x = (e.x / viewW) * ancho;
+    const x0 = (e.x / viewW) * ancho;
     const y0 = (e.y / viewH) * alto;
     const w = e.texto.length * CHIP_CARACTER + CHIP_FIJO;
-    const choca = (y: number) =>
-      puestas.some(
-        (p) =>
-          Math.abs(p.x - x) < (p.w + w) / 2 + HOLGURA && Math.abs(p.y - y) < CHIP_ALTO + HOLGURA,
-      );
-    const salto = SALTOS.map((k) => y0 + k * (CHIP_ALTO + HOLGURA)).find(
-      (y) => y - CHIP_ALTO / 2 >= 0 && y + CHIP_ALTO / 2 <= alto && !choca(y),
+    const candidatas = HUECOS.map(([dx, dy]) => ({
+      x: x0 + dx * (w / 2 + HOLGURA * 2),
+      y: y0 + dy * (CHIP_ALTO + HOLGURA),
+      w,
+      h: CHIP_ALTO,
+    })).filter(
+      (c, i) =>
+        i === 0 ||
+        (c.y - CHIP_ALTO / 2 >= 0 && c.y + CHIP_ALTO / 2 <= alto && c.x - w / 2 >= 0 && c.x + w / 2 <= ancho),
     );
-    const y = salto ?? y0;
-    puestas.push({ x, y, w });
-    return { x, y };
+    const contraChips = (c: Caja) => puestas.reduce((s, p) => s + solape(c, p, HOLGURA), 0);
+    const tapaRotulo = (c: Caja) => rotulos.some((r) => solape(c, r, -ROCE) > 0);
+    const elegida =
+      candidatas.slice(0, HUECOS_POR_ROTULO).find((c) => contraChips(c) === 0 && !tapaRotulo(c)) ??
+      candidatas.find((c) => contraChips(c) === 0) ??
+      candidatas.reduce((mejor, c) => (contraChips(c) < contraChips(mejor) ? c : mejor));
+    puestas.push(elegida);
+    return { x: elegida.x, y: elegida.y };
   });
+}
+
+/**
+ * Las cajas [px] de los rótulos del SVG (`<text>` y lo marcado con
+ * `data-rotulo`, como los iconos), medidas en el navegador respecto al lienzo.
+ * Sin medida real (jsdom) no hay ninguna.
+ */
+function medirRotulos(lienzo: HTMLElement): Caja[] {
+  const base = lienzo.getBoundingClientRect();
+  const cajas: Caja[] = [];
+  lienzo.querySelectorAll("svg text, svg [data-rotulo]").forEach((t) => {
+    const r = t.getBoundingClientRect();
+    if (r.width > 0 && r.height > 0) {
+      cajas.push({
+        x: Math.round(r.left - base.left + r.width / 2),
+        y: Math.round(r.top - base.top + r.height / 2),
+        w: Math.round(r.width),
+        h: Math.round(r.height),
+      });
+    }
+  });
+  return cajas;
 }
 
 interface DibujoConEtiquetasProps {
@@ -102,9 +175,19 @@ export function DibujoConEtiquetas({
   seleccion,
   onSelect,
 }: DibujoConEtiquetasProps): JSX.Element {
-  const sitios = colocar(etiquetas, ancho, alto, viewW, viewH);
+  // Los rótulos del SVG se miden después de pintarlo; con ellos, los chips se
+  // recolocan para no taparlos. Solo cambia el estado si cambian las medidas.
+  const lienzoRef = useRef<HTMLDivElement>(null);
+  const [rotulos, setRotulos] = useState<{ clave: string; cajas: Caja[] }>({ clave: "", cajas: [] });
+  useLayoutEffect(() => {
+    if (!lienzoRef.current) return;
+    const cajas = medirRotulos(lienzoRef.current);
+    const clave = JSON.stringify(cajas);
+    setRotulos((prev) => (prev.clave === clave ? prev : { clave, cajas }));
+  }, [ancho, alto, svg]);
+  const sitios = colocar(etiquetas, ancho, alto, viewW, viewH, rotulos.cajas);
   return (
-    <div className="relative" style={{ width: ancho, height: alto }}>
+    <div ref={lienzoRef} className="relative" style={{ width: ancho, height: alto }}>
       {svg}
       <ul aria-label="Cifras del dibujo">
         {etiquetas.map((e, i) => {
