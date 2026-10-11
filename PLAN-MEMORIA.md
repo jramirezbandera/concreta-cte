@@ -1,8 +1,8 @@
 # Memoria como la del estudio — plan por fases
 
-> Estado: **fases 0 a 4 hechas** · 2026-10-11 (fase 1 en [feature-28.md](feature-28.md), fase 2
+> Estado: **fases 0 a 5 hechas** · 2026-10-11 (fase 1 en [feature-28.md](feature-28.md), fase 2
 > en [feature-29.md](feature-29.md), fase 3 en [feature-30.md](feature-30.md), fase 4 en
-> [feature-31.md](feature-31.md)). Siguiente: fase 5.
+> [feature-31.md](feature-31.md), fase 5 en [feature-32.md](feature-32.md)). Siguiente: fase 6.
 > Origen: comparación de la memoria de la app con tres memorias de ejecución reales del estudio,
 > en `ejemplos/` (ignorada por git: son datos de clientes):
 > - plurifamiliar de 6 viviendas (`01_MEM_26_05_2025.docx`);
@@ -76,7 +76,7 @@ HR y HE 0/HE 1 van pegados como imagen.
 | **2 · Esqueleto del documento** ✅ | Orden y numeración del CTE, cabecera y pie, datos del estudio y del proyecto, título, apartado inicial con cuadro de aplicabilidad, línea de fuentes limpia y «Normativa aplicada» al final (§5.2). | La memoria de la unifamiliar se pega en la plantilla del estudio sin retocar; el índice de Word la recoge. |
 | **3 · Obra existente redactada como intervención** ✅ | Cada módulo dice qué existe y no se toca, y qué se proyecta; lo existente lo cubre el no empeoramiento (§5.3). | En el caso de reforma ningún apartado describe el edificio entero; SUA 1 redactado. |
 | **4 · Tablas «Norma \| Proyecto»** ✅ | `MemoriaDoc` con varias tablas y notas; tablas en SI 1, SI 3, SI 4, SI 6, SUA 1–4 y SUA 8; HR con la maqueta de la ficha K.1 (§5.4). | Cada apartado de SI y SUA se lee en diagonal por su tabla; el texto no repite la tabla. |
-| **5 · Habitabilidad (municipal y autonómica)** | Iluminación y ventilación por estancia, densidad de viviendas, con la norma declarada por el proyectista (§5.5). | El caso de reforma justifica huecos y densidad con la norma que el usuario declara, citada en cada fila. |
+| **5 · Habitabilidad (municipal y autonómica)** ✅ | Iluminación y ventilación por estancia, densidad de viviendas, con la norma declarada por el proyectista (§5.5). | El caso de reforma justifica huecos y densidad con la norma que el usuario declara, citada en cada fila. |
 | **6 · Anejo de cálculo de instalaciones** | Anejo 5.3: HS 4 por tramos, HS 5 por aparato y arquetas, REBT con circuitos, derivación individual y tierra; la memoria remite a él y a los planos (§5.6). | El anejo sustituye al de CYPE en la unifamiliar del ejemplo, sin contradecir la memoria. |
 | **7 · Otros reglamentos y coherencia** | HE 2/RITE, HE 3, ficha ICT del arquitecto, accesibilidad autonómica; comprobaciones cruzadas en «Antes de entregar» (§5.7). | Las contradicciones de los ejemplos (ACS, grupo de presión, garaje) no se pueden dar sin un aviso. |
 
@@ -127,7 +127,7 @@ leyó con un lector que resume: hay que cotejarlo palabra por palabra antes de i
 | 4 | **HE 3**: excluye el interior de las viviendas. En zonas comunes: VEEI ≤ 4,0, potencia ≤ 10 W/m² (aparcamiento ≤ 5), control manual y horario o por presencia; la luz natural no se exige. | Fase 7. |
 | 5 | **ICT** obligatoria en propiedad horizontal (o arrendamiento de más de un año con más de una vivienda), en construcción o rehabilitación integral. La unifamiliar aislada no la necesita. El arquitecto reserva recintos (RITU hasta PB+3 y 16 PAU) y remite al proyecto técnico. | Fase 7. |
 | 6 | **Habitabilidad en Andalucía**: no hay norma autonómica con fracciones para la vivienda libre (Ley 5/2025, sin cifras). La de VPO (Orden 21-07-2008, art. 7) pide 10 % de iluminación y 5 % de ventilación, sin baños ni aseos. **El «Decreto 141/2009» no es andaluz**: es canario, de instalaciones eléctricas. | La fracción la fija el PGOU: sin plantilla autonómica para vivienda libre. Plantilla VPO solo si la vivienda es protegida (§5.5). |
-| 6b | **PGOU de Málaga** (art. 12.2.34, densidad / 70, y los artículos de huecos) y **PGOU de Benalmádena** (art. 136, remite a la Orden de 1944, ¿1/8?): **sin confirmar**, solo están en PDF. La modificación del art. 136 de Benalmádena (2022) fija densidades por zonas para **frenar la conversión de locales en viviendas**. | Sin plantillas municipales hasta leer los textos. Aviso en «local a vivienda» en Benalmádena. |
+| 6b | **PGOU de Málaga** (art. 12.2.34, densidad / 70, y los artículos de huecos) y **PGOU de Benalmádena** (art. 136, remite a la Orden de 1944): **sin confirmar en el boletín**. La Orden de 1944 pide **1/6**, no 1/8 (cotejada en el BOE, K-MEM.17). La modificación del art. 136 de Benalmádena (2022) fija densidades por zonas para **frenar la conversión de locales en viviendas**. | Sin plantillas municipales hasta leer los textos. Aviso en «local a vivienda» en Benalmádena. |
 | 7 | **Decreto 293/2009**: zonas comunes que se construyen, reforman o cambian de uso; nada en el interior de la vivienda libre; en reforma, solo lo modificado; convive con SUA 9 y se cumple el más exigente. No hay «Decreto 64/2012». | Fase 7. |
 
 ## 5. Por fase: qué cambia

@@ -559,3 +559,227 @@ Objeto (art. 1): «la adaptación de la normativa técnica de diseño aplicable 
 5. RITE: literal de la tabla 1.4.1.1, IT 1.2.4.1 (bombas de calor), IT 1.2.4.4 y IT 1.2.4.5 (umbrales).
 6. RD 346/2011, Anexo III: tabla de dimensiones de RITI, RITS y RITU, y ap. del RTR.
 7. Orden VPO 2020, art. 7: cotejar el literal en el PDF del BOJA.
+
+---
+
+## K-MEM.17 — Cotejo de plantillas de habitabilidad (2026-10-11)
+
+**Fecha:** 2026-10-11 · Agente: cte-normativa · **No se ha editado código.**
+**Encargo:** fase 5 de `PLAN-MEMORIA.md` (§5.5, habitabilidad). Principio: **la app solo ofrece como plantilla una norma cuyo literal se haya cotejado en el boletín oficial (BOJA/BOE/BOP), con su fecha.** Lo «LEÍDO (web)» no basta.
+
+**Método de esta sesión.** El lector de PDF **sí ha podido leer** los PDF descargados: devuelve, por página, el texto y la **imagen renderizada**. Cada literal de este apartado se ha cotejado con la imagen de la página. Grados que se usan aquí, además de los de la cabecera:
+- **VERIFICADO (imagen, boletín)**: literal cotejado en la imagen de la página del boletín oficial, con número, fecha y página. **Apto para plantilla.**
+- **LEÍDO (documento municipal, imagen)**: literal cotejado en imagen, pero en un documento municipal (certificado o acta de Pleno, texto refundido de la Gerencia), **no en el boletín**. Pista fuerte; **no apto para plantilla** según el principio.
+
+Este apartado **actualiza** K-MEM.10, K-MEM.12, K-MEM.13, las filas 10, 12 y 13 de K-MEM.16 y los pendientes 1, 2, 3 y 7. Donde haya contradicción, manda K-MEM.17.
+
+### 17.1 Orden de 21-07-2008 (VPO Andalucía), texto integrado por la Orden de 12-02-2020
+
+**Fuente.** BOJA núm. 35, jueves 20-02-2020, pp. 13–20. «Orden de 12 de febrero de 2020, por la que se modifica la Orden de 21 de julio de 2008, sobre normativa técnica de diseño y calidad, aplicable a las viviendas protegidas en la Comunidad Autónoma de Andalucía, y se agilizan los procedimientos establecidos para otorgar las Calificaciones de Vivienda Protegida, y se publica el texto integrado con las modificaciones que se introducen en esta norma.» El texto integrado va en el **Anexo** (pp. 16–20).
+- PDF: `https://www.juntadeandalucia.es/eboja/2020/35/BOJA20-035-00008-2537-01_00169993.pdf` (CVE 00169993).
+- Entrada en vigor: «el día siguiente al de su publicación» (Orden de 2020, disposición final única, p. 16) → 21-02-2020.
+
+**Art. 7 «Superficie de iluminación»** (Anexo, p. 18), **VERIFICADO (imagen, boletín)**:
+> «La superficie de los huecos de iluminación de todas las habitaciones de las viviendas, excepto baños y aseos, no será inferior al 10 por ciento de la superficie útil de su planta, pudiendo reducirse la superficie real de ventilación de dichos huecos hasta un 5 por ciento de la superficie útil de su planta.»
+
+Coincide palabra por palabra con el LEÍDO (web) de K-MEM.10. **No hay artículo de ventilación aparte**: la ventilación es la segunda mitad del art. 7.
+
+**Art. 8 «Superficies mínimas de las habitaciones»** (p. 18), **VERIFICADO (imagen, boletín)**:
+> «1. En toda vivienda la superficie útil mínima (E) y la acumulada de estar, comer y cocinar (E+C+K) serán, en función del número de dormitorios, las siguientes:»
+
+| Viviendas de | E (m²) | E+C+K (m²) |
+|---|---|---|
+| Un dormitorio | 14 | 20 |
+| Dos dormitorios | 16 | 20 |
+| Tres dormitorios | 18 | 24 |
+| Cuatro dormitorios | 20 | 24 |
+| Más de cuatro dormitorios | 24 | 28 |
+
+> «Si la cocina es independiente de la estancia tendrá, como mínimo, 7 m². En el cómputo de esta superficie quedan excluidos los lavaderos.»
+> «La superficie útil mínima de los dormitorios será de 8 m² y en toda vivienda existirá un dormitorio de superficie útil no menor de 12 m². Los pasillos tendrán una anchura no menor de 0,90 m.»
+> «2. En obras de rehabilitación, cuando el cumplimiento de las determinaciones de este artículo suponga una gran dificultad técnica, que deberá justificarse en el proyecto, se podrá permitir una reducción en las superficies mínimas expresadas de hasta un 20 por ciento.»
+> «3. Lo dispuesto en este artículo será de aplicación sin perjuicio del cumplimiento de mayores exigencias impuestas por la normativa técnica sobre accesibilidad vigente en cada momento.»
+> «4. Se exceptúa del cumplimiento de las determinaciones de este artículo a los alojamientos.»
+
+**Art. 2 «Normas técnicas de diseño»** (Anexo, p. 17), **VERIFICADO (imagen, boletín)**. El tercer párrafo lo añade la Orden de 2020 (art. 1.Uno, p. 14):
+> «Esta normativa será también de aplicación a las obras de rehabilitación, salvo que sean incompatibles con la naturaleza de la intervención y de la edificación existente y supongan una gran dificultad técnica que deberá justificarse en el proyecto. En este caso, tendrán carácter de recomendación.»
+> «En aquellos municipios que dispongan de Plan General de Ordenación Urbana, normativa urbanística u ordenanzas municipales que establezcan condiciones funcionales y de diseño para viviendas libres y sus anejos vinculados, no será de aplicación lo regulado en el Capítulo II de la presente orden al efecto de otorgar licencias urbanísticas ni calificaciones de vivienda protegida, cuyo diseño y condiciones funcionales tendrán los mismos requisitos que las viviendas libres. En estas circunstancias, lo regulado en el Capítulo II de la presente orden será aplicable únicamente para aquellos parámetros no dispuestos en la normativa municipal.»
+
+**CORREGIDO (K-MEM.10).** La plantilla VPO **no es automática** en una vivienda protegida. Desde el 21-02-2020, si el planeamiento del municipio regula las condiciones de diseño de la vivienda libre, el Capítulo II (arts. 2–9, con el 7 y el 8) **cede ante él**, y solo rige para los parámetros que el municipio no regule. Ejemplo: Málaga regula el hueco (art. 12.2.37, ver 17.4), así que en Málaga el art. 7 no se aplica a la vivienda protegida mientras ese artículo esté vigente.
+
+**SIN CONFIRMAR.** El art. 2 párr. 1 declara aplicables las Ordenanzas Provisionales de VPO de 1969 (9.ª, 11.ª, 12.ª, 13.ª, 16.ª, 17.ª y 34.ª, mod. 1981) «con las especificaciones técnicas que se concretan en este Capítulo». No se han leído; no se sabe si alguna añade condiciones de hueco.
+
+**Vigencia.**
+- **Ley 5/2025 de Vivienda de Andalucía**, disposición derogatoria única (BOE-A-2026-423, consolidado con «última actualización, publicada el 24/12/2025»), **LEÍDO (web)**. Deroga expresamente: Ley 13/2005; Ley 1/2010; Ley 4/2013; Ley 1/2018; varios apartados de la Ley 8/1997; los arts. 2, 3, 4, 5, la DA 2.ª y los arts. 15, 30–34, 39, 40 y 45–49 del Anexo I del Decreto 149/2006; el Acuerdo de 3-06-2014; el art. 3 del Decreto-ley 1/2025. Además, la cláusula general: «Quedan derogadas cuantas disposiciones legales o reglamentarias se opongan a lo establecido en la presente ley o lo contradigan». **No cita la Orden de 21-07-2008.**
+- No se ha encontrado ninguna orden posterior que sustituya la de 2008 o su texto integrado.
+- **INTERPRETACIÓN:** sigue vigente. **SIN CONFIRMAR:** no hay un consolidado oficial de la Orden que lo declare, ni se ha revisado el BOJA de 2026 completo.
+
+**Parámetros para plantilla «Andalucía · vivienda protegida (Orden 21-07-2008, texto integrado BOJA 35/2020)»** — **VERIFICADO (imagen, boletín)**:
+- **Iluminación:** superficie de hueco ≥ **0,10** × superficie útil de la planta de la habitación.
+- **Ventilación:** superficie real de ventilación de esos huecos ≥ **0,05** × la misma superficie. **Dos comprobaciones separadas.**
+- **Qué se mide:** superficie útil de la planta de cada habitación.
+- **Computan:** todas las habitaciones de la vivienda. **Excluidos:** baños y aseos.
+- **Superficies mínimas:** art. 8 (tabla, cocina independiente 7 m², dormitorios 8 y 12 m², pasillo 0,90 m; rehabilitación hasta −20 % justificado).
+- **Densidad:** no la regula.
+- **Ámbito:** vivienda protegida en Andalucía. Cede ante el planeamiento municipal que regule el parámetro (art. 2 párr. 3). En rehabilitación con gran dificultad técnica justificada, solo recomendación (art. 2 párr. 2).
+
+### 17.2 Orden de 29 de febrero de 1944 (condiciones higiénicas mínimas de las viviendas)
+
+**Fuente.** Boletín Oficial del Estado núm. 61, 1 de marzo de 1944, pp. 1833–1834, Ministerio de la Gobernación: «ORDEN de 29 de febrero de 1944 por la que se determinan las condiciones higiénicas mínimas que han de reunir las viviendas.» Firma: Pérez González.
+- PDF de las dos páginas: `https://www.boe.es/datos/pdfs/BOE//1944/061/A01833-01834.pdf`.
+- Número completo: `https://boe.es/gazeta/dias/1944/03/01/pdfs/BOE-1944-61.pdf`.
+- **VERIFICADO (imagen, boletín).** El texto OCR del BOE tiene muchos errores; lo que sigue se transcribe de la imagen, con la ortografía del original.
+
+Encabezamiento (p. 1833):
+> «Ilmo. Sr.: A propuesta de la Comisión Central de Sanidad Local, este Ministerio ha tenido a bien disponer, que las condiciones mínimas que han de reunir toda clase de viviendas, sea cual fuere la Entidad, o particular a quienes pertenecieren, son las siguientes:»
+
+Condición 1.ª:
+> «Toda vivienda familiar se compondrá, como mínimo, de cocina-comedor, un dormitorio de dos camas y un retrete, habiendo de tenerse siempre en cuenta la relación entre la capacidad de la vivienda y el número y sexo de sus moradores.»
+
+**Condición 3.ª (el hueco)** (p. 1833):
+> «Toda pieza habitable de día o de noche tendrá ventilación directa al exterior por medio de un hueco con superficie no inferior a 1/6 de la superficie de la planta.
+> Cuando la pieza comprenda alcoba y gabinete, una de ellas podrá servir de dormitorio y el hueco alcanzará doble superficie de la prevista en el caso anterior.
+> Cuando la pieza se ventile a través de una galería no podrá servir ésta de dormitorio, y la superficie total de huecos de ella no será inferior a la mitad de su fachada, y la ventilación entre galería y habitación será, como mínimo, el doble de la fijada en el caso anterior.»
+
+Condición 4.ª (retretes y baños):
+> «Excepcionalmente en fincas cuya capacidad y tipos de construcción ofrezcan garantías de eficacia y presenten dificultades para la ventilación directa de retretes y baños, se autorizará el uso de chimeneas de ventilación que cumplan las siguientes condiciones: a) Saliente de 0,50 m. por encima del tejado o 0,20 sobre el pavimento de azotea. b) Comunicación interior y directa que asegure la renovación de aire. c) Sección suficiente para facilitar la limpieza.»
+
+Condición 5.ª (patios, extracto):
+> «Los patios serán de forma y dimensiones para poder inscribir un círculo cuyo diámetro no sea inferior a 1/6 de la altura del edificio: la dimensión mínima admisible en patios y patinillos es de tres metros.»
+
+**Condición 6.ª (superficies mínimas)** (p. 1833):
+> «Las dimensiones mínimas de las distintas habitaciones serán las siguientes: dormitorios de una sola cama, seis metros cuadrados de superficie y 15 metros cúbicos de cubicación.
+> Dormitorios de dos camas, de 10 metros cuadrados de superficie y 25 metros cúbicos de cubicación.
+> Cuarto de estar, 10 metros cuadrados.
+> Cocina, cinco metros cuadrados.
+> Retrete, 1,50 metros cuadrados.
+> Si la cocina y cuarto de estar constituye una sola pieza, ésta tendrá una dimensión mínima de 14 metros cuadrados.
+> La anchura mínima de pasillo será de 0,80 metros cuadrados, salvo en la parte correspondiente a la entrada en el piso, cuya anchura se elevará a un metro.
+> La altura de todas las habitaciones medida del pavimento al cielo raso, no será inferior a 2,50 metros en el medio urbano, pudiendo descender a 2,20 en las casas aisladas y en el medio rural.»
+
+(«0,80 metros cuadrados» es literal del original: es una anchura.)
+
+Condición 8.ª (viviendas bajo el nivel de la calle; relevante en un local que pasa a vivienda en semisótano) (pp. 1833–1834):
+> «Sólo se podrán autorizar viviendas en nivel inferior al de la calle en terrenos situados en el medio urbano cuando se cumplan las siguientes condiciones: a) Aislamiento del terreno natural por cámara de aire o capa impermeable de 0,20 en espesor mínimo. b) Impermeabilización de muros y suelos mediante empleo de morteros y materiales hidrófugos adecuados. c) Iluminación directa de todas las habitaciones, teniendo esta como mínimo la mitad de la altura de la habitación; […]»
+
+**CORREGIDO (K-MEM.13).** La fracción es **1/6**, no 1/8. El «1/8» de las fuentes secundarias no está en la Orden.
+
+**Lectura de la condición 3.ª** (INTERPRETACIÓN donde se indica):
+- **Un solo hueco, una sola fracción.** El texto pide «ventilación directa al exterior por medio de un hueco» de 1/6. No separa iluminación y ventilación ni dice si la superficie es la del hueco o la practicable. INTERPRETACIÓN: comprobar la superficie del hueco; la Orden no exige una fracción practicable distinta.
+- **Qué se mide:** «la superficie de la planta» de la pieza. No dice «útil». INTERPRETACIÓN: superficie en planta de la pieza (útil en la práctica).
+- **Computan:** «toda pieza habitable de día o de noche». La Orden no define «pieza habitable». INTERPRETACIÓN: dormitorios, estar y cocina (la vivienda mínima es «cocina-comedor»). Retretes y baños tienen su propia regla (4.ª): ventilación directa o, excepcionalmente, chimenea; **no la fracción**.
+- **Casos especiales:** alcoba con gabinete, hueco doble (2/6); pieza que ventila a galería, ventilación galería-habitación doble y huecos de la galería ≥ mitad de su fachada.
+
+**Vigencia y ámbito.**
+- **Ámbito literal:** «toda clase de viviendas, sea cual fuere la Entidad, o particular a quienes pertenecieren».
+- **No se ha localizado derogación expresa.** La disposición no tiene ficha consolidada ni «estado de vigencia» en boe.es (solo el facsímil). **SIN CONFIRMAR en fuente oficial.**
+- Indicios de vigencia, ninguno oficial:
+  - Ayuntamiento de Benalmádena, informe del arquitecto municipal (14-12-2020) transcrito en el certificado del Pleno de 28-01-2021, p. 2, **LEÍDO (documento municipal, imagen)**: el art. 136.1 del PGOU «se limita a remitirse a estos efectos a la orden del Ministerio de Gobernación de 29 de Febrero de 1.944 sobre Condiciones Higiénicas Mínimas de las viviendas, mediante la complementación y adaptación de dicha norma, que sigue estando en vigor». Informe del técnico de disciplina (16-11-2020), p. 14: «La modificación que ahora se presenta, no deroga dicha Orden Ministerial, lo que hace es complementarla y adaptarla a las necesidades de vivienda actuales.»
+  - Prensa (La Marea, 26-05-2023): el Ayuntamiento de Madrid la aplica en ausencia de regulación municipal. No oficial.
+- **INTERPRETACIÓN:** norma estatal supletoria, que rige donde ni la Comunidad ni el municipio fijan el parámetro, o donde el planeamiento remite a ella.
+
+**Parámetros para plantilla «Orden de 29-02-1944 (BOE 61, 01-03-1944), supletoria»** — literal **VERIFICADO (imagen, boletín)**; vigencia **SIN CONFIRMAR** en fuente oficial:
+- **Hueco** (ventilación directa al exterior): ≥ **1/6** de la superficie en planta de la pieza. **Una sola comprobación**, sin fracción practicable aparte.
+- **Computan:** piezas habitables de día o de noche. **Fuera de la fracción:** retretes y baños (condición 4.ª).
+- **Especiales:** alcoba + gabinete → 2/6; ventilación a través de galería → condiciones dobles.
+- **Superficies mínimas:** dormitorio de 1 cama 6 m² y 15 m³; de 2 camas 10 m² y 25 m³; estar 10 m²; cocina 5 m²; cocina-estar 14 m²; retrete 1,50 m²; pasillo 0,80 m (1 m en la entrada); altura 2,50 m (urbano) o 2,20 m (aislada o rural).
+- **Densidad:** no la regula.
+
+### 17.3 PGOU de Benalmádena, art. 136 (modificación de 2022)
+
+**Tramitación localizada:**
+- Aprobación inicial: Pleno 30-04-2020; información pública en BOP núm. 119 de 23-06-2020.
+- Aprobación provisional: Pleno 28-01-2021, «según documentación técnica redactada por el Arquitecto municipal en diciembre de 2020». Certificado (22 pp.): `https://www.benalmadena.es/docs/PGOU/innovaciones-pgou/exp00006086b-2020/Documentacion-Administrativa/expediente-000060686b-2020-aprobacion-provisional-28012021.pdf`. **LEÍDO (documento municipal, imagen).**
+- Informe de la Delegación Territorial de Fomento (9-05-2022, exp. EM-BM-228): favorable condicionado.
+- **Aprobación definitiva: Pleno 28-07-2022, punto 6.º** (18 votos a favor, 7 en contra), «dando nueva redacción al artículo 136 de las normas urbanísticas, según documentación técnica (proyecto Técnico y Resumen ejecutivo) redactada por el Arquitecto Municipal de Julio de 2022». Acta, pp. 18–22: `https://www.benalmadena.es/docs/disposiciones/acta-pleno-ordinario-28-07-2022-pagina-web-docx-20220808095948.pdf`. **LEÍDO (documento municipal, imagen).** El acta **no transcribe** el artículo.
+- **Publicación: BOP de Málaga núm. 167, de 31-08-2022, edicto 3218/2022**, Ayuntamiento de Benalmádena, «Aprobación definitiva del expediente de innovación del Plan General para la densidad en el suelo urbano». Localizado en el sumario `https://www.bopmalaga.es/sumario.php?fecha=31-08-2022`, **LEÍDO (web)**. **El PDF no se ha podido descargar:** bopmalaga.es devuelve 403 a `verificacion.php` y `descarga.php`. No se sabe si el edicto publica el texto íntegro del artículo.
+
+**Texto leído: el de la aprobación provisional** (diciembre de 2020), no el definitivo (julio de 2022). **No apto para plantilla.**
+
+Densidad, ap. 2.2 (certificado de 28-01-2021, p. 8), **LEÍDO (documento municipal, imagen)**:
+> «2.2. –Suelo urbano directo
+> Para las parcelas residenciales incluidas en Suelo Urbano Directo, por pertenecer a los Núcleos Principales de Benalmádena-Pueblo, Arroyo de la Miel y Benalmádena-Costa, tal como se definen los mismos en el plano de ordenación estructural D.1.AD de la Adaptación Parcial a la LOUA, relativo a las Densidades y Edificabilidades Globales y que, al no pertenecer a Sectores, Unidades o Polígonos de Actuación, no tienen fijada su densidad, se establece una densidad máxima de viviendas que se calculará como se especifica a continuación:
+> En las licencias de obras correspondientes a edificios de nueva planta o a rehabilitación de los existentes, la densidad máxima de la parcela en la que se sitúen, será la resultante de dividir, la superficie de techo edificable o superficie construida computable total permitida para la misma por el planeamiento, entre 100 metros cuadrados para las parcelas situadas en el núcleo principal de Benalmádena-Pueblo y de Arroyo de la Miel, y entre 54 metros cuadrados para las parcelas situadas en el núcleo principal de Benalmádena-Costa. El número total se determinará por el mencionado cociente entero, que se incrementará en una unidad cuando la parte decimal sea igual o superior a cinco.
+> Para las parcelas de Suelo Urbano Directo, cuya superficie de suelo no permita alcanzar una superficie construida computable total, que alcance el mínimo de 100 m2t, en el caso de Benalmádena-Pueblo y de Arroyo de la Miel, o de 54 m2t en el caso de Benalmádena-Costa, cuyas características y grado de consolidación imposibiliten de hecho cualquier trámite reparcelatorio que permita alcanzar dichas superficies construidas mínimas, y siempre que se tenga constancia de la existencia de dicha parcela con anterioridad a la aprobación de la presente modificación del plan general, se permitirá una vivienda, aunque ello suponga superar ligeramente la densidad máxima por parcela establecida en este artículo.
+> En cualquier caso, también serán de aplicación a estos supuestos, las superficies útiles mínimas y las condiciones de distribución establecidas en el apartado "1" anterior sobre las "Condiciones de programa e higiénicosanitarias".»
+
+Cambio posterior conocido (acta de 28-07-2022, p. 20): por el informe de la Junta, «se corregirá la redacción del artículo 136, apartado 2.2. y nos referiremos al "Suelo Urbano que no pertenece a Sectores, Unidades o Polígonos"». Los demás cambios del texto de julio de 2022 («no sustanciales») no se han leído.
+
+Habitabilidad (certificado de 28-01-2021, pp. 14–16), **LEÍDO (documento municipal, imagen)**:
+- **Ap. 1.2, superficies útiles mínimas.** Vivienda compartimentada: salón-comedor 16,00 m² (círculo de 3 m); cocina 5,00 m²; salón-comedor-cocina 20,00 m² (círculo de 3 m); dormitorio principal 12,00 m²; dormitorio secundario 8,00 m²; baño 3,00 m²; aseo, sin mínimo. Vivienda en espacio único: espacio común 30,00 m² (círculo de 3 m); baño 3,00 m². Cuadro resumen, superficie útil mínima: 4 dormitorios 70,00 m²; 3 → 60,00; 2 → 50,00; 1 → 40,00; espacio único 35,00 m². (El informe habla de «35,50 m2 útiles» para una persona; el cuadro dice 35,00.)
+- **Ap. 1.4** (extracto): «En los casos de reutilización y rehabilitación de viviendas, no serán obligatorias las condiciones de los apartados anteriores siempre que desde el proyecto se justifique razonablemente la imposibilidad de cumplirlas, por las condicionantes estructurales y de distribución interna de la vivienda existente.» «La altura de todas las habitaciones medidas del pavimento al techo, no será inferior a 2,50 metros y en las cocinas, pasillos, distribuidores y baños de 2,20 metros.» «No se considera unidad residencial aquellas estancias que estén en condición de sótano o semisótano, debiendo tener como mínimo la mitad de la altura de la fachada por encima del nivel de acerado o terreno terminado.»
+- **Ap. 1.8 «Iluminación y ventilación»: aparece TACHADO** en el certificado, junto con el 1.7 (pasillos y escaleras). El texto tachado decía: «Toda estancia tendrá iluminación y ventilación directa del exterior mediante hueco de superficie no menor que una décima parte (1/10) de la superficie en planta de la estancia. Se entiende por estancia cualquier dependencia habilitada de la vivienda incluida la cocina, estando por tanto excluidos los pasillos, distribuidores, armarios o despensas y baños. La ventilación de los baños será obligatorio realizarla con medios mecánicos, en los casos que no dispongan de ventilación directa al exterior.»
+
+**SIN CONFIRMAR, y es lo importante:** si el art. 136 definitivo fija un hueco propio o lo deja en la remisión del 136.1 a la Orden de 1944 (1/6). El 1/10 se suprimió en la provisional; el texto de julio de 2022 no se ha leído.
+
+**Observación.** Los aps. 1.2, 1.4, 1.5 y el 1.8 tachado reproducen casi literalmente los arts. 12.2.35 y 12.2.37 del PGOU de Málaga (17.4).
+
+**Parámetros (pista, no plantilla)** — **SIN CONFIRMAR** hasta leer el edicto del BOP:
+- **Densidad:** N.º máx. de viviendas = techo edificable (superficie construida computable total **permitida por el planeamiento**, no la proyectada) ÷ **100** m² (Benalmádena-Pueblo, Arroyo de la Miel) o ÷ **54** m² (Benalmádena-Costa). Cociente entero, +1 si la parte decimal es ≥ 0,5. Una vivienda en parcelas preexistentes que no llegan a 100 o 54 m²t.
+- **Ámbito:** parcelas residenciales de suelo urbano de los núcleos principales que no pertenecen a sectores, unidades o polígonos; licencias de nueva planta o de rehabilitación.
+- **INTERPRETACIÓN pendiente:** si una licencia de cambio de uso de local a vivienda es «rehabilitación» a estos efectos. El literal no lo dice.
+- **Hueco:** desconocido en el texto definitivo (¿1/6 por remisión a la Orden de 1944?).
+- **Superficies mínimas:** las del ap. 1.2 provisional, pendientes de cotejo.
+
+### 17.4 PGOU de Málaga, Título XII, Ordenanza General de Edificación
+
+**Fuente leída.** «Plan General de Ordenación Urbanística de Málaga. Texto refundido. Normas Urbanísticas. Ordenanzas. Título XII. Febrero 2018», Ayuntamiento de Málaga, Gerencia Municipal de Urbanismo (57 pp.): `https://www.malaga.eu/recursos/urbanismo/GIS_URBANISMO/PGOU/PDF_Normativa_GIS/Norm_TXII_C1-2_Ordenanza_General_Edificacion_OG.pdf`. **LEÍDO (documento municipal, imagen).** No es el boletín: no se ha cotejado con el Anexo de la Orden de 28-07-2011 (BOJA núm. 170, 30-08-2011) ni se han revisado las modificaciones posteriores a febrero de 2018.
+
+**Art. 12.2.34 «Densidad máxima de viviendas»** (p. 30):
+> «1. Se establece una densidad máxima de viviendas en cada parcela residencial de suelo urbano que se calculará como se especifica a continuación:
+> 2.1. Para edificios de nueva planta y rehabilitación, la resultante de dividir la superficie construida sobre rasante de uso residencial y usos vinculados al mismo (excluyendo superficie construida destinada a locales comerciales, oficinas no vinculadas a viviendas, aparcamientos etc.) por 70 metros cuadrados. El número total se determinará por el cociente entero que se incrementará en una unidad cuando la parte decimal sea igual o superior a cinco.
+> 2.2. En parcelas de Suelo Urbano de superficie inferior a la mínima, encajadas entre dos edificios medianeros que por sus características y grado de consolidación imposibilitan de hecho cualquier trámite reparcelatorio que permita alcanzar dicha superficie mínima, siempre que se tenga constancia de la existencia de dicha parcela con anterioridad a la aprobación del Plan General de Ordenación Urbana de 1983; podrá permitirse una vivienda por planta aunque se supere la densidad máxima establecida en este artículo. En cualquier caso serán de aplicación las superficies útiles mínimas y condiciones de distribución establecidas en el artículo 12. 2. 32.»
+
+(La numeración «1. / 2.1. / 2.2.» y la remisión al «12. 2. 32» son literales; las superficies útiles están en el 12.2.35.)
+
+**CORREGIDO (K-MEM.12).** La regla es «cociente entero, +1 si la parte decimal es ≥ 0,5», es decir, **N.º máx. = redondeo de S/70 con medios hacia arriba**. El «menor que S/70» del proyecto del estudio no es el literal. La superficie que entra es la **construida sobre rasante** de uso residencial y vinculados **del proyecto** (en Benalmádena, la permitida por el planeamiento).
+
+**Art. 12.2.37 «Iluminación y ventilación»** (p. 34):
+> «1. Toda estancia tendrá iluminación y ventilación directa del exterior mediante hueco de superficie no menor que una décima parte (1/10) de la superficie en planta de la estancia. Se entiende por estancia cualquier dependencia habilitada de la vivienda incluida la cocina, estando por tanto excluidos los pasillos, distribuidores, armarios o despensas y baños.»
+> «3. La ventilación e iluminación por medios técnicos sin utilización de Patios de Luces ni Patios de Ventilación, se admitirán en las viviendas para dependencias y piezas auxiliares no destinadas a dormitorios ni estancias, cuando se aseguren las condiciones higiénicas y esté expresamente autorizado por las normas estatales y municipales sobre condiciones higiénicas y sanitarias de las viviendas.»
+
+El ap. 2 prohíbe dormitorios y estancias interiores que no ventilen al menos a patio de luces; el ap. 5 regula los patios de luces (círculo de H/3, mínimo 4 m; superficie mínima por número de plantas).
+
+**CORREGIDO (K-MEM.12).** La habitabilidad de Málaga **sí está localizada**: 1/10, iluminación y ventilación **conjuntas** en un hueco. El «1/8» tampoco es de Málaga.
+
+**Art. 12.2.35 «Superficies útiles mínimas y condiciones de distribución»** (pp. 30–33), extracto:
+- Tabla, vivienda o apartamento (1D / 2D / 3D / 4D): salón-comedor 16 / 16 / 18 / 20 m² (círculo de 3 m; 24 m² con más de cuatro dormitorios); cocina 7 m² (5 m² integrada, sumando 5 m² al salón); dormitorios 12 / 12+8 / 12+8+8 / 12+8+8+8 m²; baño 3 m²; distribuidor 1,50 m²; lavadero 2 m²; aseo 1,5 m² (2D y más). Loft o estudio: salón-comedor 16 m² (círculo de 3,5 m), dormitorio 10 m², baño 3 m², distribuidor 1,50 m²; total 30,50 m².
+- «Cualquier unidad urbana con superficie útil menor de 30,5 m², o que no cumpla los requisitos dimensionales y de estancias indicados no tendrá la consideración de unidad residencial, siéndole de aplicación la normativa de uso terciario (despacho u oficinas).»
+- 2.1: «Superficie útil de las dependencias de una vivienda, es la superficie de suelo contenida dentro del perímetro definido por la cara interna de los muros o paredes que conforman el espacio.»
+- 3.6: «En los casos de reutilización y rehabilitación de viviendas, no serán obligatorias las condiciones de los apartados anteriores siempre que desde el proyecto se justifique razonablemente la imposibilidad de cumplirlas, por las condicionantes estructurales y de distribución interna de la vivienda existente.»
+
+**Art. 12.2.38** (p. 41):
+> «Las presentes Normas de edificación residencial, responden a las existentes en el momento de redacción de este Plan General, como pautas de diseño para las viviendas protegidas, que este Plan adopta como normas mínimas para todo tipo de viviendas. Si aquellas normas de las viviendas protegidas variaran en el transcurso de la gestión de este Plan, los artículos de la normativa afectados variarán en consecuencia, sin ningún trámite de modificación de Plan.»
+
+**INTERPRETACIÓN.** El PGOU de Málaga adoptó como mínimo las normas de VPO, y desde 2020 la Orden de VPO cede ante el PGOU (17.1). Las dos remisiones se cruzan. Para la app no cambia el número: en Málaga, 1/10 conjunto.
+
+**Otros:** pasillo de vivienda ≥ 0,85 m (12.2.36.1); altura libre en plantas altas ≥ 2,50 m, 2,40 m en vestíbulos, pasillos y baños (12.2.29).
+
+**Parámetros (no plantilla hasta el boletín)** — **LEÍDO (documento municipal, imagen)**:
+- **Hueco:** ≥ **1/10** de la superficie en planta de la estancia; **iluminación y ventilación conjuntas** (una comprobación).
+- **Computan:** estancias = dependencias habitables, cocina incluida. **Excluidos:** pasillos, distribuidores, armarios o despensas y baños.
+- **Superficies mínimas:** art. 12.2.35; menos de 30,5 m² útiles no es vivienda.
+- **Densidad:** S construida sobre rasante residencial y vinculada ÷ **70** m², redondeo con medios hacia arriba.
+
+### 17.5 Resumen para plantillas
+
+| Norma | Iluminación | Ventilación | Qué se mide | Computan / excluidas | Superficies mínimas | Densidad | Grado |
+|---|---|---|---|---|---|---|---|
+| VPO Andalucía, Orden 21-07-2008, texto integrado BOJA 35/2020, art. 7 y 8 | ≥ 10 % | ≥ 5 % (superficie real de ventilación); separadas | Superficie útil de la planta de cada habitación | Todas las habitaciones; excluidos baños y aseos | Art. 8 (E y E+C+K por n.º de dormitorios; cocina 7; dormitorios 8 y 12; pasillo 0,90) | No regula | **VERIFICADO (imagen, boletín)**. Cede ante el PGOU (art. 2 párr. 3). Vigencia: INTERPRETACIÓN (no derogada expresamente) |
+| Orden 29-02-1944, BOE 61, 01-03-1944, cond. 3.ª y 6.ª | Un solo hueco ≥ 1/6 | (el mismo hueco, «ventilación directa»); no separa | «Superficie de la planta» de la pieza | Piezas habitables de día o de noche; retretes y baños, por la 4.ª | Dormitorio 6 / 10 m²; estar 10; cocina 5; cocina-estar 14; retrete 1,50; pasillo 0,80; altura 2,50 / 2,20 | No regula | **VERIFICADO (imagen, boletín)**. Vigencia SIN CONFIRMAR en fuente oficial (indicios municipales) |
+| PGOU Benalmádena, art. 136 (mod. 2022) | ¿1/10 suprimido? ¿1/6 por remisión? | — | — | — | Ap. 1.2 provisional (70/60/50/40/35 m²) | Techo permitido ÷ 100 (Pueblo, Arroyo) o ÷ 54 (Costa); +1 si decimal ≥ 0,5 | **SIN CONFIRMAR** (solo texto provisional; BOP 167/2022 no descargado) |
+| PGOU Málaga, Título XII OG, arts. 12.2.34, 35 y 37 | ≥ 1/10 | conjunta con la iluminación | Superficie en planta de la estancia | Estancias (incl. cocina); excluidos pasillos, distribuidores, armarios, despensas y baños | Art. 12.2.35; < 30,5 m² útiles no es vivienda | S construida s/rasante residencial ÷ 70; +1 si decimal ≥ 0,5 | **LEÍDO (documento municipal, imagen)**, texto refundido feb-2018; falta boletín |
+
+### 17.6 Consecuencias para la app
+
+- **Plantilla VPO:** publicable, con fecha de boletín y cita «Orden de 21-07-2008, texto integrado (BOJA núm. 35, 20-02-2020), arts. 7 y 8». Dos filas (iluminación 0,10 y ventilación 0,05). **Regla nueva:** si el proyectista declara una norma municipal que regula el hueco, esa manda también en la vivienda protegida, y la VPO solo cubre lo que el municipio no regule (art. 2 párr. 3). Aviso si se elige VPO en Málaga.
+- **Plantilla Orden de 1944:** publicable como «supletoria», una fila (hueco ≥ 1/6, sin practicable aparte), con el rótulo «vigencia no confirmada en consolidado oficial». **Corregir** cualquier «1/8» en el código o los textos.
+- **Benalmádena:** sin plantilla. Se mantiene el aviso de K-MEM.13 con los valores provisionales rotulados como pista (100 / 54 m²t por vivienda, sobre el techo permitido). **Acción:** conseguir el edicto 3218/2022 del BOP núm. 167 de 31-08-2022 (descarga manual o texto aportado por el usuario) y el documento técnico de julio de 2022.
+- **Málaga:** sin plantilla hasta el cotejo en boletín. Los valores pueden precargarse en «Mis normas» rotulados «texto refundido municipal (feb-2018), pendiente de boletín». Decisión del usuario. **Acción:** cotejar los arts. 12.2.34, 12.2.35 y 12.2.37 en el Anexo de la Orden de 28-07-2011 (BOJA núm. 170, 30-08-2011, PDF) y revisar las modificaciones posteriores.
+- **Ligar norma y municipio** (K-MEM.13): Benalmádena no hereda la OG de Málaga, aunque su texto provisional la copie.
+
+**Pendientes que quedan de esta fase:**
+1. BOP de Málaga núm. 167, 31-08-2022, edicto 3218/2022 (Benalmádena, art. 136 definitivo).
+2. BOJA núm. 170, 30-08-2011, Anexo, Título XII (Málaga), y modificaciones de los arts. 12.2.34–12.2.37 después de 2018.
+3. Ordenanzas Provisionales de VPO de 1969 citadas en el art. 2 de la Orden de 2008: ¿condiciones de hueco?
+4. Vigencia de la Orden de 1944 en una fuente oficial (consolidado o resolución que la declare).
