@@ -25,6 +25,7 @@ describe("antesDeEntregar", () => {
       "HS2:revisar",
       "HS2:revisar",
       "HS4:revisar",
+      "HS4:revisar",
       "HS5:revisar",
       "HS5:revisar",
       "HS6:revisar",
@@ -72,7 +73,7 @@ describe("antesDeEntregar", () => {
         ...j,
         hs1: { ...j.hs1, revisados: ["clima-supuesto"] },
         hs2: { revisados: ["dobles", "recogida"] },
-        hs4: { ...j.hs4, revisados: ["presion-red-supuesta"] },
+        hs4: { ...j.hs4, revisados: ["presion-red-supuesta", "longitudes-estimadas"] },
         hs5: { ...j.hs5, revisados: ["garaje-s1-bombeo", "pluviometria-supuesta"] },
         hs6: { ...j.hs6, revisados: ["nucleo-garaje"] },
         si1: { revisados: ["uso-local-z2", "cuarto-z6"] },
@@ -101,8 +102,8 @@ describe("entregables", () => {
       memoria: { listos: 27, total: 27, noCumplen: [] },
       fichas: { listos: 25, total: 25, noCumplen: [] },
       esquemas: { listos: 2, total: 2, noCumplen: [], claves: ["hs5", "hs4"] },
-      // Ningún módulo desarrolla aún su anejo (feature-33, pasos 2 y 3).
-      instalaciones: { listos: 0, total: 3, noCumplen: [] },
+      // HS4 ya desarrolla su anejo (feature-33, paso 2); HS5 y REBT, aún no.
+      instalaciones: { listos: 1, total: 3, noCumplen: [] },
     });
   });
 

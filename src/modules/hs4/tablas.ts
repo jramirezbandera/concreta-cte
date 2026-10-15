@@ -481,6 +481,46 @@ export const LIMITACION_PRESION = tablaCTE(
   { obligatoriaSiSuperaMax_kPa: 500 } as const,
 );
 
+// -----------------------------------------------------------------------------
+// Tabla 4.1 — Dimensiones del armario y de la arqueta para el contador general
+// [mm]. [VERIFICADO K-MEM.18: DBHS.pdf p. 90 en imagen y DccHS.pdf p. 98 en
+// texto]. Armario de Ø 15 a 40; cámara de Ø 50 a 150 (el filete de la cabecera
+// de la tabla, visto en imagen). En armario, largo × ancho × alto se entiende
+// como longitud × anchura × profundidad (comentario, DccHS p. 98).
+// -----------------------------------------------------------------------------
+export interface FilaContador4_1 {
+  readonly diametro_mm: number;
+  readonly alojamiento: "armario" | "camara";
+  readonly largo_mm: number;
+  readonly ancho_mm: number;
+  readonly alto_mm: number;
+}
+
+export const CONTADOR_GENERAL_TABLA_4_1 = tablaCTE(
+  { ...PROC_HS4, articulo: "ap. 4.1 pto 1", tabla: "Tabla 4.1" },
+  {
+    rotulo: "Dimensiones del armario y de la arqueta para el contador general",
+    filas: [
+      { diametro_mm: 15, alojamiento: "armario", largo_mm: 600, ancho_mm: 500, alto_mm: 200 },
+      { diametro_mm: 20, alojamiento: "armario", largo_mm: 600, ancho_mm: 500, alto_mm: 200 },
+      { diametro_mm: 25, alojamiento: "armario", largo_mm: 900, ancho_mm: 500, alto_mm: 300 },
+      { diametro_mm: 32, alojamiento: "armario", largo_mm: 900, ancho_mm: 500, alto_mm: 300 },
+      { diametro_mm: 40, alojamiento: "armario", largo_mm: 1300, ancho_mm: 600, alto_mm: 500 },
+      { diametro_mm: 50, alojamiento: "camara", largo_mm: 2100, ancho_mm: 700, alto_mm: 700 },
+      { diametro_mm: 65, alojamiento: "camara", largo_mm: 2100, ancho_mm: 700, alto_mm: 700 },
+      { diametro_mm: 80, alojamiento: "camara", largo_mm: 2200, ancho_mm: 800, alto_mm: 800 },
+      { diametro_mm: 100, alojamiento: "camara", largo_mm: 2500, ancho_mm: 800, alto_mm: 900 },
+      { diametro_mm: 125, alojamiento: "camara", largo_mm: 3000, ancho_mm: 800, alto_mm: 1000 },
+      { diametro_mm: 150, alojamiento: "camara", largo_mm: 3000, ancho_mm: 800, alto_mm: 1000 },
+    ] satisfies readonly FilaContador4_1[],
+  } as const,
+);
+
+/** La fila de la tabla 4.1 para un contador de Ø dado: la primera columna ≥ Ø; `null` por encima de 150 mm. */
+export function filaContadorGeneral(diametro_mm: number): FilaContador4_1 | null {
+  return CONTADOR_GENERAL_TABLA_4_1.datos.filas.find((f) => f.diametro_mm >= diametro_mm) ?? null;
+}
+
 /** Contadores y retorno de ACS (ap. 2.3 ptos 1 y 2; 3.2.2.1 pto 3). */
 export const AHORRO_AGUA = tablaCTE({ ...PROC_HS4, articulo: "ap. 2.3 ptos 1 y 2; 3.2.2.1 pto 3" }, {
   /** Contador de AF y ACS por unidad de consumo individualizable. */

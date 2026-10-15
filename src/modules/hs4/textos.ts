@@ -12,7 +12,7 @@ import type { Aviso } from "../../lib/cte/resultado";
 import { etiquetaNivel } from "../../lib/edificio/derivar";
 import { fmt } from "../../lib/units/format";
 import type { ElementoHs4, JustificacionHs4, PuntoHs4 } from "./justificacion";
-import { NOMBRE_TUBERIA, PRESION_GRUPO_POR_DEFECTO_kPa, type DecisionesHs4, type UnidadHs4 } from "./red";
+import { LONGITUDES_M, NOMBRE_TUBERIA, PRESION_GRUPO_POR_DEFECTO_kPa, type DecisionesHs4, type UnidadHs4 } from "./red";
 import { GRUPO_PRESION, type TipoAparatoHS4 } from "./tablas";
 
 // -----------------------------------------------------------------------------
@@ -501,6 +501,11 @@ export function textoAviso(a: Aviso, j: JustificacionHs4): TextoAviso {
       return {
         titulo: "Se ha supuesto dónde están los cuartos húmedos.",
         detalle: `${String(a.datos.reparto ?? "")}. Si no es así, dilo en El edificio: cada planta de la vivienda lleva sus cuartos.`,
+      };
+    case "longitudes-estimadas":
+      return {
+        titulo: "Las longitudes de la red son estimadas.",
+        detalle: `La red sale de El edificio con longitudes tipo (acometida ${n0(LONGITUDES_M.acometida)} m, tubo de alimentación ${n0(LONGITUDES_M.tuboAlimentacion)} m, derivaciones de ${n1(LONGITUDES_M.derivacionParticular)} y ${n1(LONGITUDES_M.cuarto)} m…). El anejo de instalaciones las imprime tramo a tramo: confírmalas con los planos o ajusta la red a mano.`,
       };
     case "oficinas-sin-nucleos":
       return {

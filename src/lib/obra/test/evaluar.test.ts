@@ -44,7 +44,7 @@ describe("evaluarExpediente — el Demo", () => {
     expect(ev.hs5!.avisos.map((a) => a.id)).toEqual(["garaje-s1-bombeo", "pluviometria-supuesta"]);
     expect(ev.hs5!.avisos[0].titulo).toBe("El garaje queda por debajo del alcantarillado.");
     expect(ev.hs5!.avisos[0].elementoId).toBeDefined();
-    expect(ev.hs4!.avisos.map((a) => a.id)).toEqual(["presion-red-supuesta"]);
+    expect(ev.hs4!.avisos.map((a) => a.id)).toEqual(["presion-red-supuesta", "longitudes-estimadas"]);
   });
 
   it("la frase y «Qué entra» salen del módulo", () => {

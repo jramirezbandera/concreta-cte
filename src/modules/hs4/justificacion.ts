@@ -468,6 +468,10 @@ export function justificarHs4(estado: Hs4Estado, edificio: Edificio, obra: ObraH
   if (d.aguaCaliente === "central") {
     avisos.push({ id: "acs-central", tipo: "fuera_de_alcance", datos: {} });
   }
+  // Las longitudes de la red generada son tipo: el anejo las imprime tramo a tramo (feature-33).
+  if (modo === "edificio" && resultado && resultado.porTramo.length > 0) {
+    avisos.push({ id: "longitudes-estimadas", tipo: "supuesto", datos: {} });
+  }
   if (modo === "edificio" && red.supuestos.unifamiliarReparto) {
     avisos.push({ id: "unifamiliar-reparto", tipo: "supuesto", datos: { reparto: red.repartoTexto } });
   }

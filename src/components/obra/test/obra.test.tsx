@@ -198,21 +198,23 @@ describe("Antes de entregar", () => {
   it("los avisos sin revisar del Demo, cada uno hacia su módulo", () => {
     montar(<AntesDeEntregar />);
     const items = screen.getAllByRole("listitem");
-    expect(items).toHaveLength(31);
+    expect(items).toHaveLength(32);
     // HR (feature-25): el porcentaje de huecos, el Ld, las colindancias supuestas y el local.
-    expect(within(items[19]).getByRole("link")).toHaveAttribute("href", "/hr/ruido");
-    expect(items[20]).toHaveTextContent(/HR · Indica el Ld/);
-    expect(items[21]).toHaveTextContent(/HR · 3 colindancias supuestas/);
-    expect(within(items[23]).getByRole("link")).toHaveAttribute("href", "/he/acs");
-    expect(items[26]).toHaveTextContent(/HE5 · /);
-    expect(within(items[29]).getByRole("link")).toHaveAttribute("href", "/rebt/prevision");
-    expect(items[29]).toHaveTextContent(/REBT · /);
+    expect(within(items[20]).getByRole("link")).toHaveAttribute("href", "/hr/ruido");
+    expect(items[21]).toHaveTextContent(/HR · Indica el Ld/);
+    expect(items[22]).toHaveTextContent(/HR · 3 colindancias supuestas/);
+    expect(within(items[24]).getByRole("link")).toHaveAttribute("href", "/he/acs");
+    expect(items[27]).toHaveTextContent(/HE5 · /);
+    expect(within(items[30]).getByRole("link")).toHaveAttribute("href", "/rebt/prevision");
+    expect(items[30]).toHaveTextContent(/REBT · /);
     expect(within(items[0]).getByRole("link")).toHaveAttribute("href", "/hs/humedad");
     expect(items[0]).toHaveTextContent("HS1 · Faltan datos del clima: se ha supuesto zona pluviométrica I.");
     expect(within(items[1]).getByRole("link")).toHaveAttribute("href", "/hs/residuos");
     expect(items[1]).toHaveTextContent("HS2 · Confirma cómo se recogen los residuos.");
     expect(within(items[3]).getByRole("link")).toHaveAttribute("href", "/hs/fontaneria");
     expect(items[3]).toHaveTextContent("HS4 · La presión de la red es un dato supuesto.");
+    // feature-33: las longitudes tipo de la red, que el anejo imprime.
+    expect(items[4]).toHaveTextContent("HS4 · Las longitudes de la red son estimadas.");
   });
 
   it("lo que no cumple va primero, en rojo", () => {
@@ -230,7 +232,7 @@ describe("Antes de entregar", () => {
         ...j,
         hs1: { ...j.hs1, revisados: ["clima-supuesto"] },
         hs2: { revisados: ["dobles", "recogida"] },
-        hs4: { ...j.hs4, revisados: ["presion-red-supuesta"] },
+        hs4: { ...j.hs4, revisados: ["presion-red-supuesta", "longitudes-estimadas"] },
         hs5: { ...j.hs5, revisados: ["garaje-s1-bombeo", "pluviometria-supuesta"] },
         hs6: { ...j.hs6, revisados: ["nucleo-garaje"] },
         si1: { revisados: ["uso-local-z2", "cuarto-z6"] },

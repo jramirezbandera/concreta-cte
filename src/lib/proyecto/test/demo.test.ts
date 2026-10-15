@@ -74,7 +74,7 @@ describe("crearProyectoDemo — el estado calculado coincide con el motor (featu
     const r = justificarHs4(estado, p.edificio, { presionAcometida_kPa: p.datosGenerales.presionAcometida_kPa });
     // Cumple, con la presión de la red sin confirmar → «warn».
     expect(r.veredicto).toBe("ok");
-    expect(r.avisos.map((a) => a.id)).toEqual(["presion-red-supuesta"]);
+    expect(r.avisos.map((a) => a.id)).toEqual(["presion-red-supuesta", "longitudes-estimadas"]);
     expect(estadoDe(p, "hs4").veredicto).toBe("warn");
   });
 

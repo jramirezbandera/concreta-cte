@@ -18,6 +18,10 @@ export type ModoRedHs4 = "edificio" | "manual";
 
 export interface Hs4Estado extends HS4Inputs, DecisionesHs4 {
   red: ModoRedHs4;
+  /** Ø del contador general que fija la compañía [mm] (feature-33). Sin él, el anejo toma el del tubo de alimentación. */
+  diametroContador_mm?: number;
+  /** Longitud de ida del ACS al punto más alejado [m] (feature-33). Sin ella, el anejo la estima sobre la red. */
+  longitudIdaAcs_m?: number;
 }
 
 export const hs4EstadoDefaults: Hs4Estado = {

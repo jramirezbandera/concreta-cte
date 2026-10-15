@@ -285,6 +285,10 @@ export interface ResultadoTramoHS4 {
   perdida_kPa: number;
   /** La misma pérdida, por concepto (feature-15). */
   perdidas: PerdidasRecorrido;
+  /** Pérdida unitaria por rozamiento con el modelo de predimensionado [kPa/m] (feature-33). */
+  j_kPa_m: number;
+  /** Presión a la entrada (aguas abajo) de este tramo: la residual de su padre o la de la acometida [kPa] (feature-33). */
+  presionEntrada_kPa: number;
   /** Presión residual a la salida (aguas arriba) de este tramo [kPa]. */
   presionResidual_kPa: number;
   /** `true` si el tramo pertenece al recorrido crítico (lo pinta el SVG en rojo). */
@@ -324,6 +328,8 @@ export interface HS4Result {
   normaCriterioK: string | null;
   /** Presión disponible en la acometida [kPa]. */
   presionAcometida_kPa: number;
+  /** Fracción de pérdidas localizadas sobre las longitudinales que se ha aplicado [0..1] (feature-33). */
+  fraccionPerdidasLocalizadas: number;
   /** Verificación por aparato (Tabla 2.1 / 4.2). */
   porAparato: ResultadoAparatoHS4[];
   /** Tramos dimensionados, en orden topológico (hojas → raíz). */
@@ -786,7 +792,9 @@ export function calcHS4(inp: HS4Inputs): HS4Result {
       velocidad_m_s,
       perdida_kPa,
       perdidas,
-      // Presión residual se calcula en el paso 5 (recorrido raíz → hojas).
+      j_kPa_m,
+      // Las presiones se calculan en el paso 5 (recorrido raíz → hojas).
+      presionEntrada_kPa: 0,
       presionResidual_kPa: 0,
       esCritico: false,
       velocidadFueraDeRango,
@@ -813,6 +821,7 @@ export function calcHS4(inp: HS4Inputs): HS4Result {
         : presionResidual.get(r.parentId) ?? inp.presionAcometida_kPa;
     const pr = presionEntrada - r.perdida_kPa;
     presionResidual.set(id, pr);
+    r.presionEntrada_kPa = presionEntrada;
     r.presionResidual_kPa = pr;
   }
 
@@ -954,6 +963,7 @@ export function calcHS4(inp: HS4Inputs): HS4Result {
     kEsCriterioExterno,
     normaCriterioK: normaK,
     presionAcometida_kPa: inp.presionAcometida_kPa,
+    fraccionPerdidasLocalizadas: fraccionLocalizadas,
     porAparato,
     porTramo,
     caudalTotal_dm3_s,
@@ -964,6 +974,27 @@ export function calcHS4(inp: HS4Inputs): HS4Result {
     veredictoGlobal,
     warnings,
   };
+}
+
+/**
+ * El recorrido crítico en orden, de la acometida al punto de consumo más
+ * desfavorable (feature-33: la tabla del anejo). Vacío sin aparatos.
+ */
+export function caminoCritico(r: HS4Result): ResultadoTramoHS4[] {
+  const ap = r.porAparato.find((a) => a.id === r.puntoCriticoId);
+  if (!ap) return [];
+  const porId = new Map(r.porTramo.map((t) => [t.id, t] as const));
+  const camino: ResultadoTramoHS4[] = [];
+  const visto = new Set<string>();
+  let cur: string | null = ap.tramoId;
+  while (cur !== null && !visto.has(cur)) {
+    visto.add(cur);
+    const t = porId.get(cur);
+    if (!t) break;
+    camino.push(t);
+    cur = t.parentId;
+  }
+  return camino.reverse();
 }
 
 /**

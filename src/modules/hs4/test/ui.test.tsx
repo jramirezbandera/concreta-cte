@@ -36,7 +36,7 @@ describe("HS4 · desde El edificio (feature-15)", () => {
 
     const frases = await findAllByText(/Batería de 8 contadores en planta baja y un montante por vivienda/);
     expect(frases.some((f) => f.tagName === "P")).toBe(true);
-    expect(await findByText("1 cosa por revisar")).toBeInTheDocument();
+    expect(await findByText("2 cosas por revisar")).toBeInTheDocument();
 
     const entra = getByRole("region", { name: "Qué entra" });
     expect(entra).toHaveTextContent(/Viviendas.*P1–P3 · 6 · A 11 · B 10 ap./);
@@ -82,7 +82,7 @@ describe("HS4 · desde El edificio (feature-15)", () => {
     expect(await findByText("Presión de la red confirmada por la compañía.")).toBeInTheDocument();
     expect(within(getByRole("region", { name: "Decisiones" })).getByText("confirmada")).toBeInTheDocument();
     await user.click(within(avisos).getByRole("button", { name: "Deshacer" }));
-    expect(await findByText("1 cosa por revisar")).toBeInTheDocument();
+    expect(await findByText("2 cosas por revisar")).toBeInTheDocument();
   });
 
   it("Comprobaciones es la lista; Memoria, el texto", async () => {

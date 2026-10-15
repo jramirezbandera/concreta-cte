@@ -29,6 +29,7 @@ import { hs4EstadoDefaults, type Hs4Estado } from "../../modules/hs4/estado";
 import { justificarHs4, obraHs4De, type JustificacionHs4 } from "../../modules/hs4/justificacion";
 import { filasQueEntraHs4 } from "../../modules/hs4/entra";
 import { memoriaHs4 } from "../../modules/hs4/memoria";
+import { anejoHs4 } from "../../modules/hs4/anejo";
 import * as textosHs4 from "../../modules/hs4/textos";
 import { hs5EstadoDefaults, type Hs5Estado } from "../../modules/hs5/estado";
 import { justificarHs5, obraHs5De, type JustificacionHs5 } from "../../modules/hs5/justificacion";
@@ -177,6 +178,10 @@ const hs4: ModuloObra = {
         return t ? { titulo: t.titulo, detalle: t.detalle } : null;
       },
       memoria: () => memoriaHs4(j),
+      anejo: () => {
+        const e = estado as unknown as Hs4Estado;
+        return anejoHs4(j, { diametroContador_mm: e.diametroContador_mm, longitudIdaAcs_m: e.longitudIdaAcs_m });
+      },
     };
   },
 };

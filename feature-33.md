@@ -186,6 +186,31 @@ texto coincidente en los dos PDF. Cambia el diseño de los pasos 2 y 3:
   - Sin dato ni red, la línea dice la condición y «Antes de entregar» la pide.
 - **Nota de longitudes** en modo «edificio» y aviso en «Antes de entregar».
 
+**Hecho (2026-10-15).**
+- **Motor** ([calc.ts](src/modules/hs4/calc.ts)): añade `j_kPa_m` y `presionEntrada_kPa` por tramo,
+  `fraccionPerdidasLocalizadas` en el resultado y `caminoCritico(r)`. Al regenerar los snapshots
+  solo se añaden líneas: 86 nuevas y ninguna cifra cambia. Los tests comprueban que:
+  - las pérdidas del camino suman Pacometida − Pcrítica;
+  - J·L es el rozamiento.
+- **Tabla 4.1** en [tablas.ts](src/modules/hs4/tablas.ts) (`CONTADOR_GENERAL_TABLA_4_1`,
+  `filaContadorGeneral`).
+- **[anejo.ts](src/modules/hs4/anejo.ts)** (`anejoHs4`), con cinco partes:
+  - **caudales por aparato**: una columna por unidad tipo, con los Qb de agua fría y de ACS;
+  - **camino crítico**: 11 columnas, en tabla ancha;
+  - **resto de la red**: los tramos iguales agrupados, ordenados por profundidad en la red;
+  - **contador**: tabla 4.1 en la unifamiliar; batería o por planta en el resto, sin
+    dimensiones del DB;
+  - **agua caliente sanitaria**: ida estimada o declarada, frente a 15 m.
+- **En reforma**, la acometida y el tubo de alimentación salen como «(existente)», con su nota.
+- **Aviso nuevo** `longitudes-estimadas` en modo «edificio», que sale en «Antes de entregar».
+  - Demo: 32 avisos (antes 31).
+  - HS 4 del Demo: «2 cosas por revisar».
+- **Datos opcionales** `Hs4Estado.diametroContador_mm` y `longitudIdaAcs_m`: el anejo ya los lee.
+  **Su control en pantalla va en el paso 4**, con el de planos.
+- Tests: [anejo.test.ts](src/modules/hs4/test/anejo.test.ts) (18), con la coherencia
+  memoria–anejo de la presión crítica. 1656 en verde.
+- PDF del Demo revisado en imagen: la tabla de 11 columnas cabe sin partir y se lee.
+
 ### Paso 3 · Saneamiento (5.3.2)
 
 - **Tabla 5.3.2-1, aparatos por vivienda tipo** (tabla 4.1 del DB): aparato, nº, UD por aparato,

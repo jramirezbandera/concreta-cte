@@ -74,7 +74,7 @@ describe("justificarHs4 · plurifamiliar con locales a 250 kPa (el Demo)", () =>
   it("la presión de la red es un dato supuesto hasta que se confirme", () => {
     const red = el(j, "presion-red");
     expect(red.veredicto).toBe("dato");
-    expect(j.avisos.map((a) => a.id)).toEqual(["presion-red-supuesta"]);
+    expect(j.avisos.map((a) => a.id)).toEqual(["presion-red-supuesta", "longitudes-estimadas"]);
     expect(j.avisos[0].elementoId).toBe("presion-red");
   });
 
