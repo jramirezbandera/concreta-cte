@@ -2,7 +2,8 @@
 
 > Estado: **fases 0 a 5 hechas** · 2026-10-11 (fase 1 en [feature-28.md](feature-28.md), fase 2
 > en [feature-29.md](feature-29.md), fase 3 en [feature-30.md](feature-30.md), fase 4 en
-> [feature-31.md](feature-31.md), fase 5 en [feature-32.md](feature-32.md)). Siguiente: fase 6.
+> [feature-31.md](feature-31.md), fase 5 en [feature-32.md](feature-32.md)). Siguiente: fase 6,
+> partida en 6a (HS 4 y HS 5, [feature-33.md](feature-33.md)) y 6b (REBT, feature-34).
 > Origen: comparación de la memoria de la app con tres memorias de ejecución reales del estudio,
 > en `ejemplos/` (ignorada por git: son datos de clientes):
 > - plurifamiliar de 6 viviendas (`01_MEM_26_05_2025.docx`);
