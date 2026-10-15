@@ -783,3 +783,253 @@ El ap. 2 prohíbe dormitorios y estancias interiores que no ventilen al menos a 
 2. BOJA núm. 170, 30-08-2011, Anexo, Título XII (Málaga), y modificaciones de los arts. 12.2.34–12.2.37 después de 2018.
 3. Ordenanzas Provisionales de VPO de 1969 citadas en el art. 2 de la Orden de 2008: ¿condiciones de hueco?
 4. Vigencia de la Orden de 1944 en una fuente oficial (consolidado o resolución que la declare).
+
+---
+
+## K-MEM.18 — Anejo de instalaciones: HS 4 tabla 4.1, HS 5 arquetas, retorno de ACS (2026-10-15)
+
+**Fecha:** 2026-10-15 · Agente: cte-normativa · **No se ha editado código.**
+**Encargo:** paso 0 de `feature-33.md` (fase 6a de `PLAN-MEMORIA.md`, anejo de instalaciones). Cuatro preguntas:
+1. tabla 4.1 del HS 4 y Ø del contador;
+2. tabla 4.13 y arquetas del HS 5;
+3. umbral de 15 m del retorno de ACS;
+4. presiones en el punto de consumo.
+
+**Fuentes y edición**
+
+| Clave | Documento | Edición | Fuente |
+|---|---|---|---|
+| [HS22] | DB-HS, consolidado | Articulado vigente. Última disposición incorporada: **RD 450/2022, de 14 de junio (BOE 15/06/2022)** (p. 2, relación de disposiciones). El propio PDF avisa: «Este texto consolidado no tiene valor jurídico.» | `research/pdf/DBHS.pdf` |
+| [DccHS] | DB-HS con comentarios | El mismo articulado (14-06-2022), con comentarios de 12-02-2025 | `research/pdf/DccHS.pdf` |
+
+**Cita recomendada:** «DB-HS 4 (consolidado 14-06-2022)» y «DB-HS 5 (consolidado 14-06-2022)». Coincide con `PROC_HS4` y `PROC_HS5` del código.
+
+**Método y límites de esta sesión**
+- **No ha habido imagen.** Para paginar un PDF de más de 10 páginas, el lector de PDF necesita `pdftoppm`, que no está instalado. Esta sesión tampoco tiene consola para renderizar. **Nada de este apartado es VERIFICADO (imagen).**
+- El literal se ha leído en los volcados de texto (`pdftotext`) de **los dos PDF locales**, con marca de página: `…\scratchpad\hs1\DBHS.txt` y `DccHS.txt` (sesión 165cc529). La página citada es la del PDF, que coincide con el folio impreso.
+- Cada literal se ha leído en **los dos** PDF y coincide palabra por palabra → **VERIFICADO (texto)**. Las páginas se dan como [HS22] / [DccHS].
+- Límite del texto: en una tabla, `pdftotext` da las celdas en orden, pero **no** qué columnas abarca un encabezado. Afecta a la tabla 4.1 (18.1).
+
+### 18.1 HS 4, tabla 4.1: armario y cámara del contador general
+
+**4.1 «Reserva de espacio en el edificio», pto 1** ([HS22] p. 90; [DccHS] p. 98), **VERIFICADO (texto)**:
+> «En los edificios dotados con contador general único se preverá un espacio para un armario o una cámara para alojar el contador general de las dimensiones indicadas en la tabla 4.1.»
+
+**Tabla 4.1 «Dimensiones del armario y de la arqueta para el contador general»** ([HS22] p. 90; [DccHS] p. 98). Unidades: «Dimensiones en mm».
+- Cifras y su orden: **VERIFICADO (texto)**.
+- Reparto armario/cámara: ver la nota después de la tabla.
+
+| Ø nominal del contador (mm) | 15 | 20 | 25 | 32 | 40 | 50 | 65 | 80 | 100 | 125 | 150 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Alojamiento (ver nota) | Armario | Armario | Armario | Armario | Armario | Cámara | Cámara | Cámara | Cámara | Cámara | Cámara |
+| Largo | 600 | 600 | 900 | 900 | 1300 | 2100 | 2100 | 2200 | 2500 | 3000 | 3000 |
+| Ancho | 500 | 500 | 500 | 500 | 600 | 700 | 700 | 800 | 800 | 800 | 800 |
+| Alto | 200 | 200 | 300 | 300 | 500 | 700 | 700 | 800 | 900 | 1000 | 1000 |
+
+**Reparto armario / cámara: VERIFICADO (imagen)**, DBHS.pdf p. 90, renderizada con PyMuPDF el 2026-10-15 en la sesión principal. El encabezado «Armario» abarca las columnas **15, 20, 25, 32 y 40 mm**, y «Cámara» las de **50, 65, 80, 100, 125 y 150 mm** (filete vertical entre 40 y 50). Las once cifras de la tabla coinciden con la imagen. Así queda cerrado el pendiente 1.
+
+**Rótulo.** El título de la tabla dice «armario y … arqueta»; el encabezado, «Armario | Cámara»; el 4.1 pto 1, «armario o una cámara». El propio DB usa «arqueta» y «cámara» para lo mismo: 3.2.1.2.3 dice «armario o arqueta» y 5.1.2.1, «cámara o arqueta». En el anejo se cita el rótulo literal.
+
+Comentarios [DccHS] p. 98, **LEÍDO (comentario)**:
+> «Dimensiones del alojamiento para el contador general. Las dimensiones Largo-Ancho-Alto, pueden entenderse para mayor claridad en el caso de armarios como Longitud-Anchura-Profundidad.»
+> «Dimensiones del alojamiento para la batería de contadores. No se especifican unas dimensiones mínimas, por lo que el espacio reservado deberá ser adecuado a las necesidades concretas del número de contadores a instalar y a las tareas de mantenimiento necesarias.»
+
+**¿Armario o cámara, a elección?**
+- El DB no lo dice con palabras. La tabla asigna un tipo a cada Ø, así que el tipo se sigue del Ø (INTERPRETACIÓN).
+- La tabla fija una **reserva de espacio mínima**. El DB no prohíbe una cámara para un Ø de armario.
+
+**¿Qué Ø de contador? El DB no da tabla ni fórmula.** Solo dice esto:
+- 4.5.1 pto 1 ([HS22] p. 93), **VERIFICADO (texto)**: «El calibre nominal de los distintos tipos de contadores se adecuará, tanto en agua fría como caliente, a los caudales nominales y máximos de la instalación.»
+- 2.1.1 pto 2 ([HS22] p. 81), **VERIFICADO (texto)**: «Las compañías suministradoras facilitarán los datos de caudal y presión que servirán de base para el dimensionado de la instalación.»
+
+En la práctica, el calibre lo fija la entidad suministradora, en su reglamento de suministro o sus normas particulares. **No es CTE**, y no se ha leído ninguno.
+
+**Criterio propuesto para la app (CRITERIO, no norma)**
+- **Regla:** sin calibre de la compañía, Ø del contador = Ø nominal del tubo de alimentación que calcula el motor, redondeado a la columna de la tabla 4.1 igual o mayor. El tubo de alimentación es el primer tramo aguas abajo del contador y lleva el caudal simultáneo del edificio.
+- **Diámetros nominales, no exteriores.** Un PE de 32 mm exterior no es DN 32.
+- **Rótulo:** «Ø de contador supuesto (criterio de proyecto): el definitivo lo fija la entidad suministradora; el calibre se adecua a los caudales de la instalación (DB-HS 4, ap. 4.5.1)».
+- **Si el proyectista mete el Ø de la compañía, manda ese.**
+- **Por qué no «Ø de la acometida»:** la acometida es de la compañía y la app no la dimensiona. El tubo de alimentación sí está en el modelo y lleva el mismo caudal.
+- **Criterio por caudal (SIN CONFIRMAR; no se codifica):** comparar el caudal permanente Q3 del contador con el caudal simultáneo sería más fiel al 4.5.1. Pero exige la norma de contadores (UNE-EN ISO 4064), que no se ha leído.
+
+**Batería de contadores divisionarios: el DB no fija ninguna dimensión.**
+- 3.2.1.2.7 ptos 1–3 ([HS22] p. 86): ya en `verificacion-hs4-v4.md` B3b. Da la ubicación y la valvulería, sin dimensiones.
+- 5.1.2 ([HS22] pp. 97–98) solo trata el alojamiento del contador general (5.1.2.1) y los contadores individuales aislados (5.1.2.2). Ver B3d.
+- 2.1.4 pto 1 ([HS22] p. 83), **VERIFICADO (texto)**: «Excepto en viviendas aisladas y adosadas, los elementos y equipos de la instalación que lo requieran, tales como el grupo de presión, los sistemas de tratamiento de agua o los contadores, deben instalarse en locales cuyas dimensiones sean suficientes para que pueda llevarse a cabo su mantenimiento adecuadamente.» Pide que el local sea suficiente, sin cifra.
+- El comentario de [DccHS] p. 98 lo confirma: «No se especifican unas dimensiones mínimas».
+- El DB-HS no cita ninguna norma UNE de baterías. **Las dimensiones las dan las normas de la entidad suministradora.**
+
+**Remisiones (no se repiten):**
+- contador general frente a contadores aislados: `verificacion-hs4-v4.md` B3;
+- contenido del armario y 4.1 pto 1: B3d.
+
+**Actualiza E1b.** La tabla 4.1 ya está leída en el consolidado de 2022 (en texto). Sigue sin compararse con la versión de 2009, que no hace falta para citar la vigente.
+
+### 18.2 HS 5: tabla 4.13 y arquetas que exige el DB
+
+**4.5 «Accesorios», pto 1** ([HS22] p. 122; [DccHS] p. 130), **VERIFICADO (texto)**:
+> «En la tabla 4.13 se obtienen las dimensiones mínimas necesarias (longitud L y anchura A mínimas) de una arqueta en función del diámetro del colector de salida de ésta.»
+
+**Tabla 4.13 «Dimensiones de las arquetas»**, **VERIFICADO (texto)**:
+
+| Diámetro del colector de salida [mm] | 100 | 150 | 200 | 250 | 300 | 350 | 400 | 450 | 500 |
+|---|---|---|---|---|---|---|---|---|---|
+| L x A [cm] | 40 x 40 | 50 x 50 | 60 x 60 | 60 x 70 | 70 x 70 | 70 x 80 | 80 x 80 | 80 x 90 | 90 x 90 |
+
+**Cotejo con `ARQUETAS_TABLA_4_13`** (`src/modules/hs5/tablas.ts`):
+- **Las nueve filas coinciden.**
+- El orden es L × A (largo = longitud L; ancho = anchura A), como en el código.
+- La cita «ap. 4.5 pto 1», «Tabla 4.13» es correcta. Rótulo: «Dimensiones de las arquetas».
+- Ya constaba como VERIFICADO en `verificacion-hs5-pluviales.md` B4. El criterio para Ø de PVC (primera columna ≥ Ø) sigue siendo CRITERIO (B4b).
+
+**Qué arquetas exige el DB.** Literales de [HS22]; los mismos en [DccHS] pp. 120–123. **VERIFICADO (texto)**:
+
+- **Pozo o arqueta general: siempre.**
+  - 3.1 pto 1 (p. 111): «Los colectores del edificio deben desaguar, preferentemente por gravedad, en el pozo o arqueta general que constituye el punto de conexión entre la instalación de evacuación y la red de alcantarillado público, a través de la correspondiente acometida.»
+  - 3.3.1.5 pto 3 (p. 114): «Al final de la instalación y antes de la acometida debe disponerse el pozo general del edificio.»
+  - Apéndice A (p. 134): «Pozo general del edificio: punto de conexión entre las redes privada y pública, al que acometen los colectores procedentes del edificio y del que sale la acometida a la red general.»
+- **Arqueta a pie de bajante: solo con red horizontal enterrada, y nunca sifónica.**
+  - 3.3.1.4.2 pto 3 (p. 114): «La acometida de las bajantes y los manguetones a esta red se hará con interposición de una arqueta de pie de bajante, que no debe ser sifónica.»
+  - 3.3.1.5 pto 2 a) (p. 114): «la arqueta a pie de bajante debe utilizarse para registro al pie de las bajantes cuando la conducción a partir de dicho punto vaya a quedar enterrada; no debe ser de tipo sifónico;»
+  - Con colector colgado no hay arqueta. 3.3.1.4.1 pto 1 (p. 113): «Las bajantes deben conectarse mediante piezas especiales, según las especificaciones técnicas del material. No puede realizarse esta conexión mediante simples codos, ni en el caso en que estos sean reforzados.»
+- **Arquetas en encuentros y derivaciones (de paso): con red enterrada.**
+  - 3.3.1.5 pto 1 (p. 114): «En redes enterradas la unión entre las redes vertical y horizontal y en ésta, entre sus encuentros y derivaciones, debe realizarse con arquetas dispuestas sobre cimiento de hormigón, con tapa practicable. Sólo puede acometer un colector por cada cara de la arqueta, de tal forma que el ángulo formado por el colector y la salida sea mayor que 90º.»
+  - 3.3.1.5 pto 2 b) y c): «en las arquetas de paso deben acometer como máximo tres colectores;» «las arquetas de registro deben disponer de tapa accesible y practicable;»
+- **Registros en encuentros, cambios de dirección y tramos rectos, en red enterrada o colgada. Distancia máxima entre registros: 15 m.**
+  - 3.3.1.5 pto 5 (p. 114): «Los registros para limpieza de colectores deben situarse en cada encuentro y cambio de dirección e intercalados en tramos rectos.»
+  - Enterrados, 3.3.1.4.2 pto 4 (p. 114): «Se dispondrán registros de tal manera que los tramos entre los contiguos no superen 15 m.»
+  - Colgados, 3.3.1.4.1 pto 5 (p. 113): «En los tramos rectos, en cada encuentro o acoplamiento tanto en horizontal como en vertical, así como en las derivaciones, deben disponerse registros constituidos por piezas especiales, según el material del que se trate, de tal manera que los tramos entre ellos no superen los 15 m.»
+  - Colgados, 3.3.1.4.1 pto 4: «No deben acometer en un mismo punto más de dos colectores.»
+  - INTERPRETACIÓN:
+    - En red enterrada, el registro es una arqueta (pto 1).
+    - En red colgada, el registro es una **pieza especial**, no una arqueta.
+    - El DB no dice «arqueta en cada cambio de dirección»: dice «registro».
+- **Arqueta de trasdós: si llega más de un colector al pozo general.** 3.3.1.5 pto 2 d) (p. 114): «la arqueta de trasdós debe disponerse en caso de llegada al pozo general del edificio de más de un colector;»
+- **Arqueta sifónica: condicional.**
+  - 3.3.1.1 pto 1 d) (p. 112), entre los tipos de cierre hidráulico: «arquetas sifónicas, situadas en los encuentros de los conductos enterrados de aguas pluviales y residuales.»
+  - Lo que obliga es 3.2 pto 1 (p. 112), cuando el alcantarillado público es único: «La conexión entre la red de pluviales y la de residuales debe hacerse con interposición de un cierre hidráulico que impida la transmisión de gases de una a otra y su salida por los puntos de captación tales como calderetas, rejillas o sumideros. Dicho cierre puede estar incorporado a los puntos de captación de las aguas o ser un sifón final en la propia conexión.»
+  - Con alcantarillado separativo, 3.2 pto 2: cada red «debe conectarse de forma independiente con la exterior correspondiente». No hay encuentro, ni cierre que exigir en él.
+  - **Conclusión:**
+    - La arqueta sifónica no es obligatoria por sí misma.
+    - Con red pública unitaria hace falta un cierre hidráulico en la conexión pluviales–residuales. Puede ser una arqueta sifónica (o un sifón final) **o** cierres en los puntos de captación.
+    - La arqueta a pie de bajante no es sifónica nunca.
+- **Separador de grasas: condicional.** 3.3.1.5 pto 2 e) (p. 114): «el separador de grasas debe disponerse cuando se prevea que las aguas residuales del edificio puedan transportar una cantidad excesiva de grasa, (en locales tales como restaurantes, garajes, etc.), o de líquidos combustibles […]. Puede utilizarse como arqueta sifónica. […] Debe disponerse preferiblemente al final de la red horizontal, previo al pozo de resalto y a la acometida.»
+- **Pozo de resalto: condicional.** 3.3.1.5 pto 4 (p. 114): «Cuando la diferencia entre la cota del extremo final de la instalación y la del punto de acometida sea mayor que 1 m, debe disponerse un pozo de resalto […]».
+- **Arqueta de registro en el límite de parcela: NO LOCALIZADO.**
+  - El DB-HS 5 no habla de límite de parcela. Solo pide el pozo general «al final de la instalación y antes de la acometida».
+  - Dónde va (en el límite o en la acera) lo fijan las ordenanzas municipales o las normas de la entidad de saneamiento. No se han leído.
+
+**Tabla resumen**
+
+| Arqueta / registro | Cuándo | Cita | Exigencia |
+|---|---|---|---|
+| Pozo o arqueta general | Siempre, al final de la red y antes de la acometida. Una por acometida (INTERPRETACIÓN con red separativa, 3.2 pto 2) | 3.1 pto 1; 3.3.1.5 pto 3 | Obligatorio |
+| Pie de bajante (no sifónica) | Colector enterrado | 3.3.1.4.2 pto 3; 3.3.1.5 pto 2 a) | Condicional (enterrada) |
+| De paso en encuentros y derivaciones | Colector enterrado. Máximo 3 colectores, uno por cara, ángulo > 90° | 3.3.1.5 ptos 1 y 2 b) | Condicional (enterrada) |
+| Registro en encuentro, cambio de dirección y tramo recto | Enterrada (arqueta) y colgada (pieza especial). Tramos ≤ 15 m | 3.3.1.5 pto 5; 3.3.1.4.2 pto 4; 3.3.1.4.1 pto 5 | Obligatorio |
+| Trasdós | Más de un colector llega al pozo general | 3.3.1.5 pto 2 d) | Condicional |
+| Sifónica (o sifón final) | Alcantarillado unitario, en la conexión pluviales–residuales, si el cierre no está en los puntos de captación | 3.2 pto 1; 3.3.1.1 pto 1 d) | Condicional, con alternativa |
+| Separador de grasas | Grasas o líquidos combustibles (restaurantes, garajes…) | 3.3.1.5 pto 2 e) | Condicional |
+| Pozo de resalto | Desnivel con la acometida > 1 m | 3.3.1.5 pto 4 | Condicional |
+| Límite de parcela | — | No está en el DB | NO LOCALIZADO |
+
+**Dimensiones.**
+- INTERPRETACIÓN: la tabla 4.13 vale para cualquier arqueta (el 4.5 dice «una arqueta»), por el Ø de su colector de salida.
+- El DB no da dimensiones para el pozo general: el 5.4.5.2 (p. 128) solo da su construcción.
+- Dimensionar la arqueta general con la tabla 4.13 por el Ø de la acometida es CRITERIO.
+
+### 18.3 Retorno de ACS: umbral de 15 m y cómo citarlo
+
+Literales de [HS22], los mismos en [DccHS]. **VERIFICADO (texto)**:
+- 2.3 «Ahorro de agua», pto 2 ([HS22] p. 83; [DccHS] p. 91): «En las redes de ACS debe disponerse una red de retorno cuando la longitud de la tubería de ida al punto de consumo más alejado sea igual o mayor que 15 m.»
+- 3.2.2.1 «Distribución (impulsión y retorno)», pto 3 ([HS22] p. 88; [DccHS] p. 96): «Tanto en instalaciones individuales como en instalaciones de producción centralizada, la red de distribución debe estar dotada de una red de retorno cuando la longitud de la tubería de ida al punto de consumo más alejado sea igual o mayor que 15 m.»
+
+Comentario [DccHS] p. 91, **LEÍDO (comentario)**: «El objetivo de la red de retorno cuando la longitud de la tubería de ida al punto de consumo más alejado es mayor o igual a 15m es favorecer el ahorro de agua y energía. Pueden existir otras soluciones que satisfagan este objetivo.»
+- No es reglamentario. Si el proyectista adopta «otra solución», va como solución alternativa justificada, no como «cumple 2.3».
+
+**La cita de la app es correcta.**
+- `AHORRO_AGUA` cita «ap. 2.3 ptos 1 y 2; 3.2.2.1 pto 3» porque junta el contador (pto 1) y el retorno (pto 2).
+- En la línea del anejo, que solo trata el retorno: **«DB-HS 4, ap. 2.3 pto 2 y ap. 3.2.2.1 pto 3»**.
+- El umbral se compara con `>=`, como hace el código.
+
+**Líneas propuestas para el anejo:**
+- Con retorno: «La red de ACS dispone de red de retorno por ser la longitud de la tubería de ida al punto de consumo más alejado igual o mayor que 15 m (DB-HS 4, ap. 2.3 pto 2 y ap. 3.2.2.1 pto 3).»
+- Sin retorno: «La red de ACS no precisa red de retorno: la longitud de la tubería de ida al punto de consumo más alejado es menor que 15 m (DB-HS 4, ap. 2.3 pto 2).»
+
+**CORREGIDO (feature-33, paso 2, línea de ACS). El retorno no depende de que el ACS sea central.**
+- El 3.2.2.1 pto 3 dice «Tanto en instalaciones individuales como en instalaciones de producción centralizada».
+- Una vivienda con termo o aerotermia cuya ida al grifo más alejado mida ≥ 15 m también necesita retorno.
+- Por tanto, la línea va en los dos sistemas y necesita el dato «longitud de ida al punto más alejado».
+- Desde dónde se mide la ida: CRITERIO, desde la salida del generador o acumulador (`verificacion-hs4-v4.md` B1b).
+- Dimensionado del retorno: B1c (fuera del alcance de feature-33).
+
+### 18.4 Presiones en el punto de consumo
+
+Ya están en `verificacion-hs4-v4.md`, **filas A1 y A1b** (y A1c, el número de punto). Allí se leyeron en fuentes secundarias ([N22], [CYII]). Esta sesión las ha leído en el PDF oficial: 2.1.3 «Condiciones mínimas de suministro» ([HS22] pp. 82–83), **VERIFICADO (texto)**:
+- pto 2: «En los puntos de consumo la presión mínima debe ser: a) 100 kPa para grifos comunes; b) 150 kPa para fluxores y calentadores.»
+- pto 3: «La presión en cualquier punto de consumo no debe superar 500 kPa.»
+
+Coincide con `PRESIONES` de `src/modules/hs4/tablas.ts` («ap. 2.1.3 ptos 2 y 3»). El comentario «[auditoría literal de PDF pendiente]» de ese bloque ya puede decir «texto del PDF consolidado 2022, p. 83». Qué es un «calentador»: CRITERIO (A3).
+
+### 18.5 Para la app (feature-33)
+
+| # | Resultado | Qué hacer en feature-33 | Grado |
+|---|---|---|---|
+| 1 | Tabla 4.1 | Nueva `CONTADOR_GENERAL_TABLA_4_1` en `hs4/tablas.ts` (estructura abajo), con las cifras de la tabla | VERIFICADO (texto) |
+| 2 | Armario o cámara | El tipo sale de la fila: armario hasta Ø 40, cámara desde Ø 50. En armario, rotular «longitud × anchura × profundidad» (comentario) | VERIFICADO (imagen) |
+| 3 | Ø del contador | Dato opcional «Ø del contador facilitado por la compañía». Sin él, supuesto = DN del tubo de alimentación redondeado a la columna ≥, rotulado como criterio y con la cita del 4.5.1. Si DN > 150, aviso «fuera de la tabla 4.1» | CRITERIO |
+| 4 | Batería | Línea: «El DB-HS 4 no fija dimensiones para el alojamiento de la batería de contadores divisionarios; se ajusta a las normas de la entidad suministradora. Se sitúa en zona de uso común, de fácil y libre acceso (ap. 3.2.1.2.7 pto 1), en un local de dimensiones suficientes para su mantenimiento (ap. 2.1.4 pto 1).» En vivienda aislada o adosada, sin la última frase | VERIFICADO (texto) |
+| 5 | Tabla 4.13 | Sin cambios. Opcional: el rótulo «Dimensiones de las arquetas» en la procedencia | VERIFICADO (texto) |
+| 6 | `arquetasHs5` | Reglas de abajo. Decide la disposición del colector (enterrado o colgado) | VERIFICADO (texto) + INTERPRETACIÓN |
+| 7 | Retorno de ACS | Línea de 18.3, con ACS individual **y** central. Dato declarado «longitud de ida al punto más alejado»; sin él, pendiente en «Antes de entregar». Corregir el «si es central» del paso 2 | VERIFICADO (texto) |
+| 8 | Presiones | Conclusión de la tabla 5.3.1-1: Pcrítica frente a 100 o 150 kPa (2.1.3 pto 2) y, en el punto más bajo, ≤ 500 kPa (pto 3) | VERIFICADO (texto) |
+
+**Reglas para `arquetasHs5(result, red)`**
+- **Siempre:** un pozo o arqueta general por acometida: dos con alcantarillado separativo, una con unitario. Cita: 3.3.1.5 pto 3.
+- **Colector enterrado:**
+  - arqueta a pie de cada bajante, no sifónica (3.3.1.4.2 pto 3);
+  - en modo «manual», además, una arqueta de paso en cada encuentro, derivación o cambio de dirección (3.3.1.5 ptos 1 y 5);
+  - comprobar que ninguna arqueta de paso recibe más de 3 colectores.
+- **Colector colgado:**
+  - sin arqueta a pie de bajante; conexión con piezas especiales y registros (3.3.1.4.1 ptos 1 y 5);
+  - comprobar que no acometen más de 2 colectores en un punto (pto 4);
+  - solo el pozo general.
+- **Más de un colector al pozo general:** arqueta de trasdós (3.3.1.5 pto 2 d).
+- **Alcantarillado unitario con pluviales:** cierre hidráulico en la conexión (3.2 pto 1). Por defecto, arqueta sifónica, rotulada «o cierres en los puntos de captación».
+- **Garaje o restaurante:** separador de grasas (3.3.1.5 pto 2 e). El motor ya lo pone en el garaje; comprobar que la arqueta va detrás.
+- **Sin longitudes (modo «edificio»):** una línea, «Registros intercalados en tramos rectos a distancias no mayores de 15 m (ap. 3.3.1.4.1 pto 5 / 3.3.1.4.2 pto 4); su posición, en planos». Así queda la decisión 6 de feature-33, con su cita.
+- **Dimensión:** tabla 4.13, por el Ø del colector de salida de cada arqueta. El criterio de PVC (B4b), rotulado.
+
+**Estructura de datos propuesta** (formato `tablaCTE`, como el resto de `hs4/tablas.ts`):
+
+```ts
+// Tabla 4.1 — Dimensiones del armario y de la arqueta para el contador general [mm].
+// [VERIFICADO (texto) K-MEM.18: DBHS.pdf p. 90 y DccHS.pdf p. 98]
+// `alojamiento`: armario 15–40, cámara 50–150 [VERIFICADO (imagen) K-MEM.18, p. 90].
+// En armario, largo × ancho × alto = longitud × anchura × profundidad (comentario DccHS p. 98).
+export const CONTADOR_GENERAL_TABLA_4_1 = tablaCTE(
+  { ...PROC_HS4, articulo: "ap. 4.1 pto 1", tabla: "Tabla 4.1" },
+  {
+    rotulo: "Dimensiones del armario y de la arqueta para el contador general",
+    filas: [
+      { diametro_mm: 15, alojamiento: "armario", largo_mm: 600, ancho_mm: 500, alto_mm: 200 },
+      { diametro_mm: 20, alojamiento: "armario", largo_mm: 600, ancho_mm: 500, alto_mm: 200 },
+      { diametro_mm: 25, alojamiento: "armario", largo_mm: 900, ancho_mm: 500, alto_mm: 300 },
+      { diametro_mm: 32, alojamiento: "armario", largo_mm: 900, ancho_mm: 500, alto_mm: 300 },
+      { diametro_mm: 40, alojamiento: "armario", largo_mm: 1300, ancho_mm: 600, alto_mm: 500 },
+      { diametro_mm: 50, alojamiento: "camara", largo_mm: 2100, ancho_mm: 700, alto_mm: 700 },
+      { diametro_mm: 65, alojamiento: "camara", largo_mm: 2100, ancho_mm: 700, alto_mm: 700 },
+      { diametro_mm: 80, alojamiento: "camara", largo_mm: 2200, ancho_mm: 800, alto_mm: 800 },
+      { diametro_mm: 100, alojamiento: "camara", largo_mm: 2500, ancho_mm: 800, alto_mm: 900 },
+      { diametro_mm: 125, alojamiento: "camara", largo_mm: 3000, ancho_mm: 800, alto_mm: 1000 },
+      { diametro_mm: 150, alojamiento: "camara", largo_mm: 3000, ancho_mm: 800, alto_mm: 1000 },
+    ],
+  } as const,
+);
+```
+
+**Pendientes de K-MEM.18**
+1. ~~Cotejo en imagen de la tabla 4.1~~: **hecho** (2026-10-15, p. 90 en imagen). Armario 15–40, cámara 50–150.
+2. Cotejo en imagen, de rutina, de las pp. 81, 83, 86, 88, 93, 111–114 y 122 de [HS22]. En texto coinciden en los dos PDF; el riesgo es bajo.
+3. Norma de contadores (UNE-EN ISO 4064, caudal permanente Q3 por calibre), si se quiere un criterio de Ø por caudal. No es CTE.
+4. Ordenanza municipal o normas de la entidad de saneamiento del municipio de la obra: dónde va el pozo general o la arqueta de acometida (límite de parcela).

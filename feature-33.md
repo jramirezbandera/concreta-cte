@@ -83,6 +83,34 @@ Antes de escribir código:
 El resultado se apunta como K-MEM.18 y siguientes en
 [research/verificacion-memoria.md](research/verificacion-memoria.md).
 
+**Hecho (2026-10-15), K-MEM.18.** Leído en el consolidado vigente (DBHS.pdf, RD 450/2022) y en
+el comentado (DccHS.pdf, 12-02-2025). La tabla 4.1 se ha cotejado en imagen (p. 90); el resto, en
+texto coincidente en los dos PDF. Cambia el diseño de los pasos 2 y 3:
+- **Tabla 4.1**: once Ø, de 15 a 150 mm. **Armario hasta Ø 40 y cámara desde Ø 50** (imagen). El
+  rótulo literal dice «armario y … arqueta».
+- **Ø del contador**: el DB no da tabla (4.5.1: «adecuado» a los caudales; 2.1.1 pto 2: los da la
+  compañía). Se usa como criterio el DN del tubo de alimentación, redondeado a la columna igual
+  o mayor, salvo que el proyectista dé el de la compañía.
+- **Batería de divisionarios**: el DB no fija dimensiones (lo dice el comentario, p. 98). Solo
+  pide un local suficiente para el mantenimiento (2.1.4 pto 1), salvo en vivienda aislada o
+  adosada.
+- **Tabla 4.13**: la de la app es correcta (cifras, L × A y «ap. 4.5 pto 1»).
+- **Arquetas**:
+  - a pie de bajante, solo con colector enterrado, y nunca sifónica; con colector colgado, piezas
+    especiales y registros;
+  - pozo general siempre, uno por acometida;
+  - arqueta de trasdós si llega más de un colector al pozo general;
+  - arqueta sifónica, condicional: con alcantarillado unitario se puede sustituir por cierres
+    en los puntos de captación;
+  - registros a ≤ 15 m, en red enterrada y en colgada (3.3.1.4.1 pto 5 y 3.3.1.4.2 pto 4);
+  - la arqueta en el límite de parcela no es del DB, sino de la ordenanza o de la entidad de
+    saneamiento.
+- **Retorno de ACS**: el 3.2.2.1 pto 3 dice «tanto en instalaciones individuales como en
+  instalaciones de producción centralizada». **También con ACS individual.** Cita: «ap. 2.3 pto 2
+  y ap. 3.2.2.1 pto 3».
+- **Presiones** (p. 83, en el PDF oficial): 100 kPa en grifos comunes, 150 kPa en fluxores y
+  calentadores, y 500 kPa como máximo en cualquier punto.
+
 ### Paso 1 · El documento
 
 - `src/lib/obra/anejoInstalaciones.ts`: `anejoInstalaciones(p)` (modelo) y
@@ -114,18 +142,28 @@ El resultado se apunta como K-MEM.18 y siguientes en
     abreviatura lo dice.
   - Una fila por tramo, del contador al punto crítico.
   - La última línea es la conclusión: presión en el punto crítico frente a la mínima (100 kPa en
-    grifo común, 150 kPa en fluxor y calentador), y si hace falta grupo de presión.
+    grifo común, 150 kPa en fluxor y calentador), presión en el punto más bajo frente a la máxima
+    (500 kPa), y si hace falta grupo de presión o reductora.
 - **Tabla 5.3.1-2, resto de tramos.** Tramo, Qb, K, Q, Ø, v. Así queda justificado cada Ø de la
   red, no solo el del camino crítico. Los tramos iguales (`iguales`) se agrupan en una fila con
   «× n».
 - **Caudales por aparato** (tabla 2.1): aparato, nº por vivienda tipo, Qagua fría y QACS. Es lo
   que el revisor coteja primero.
-- **Contador** (paso 0.1):
-  - con contador general: el armario o la cámara de la tabla 4.1, según el Ø;
-  - con batería de divisionarios: nº de contadores y una línea que remite a la compañía
-    suministradora para su dimensión.
-- **ACS:** la línea del sistema (individual o central) y, si es central, el retorno con su
-  motivo y su cita (paso 0.3).
+- **Contador** (K-MEM.18):
+  - **con contador general**: armario (Ø ≤ 40) o cámara (Ø ≥ 50) con las medidas de la tabla 4.1.
+    El Ø es el de la compañía si el proyectista lo da (dato nuevo, opcional). Si no, es el DN del
+    tubo de alimentación redondeado a la columna igual o mayor, rotulado «criterio de proyecto» y
+    listado en «Antes de entregar»;
+  - **con batería de divisionarios**: nº de contadores y una línea: «local con dimensiones
+    suficientes para su mantenimiento (ap. 2.1.4 pto 1); medidas de la batería según la compañía
+    suministradora». No se pone en vivienda aislada ni adosada.
+- **ACS:** la línea del sistema (individual o central) y la del retorno, **en los dos
+  casos**: «la red de ACS dispone de retorno por ser la ida al punto más alejado ≥ 15 m (DB-HS 4,
+  ap. 2.3 pto 2 y ap. 3.2.2.1 pto 3)», o que no lo necesita por ser < 15 m.
+  - La longitud de ida es un dato nuevo del módulo, opcional. Se sugiere desde la red de HS 4: el
+    recorrido desde la entrada de la vivienda (o la producción, si es central) hasta el aparato
+    con ACS más alejado.
+  - Sin dato ni red, la línea dice la condición y «Antes de entregar» la pide.
 - **Nota de longitudes** en modo «edificio» y aviso en «Antes de entregar».
 
 ### Paso 3 · Saneamiento (5.3.2)
@@ -136,12 +174,23 @@ El resultado se apunta como K-MEM.18 y siguientes en
 - **Tabla 5.3.2-2, ramales, bajantes y colectores:** elemento, tipo, UD que recibe, pendiente, Ø
   y capacidad (UD admisibles). En bajantes, las dos comprobaciones de la tabla 4.4 (UD totales y
   ramal más cargado).
-- **Arquetas** (paso 0.2): `arquetasHs5(result, red)`, puro.
-  - **En modo «edificio»**: una a pie de cada bajante y una general antes de la acometida.
-  - **En modo «manual»**: una por cada nudo de colector (encuentro o cambio de dirección) más la
-    general.
+- **Arquetas** (K-MEM.18): `arquetasHs5(result, red)`, puro. Lee la disposición de los
+  colectores (`colectores: "colgado" | "enterrado"`) y el tipo de alcantarillado, que el modelo
+  ya tiene.
+  - **Siempre**: el pozo general, uno por acometida.
+  - **Colector enterrado**: una arqueta a pie de cada bajante, nunca sifónica. En modo «manual»,
+    además, una por nudo (encuentro o cambio de dirección).
+  - **Colector colgado**: sin arquetas a pie de bajante; una línea de piezas especiales y
+    registros.
+  - **Arqueta de trasdós**, si llega más de un colector al pozo general.
+  - **Arqueta sifónica**: la exigencia y, con alcantarillado unitario, la alternativa de cierres
+    hidráulicos en los puntos de captación.
+  - **Registros a ≤ 15 m**, en una línea con su cita, que remite a planos: sin longitudes no se
+    cuentan.
   - Por arqueta: tipo, Ø del colector de salida y dimensión de la tabla 4.13. `arquetaDe` pasa a
     leer de aquí.
+  - La arqueta en el límite de parcela no se pone: es de la ordenanza o de la entidad de
+    saneamiento.
 - **Pluviales:** superficie, sumideros, canalón, bajantes y colector, con Ø y capacidad (ya
   calculados).
 - **Ventilación** (primaria, secundaria): la línea que ya da el motor.
@@ -190,6 +239,10 @@ El resultado se apunta como K-MEM.18 y siguientes en
 4. **Lt = Lr·(1 + f)** en lugar de longitudes equivalentes por accesorio: es lo que calcula el
    motor; cambiarlo cambiaría los resultados.
 5. **Tabla ancha de 7 pt** para los tramos, en vez de partirla o poner la página en horizontal.
-6. **Arquetas en modo «edificio»**: a pie de bajante más la general. Sin distancias, no se
-   proponen arquetas de paso.
+6. **Arquetas**: las que exige el DB según la red (K-MEM.18). Sin distancias, los registros
+   a ≤ 15 m van en una línea que remite a planos, no se cuentan.
 7. **Planos como texto libre** por instalación, no como lista de planos con número y título.
+8. **Ø del contador general**: el de la compañía si se da y, si no, el DN del tubo de
+   alimentación (criterio de proyecto, en «Antes de entregar»).
+9. **Longitud de ida de ACS**: dato opcional del módulo, con un valor sugerido desde la red de
+   HS 4.
