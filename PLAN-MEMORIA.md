@@ -1,9 +1,10 @@
 # Memoria como la del estudio — plan por fases
 
-> Estado: **fases 0 a 5 hechas** · 2026-10-11 (fase 1 en [feature-28.md](feature-28.md), fase 2
+> Estado: **fases 0 a 5 y 6a hechas** · 2026-10-16 (fase 1 en [feature-28.md](feature-28.md), fase 2
 > en [feature-29.md](feature-29.md), fase 3 en [feature-30.md](feature-30.md), fase 4 en
-> [feature-31.md](feature-31.md), fase 5 en [feature-32.md](feature-32.md)). Siguiente: fase 6,
-> partida en 6a (HS 4 y HS 5, [feature-33.md](feature-33.md)) y 6b (REBT, feature-34).
+> [feature-31.md](feature-31.md), fase 5 en [feature-32.md](feature-32.md)). La fase 6 se parte en
+> 6a, el documento del anejo con HS 4 y HS 5 (hecha, [feature-33.md](feature-33.md)), y 6b, REBT
+> aguas abajo (feature-34, siguiente).
 > Fase 8 (estudio de gestión de residuos y estudio básico de seguridad y salud) añadida el
 > 2026-10-15; su verificación previa, hecha el 2026-10-16, está en §4.2 y §4.3.
 > Origen: comparación de la memoria de la app con tres memorias de ejecución reales del estudio,
@@ -399,6 +400,11 @@ libres. Se pueden añadir como parámetros después.
 
   Es motor nuevo: el más grande del plan.
 - **Planos.** Un campo de planos por módulo («I05–I07»), para remitir desde la memoria.
+
+**6a hecha (2026-10-16, [feature-33.md](feature-33.md)):** el documento, HS 4, HS 5 y los planos.
+El camino crítico lleva además «h», lo que sube cada tramo, para que la presión se pueda rehacer a
+mano. Fuera de 6a: el retorno y el aislamiento del ACS (no hay red de ACS en el motor; fase 7, con
+el RITE). Queda REBT para 6b (feature-34).
 
 ### 5.7 Fase 7 · Otros reglamentos y coherencia
 

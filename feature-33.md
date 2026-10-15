@@ -311,6 +311,32 @@ memoria–anejo de las UD por vivienda y del colector general. 1666 en verde.
 - Abrir el Word en Word: índice, tabla ancha, cabecera y pie.
 - Decisiones a validar, al final de este documento.
 
+**Hecho (2026-10-16).**
+- [anejo-casos.test.ts](src/lib/obra/test/anejo-casos.test.ts):
+  - **Coherencia memoria–anejo** en el Demo y los cinco casos de partida: la presión del punto
+    más desfavorable (en el texto y en la última fila del camino crítico) y las UD y el Ø del
+    colector.
+  - **Reforma**: el contador se añade a la batería existente, la acometida y el tubo de
+    alimentación salen como existentes, y el colector existente lleva las UD de la obra hecha con
+    su comprobación. La vivienda está en planta baja: no hay bajante existente a la que acometer,
+    sino el colector.
+  - **Sin HS 4 ni HS 5** (una reforma sin aparatos nuevos): el anejo dice que no son de
+    aplicación, la memoria no remite a él y el Word se genera.
+- **Lo que salió al leer los casos:**
+  - El camino crítico lleva una columna más, **h** (lo que sube el tramo). Sin ella no se podía
+    rehacer la presión a mano: en oficinas el montante a P2 baja 75 kPa y solo 4 son de
+    rozamiento. Son 12 columnas, el máximo de la tabla ancha; caben en el PDF y en el Word. Un
+    test rehace cada fila: Psal = Pent − J·Lt − 9,81·h. Se llama «h» y no «Δz» porque la fuente
+    del PDF no tiene «Δ».
+  - Sin bajantes (la reforma), la memoria decía que el colector «no puede ser menor que las
+    bajantes que recibe» y el anejo, que «las bajantes se conectan mediante piezas especiales».
+    Ahora dicen «los ramales».
+  - La fila del colector existente no llamaba a su nota (1).
+  - Los tramos agrupados de HS 4 se enumeran con «y» («A1 y A2»), como en HS 5.
+- **Foto del expediente**: solo cambian las 40 huellas del anejo.
+- 1688 tests en verde; tsc y eslint limpios.
+- **Pendiente: abrir el Word en Word**, que no se puede hacer desde aquí.
+
 ## Fuera de alcance
 
 - **REBT aguas abajo**: feature-34.
@@ -331,10 +357,12 @@ memoria–anejo de las UD por vivienda y del colector general. 1666 en verde.
 4. **Lt = Lr·(1 + f)** en lugar de longitudes equivalentes por accesorio: es lo que calcula el
    motor; cambiarlo cambiaría los resultados.
 5. **Tabla ancha de 7 pt** para los tramos, en vez de partirla o poner la página en horizontal.
+   Son 12 columnas, con «h» (lo que sube el tramo) para que cada fila se pueda rehacer a mano.
 6. **Arquetas**: las que exige el DB según la red (K-MEM.18). Sin distancias, los registros
    a ≤ 15 m van en una línea que remite a planos, no se cuentan.
 7. **Planos como texto libre** por instalación, no como lista de planos con número y título.
 8. **Ø del contador general**: el de la compañía si se da y, si no, el DN del tubo de
-   alimentación (criterio de proyecto, en «Antes de entregar»).
+   alimentación (criterio de proyecto, que el anejo declara). «Antes de entregar» no lo pide:
+   solo pide los planos.
 9. **Longitud de ida de ACS**: dato opcional del módulo, con un valor sugerido desde la red de
    HS 4.

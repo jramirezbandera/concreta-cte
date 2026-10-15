@@ -173,6 +173,7 @@ function etiqueta(n: NombreTramo | undefined, id: string): string {
 const ABREVIATURAS: [string, string][] = [
   ["Lr", "longitud real del tramo [m]"],
   ["Lt", "longitud de cálculo, Lr·(1 + f), con f la fracción de pérdidas localizadas [m]"],
+  ["h", "lo que sube el tramo [m]"],
   ["Qb", "caudal bruto: suma de los caudales instantáneos de la tabla 2.1 [dm³/s]"],
   ["K", "coeficiente de simultaneidad"],
   ["Q", "caudal de cálculo, Qb·K [dm³/s]"],
@@ -193,6 +194,7 @@ function parteCamino(j: JustificacionHs4, nombres: Map<string, NombreTramo>): Pa
     etiqueta(nombres.get(t.id), t.id),
     f(t.longitud_m, 2),
     f(t.longitud_m * (1 + fr), 2),
+    f(t.altura_m, 2),
     f(t.caudalAcumulado_dm3_s, 3),
     f(t.k, 2),
     f(t.caudalCalculo_dm3_s, 3),
@@ -215,7 +217,7 @@ function parteCamino(j: JustificacionHs4, nombres: Map<string, NombreTramo>): Pa
   const intro: Trozo[] = [
     `Recorrido de la acometida al punto de consumo más desfavorable, ${desc}${donde}, que es el de menor margen sobre su presión mínima. `,
     ...arranque,
-    ` En cada tramo la presión baja J·Lt y, si el tramo sube, 9,81 kPa por metro. Las pérdidas localizadas se toman como el ${f(fr * 100, 0)} % de las de rozamiento (ap. 4.2.2 pto 1 a); J sale de la expresión de predimensionado J = 12,7·v^1,75/Ø^1,25 (criterio de proyecto) y K, del método tradicional, K = 1/√(n − 1) (ap. 4.2.1 pto 2 b).`,
+    ` En cada tramo la presión baja J·Lt y, si el tramo sube, 9,81·h. Las pérdidas localizadas se toman como el ${f(fr * 100, 0)} % de las de rozamiento (ap. 4.2.2 pto 1 a); J sale de la expresión de predimensionado J = 12,7·v^1,75/Ø^1,25 (criterio de proyecto) y K, del método tradicional, K = 1/√(n − 1) (ap. 4.2.1 pto 2 b).`,
   ];
 
   // La conclusión: el punto crítico frente a su mínima y el de más presión frente a la máxima.
@@ -238,8 +240,8 @@ function parteCamino(j: JustificacionHs4, nombres: Map<string, NombreTramo>): Pa
   ];
   const tabla: TablaMemoria = {
     rotulo: "Camino crítico",
-    cabecera: [hayExistentes ? `Tramo (${notas.length})` : "Tramo", estimadas ? "Lr (1)" : "Lr", "Lt", "Qb", "K", "Q", "Ø", "v", "J", "Pent", "Psal"],
-    columnas: ["texto", "dato", "dato", "dato", "dato", "dato", "dato", "dato", "dato", "dato", "dato"],
+    cabecera: [hayExistentes ? `Tramo (${notas.length})` : "Tramo", estimadas ? "Lr (1)" : "Lr", "Lt", "h", "Qb", "K", "Q", "Ø", "v", "J", "Pent", "Psal"],
+    columnas: ["texto", "dato", "dato", "dato", "dato", "dato", "dato", "dato", "dato", "dato", "dato", "dato"],
     filas,
     ancha: true,
     tras: 1,
@@ -286,7 +288,9 @@ function parteResto(j: JustificacionHs4, nombres: Map<string, NombreTramo>): Par
   }
   const quien = (sinOrden: string[]) => {
     const ds = [...sinOrden].sort((a, b) => a.localeCompare(b, "es", { numeric: true }));
-    return ds.length === 0 ? "" : ds.length <= 4 ? ` · ${ds.join(", ")}` : ` · ${ds.slice(0, 3).join(", ")} y ${ds.length - 3} más`;
+    if (ds.length === 0) return "";
+    if (ds.length === 1) return ` · ${ds[0]}`;
+    return ds.length <= 4 ? ` · ${ds.slice(0, -1).join(", ")} y ${ds.at(-1)}` : ` · ${ds.slice(0, 3).join(", ")} y ${ds.length - 3} más`;
   };
   const filas = [...grupos.values()].map((g) => [`${g.base}${quien(g.dondes)}`, String(g.n), ...g.cifras]);
   return {

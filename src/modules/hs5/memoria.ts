@@ -212,6 +212,11 @@ function parrafoResiduales(j: JustificacionHs5): Trozo[] {
   return p;
 }
 
+/** Una vivienda en planta baja no tiene bajantes: sus ramales van al colector. */
+function hayBajantes(j: JustificacionHs5): boolean {
+  return j.residuales?.porTramo.some((t) => t.tipo === "bajante") ?? false;
+}
+
 function parrafoColector(j: JustificacionHs5): Trozo[] {
   const col = j.elementos.find((e) => e.detalle.clase === "colector");
   if (!col || col.detalle.clase !== "colector") return [];
@@ -232,7 +237,7 @@ function parrafoColector(j: JustificacionHs5): Trozo[] {
   ];
   if (col.manda.tipo === "no_menor_que_aguas_arriba") {
     p.push(
-      `: por unidades bastaría Ø${fmt(t.diametroPorCapacidad_mm ?? 0, undefined, 0)}, pero no puede ser menor que las bajantes que recibe (tabla 4.5).`,
+      `: por unidades bastaría Ø${fmt(t.diametroPorCapacidad_mm ?? 0, undefined, 0)}, pero no puede ser menor que ${hayBajantes(j) ? "las bajantes" : "los ramales"} que recibe (tabla 4.5).`,
     );
   } else {
     p.push(`, que admite ${n0(t.capacidad_ud ?? 0)} UD (tabla 4.5).`);

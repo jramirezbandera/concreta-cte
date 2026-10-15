@@ -81,7 +81,7 @@ describe("anejoHs4 · el Demo", () => {
 
   it("las cinco partes, con las abreviaturas una vez", () => {
     expect(a.partes.map((p) => p.titulo)).toEqual(["Caudales por aparato", "Camino crítico", "Resto de la red", "Contador", "Agua caliente sanitaria"]);
-    expect(a.abreviaturas?.map(([k]) => k)).toEqual(["Lr", "Lt", "Qb", "K", "Q", "Ø", "v", "J", "Pent y Psal"]);
+    expect(a.abreviaturas?.map(([k]) => k)).toEqual(["Lr", "Lt", "h", "Qb", "K", "Q", "Ø", "v", "J", "Pent y Psal"]);
   });
 
   it("aparatos por vivienda tipo, con los caudales de la tabla 2.1", () => {
@@ -91,14 +91,22 @@ describe("anejoHs4 · el Demo", () => {
     expect(t.filas.find((f) => f[0] === "Inodoro con cisterna")?.[2]).toBe("—");
   });
 
-  it("el camino crítico: once columnas, ancha, Lt = Lr·1,25 y las longitudes tipo con su nota", () => {
+  it("el camino crítico: doce columnas, ancha, Lt = Lr·1,25 y las longitudes tipo con su nota", () => {
     const t = parte(a, "Camino crítico").tablas![0];
     expect(t.ancha).toBe(true);
-    expect(t.cabecera).toEqual(["Tramo", "Lr (1)", "Lt", "Qb", "K", "Q", "Ø", "v", "J", "Pent", "Psal"]);
+    expect(t.cabecera).toEqual(["Tramo", "Lr (1)", "Lt", "h", "Qb", "K", "Q", "Ø", "v", "J", "Pent", "Psal"]);
     expect(t.filas[0].slice(0, 3)).toEqual(["Acometida", "3,00", "3,75"]);
     expect(t.notas?.[0]).toMatch(/^Longitudes tipo de la herramienta/);
     const camino = caminoCritico(j.resultado!);
     expect(t.filas).toHaveLength(camino.length);
+  });
+
+  it("cada fila se rehace a mano: Psal = Pent − J·Lt − 9,81·h si sube", () => {
+    const n = (x: string) => Number(x.replace(",", "."));
+    for (const f of parte(a, "Camino crítico").tablas![0].filas) {
+      const [lt, h, jj, pent, psal] = [f[2], f[3], f[9], f[10], f[11]].map(n);
+      expect(pent - jj * lt - 9.81 * Math.max(h, 0), f[0]).toBeCloseTo(psal, 0);
+    }
   });
 
   it("la memoria y el anejo dan la misma presión en el punto crítico", () => {
@@ -111,7 +119,7 @@ describe("anejoHs4 · el Demo", () => {
     const filas = parte(a, "Resto de la red").tablas![0].filas;
     const total = filas.reduce((s, f) => s + Number(f[1]), 0);
     expect(total).toBe(j.resultado!.porTramo.filter((t) => !t.esCritico).length);
-    expect(filas.find((f) => f[0].startsWith("Montante · A1, A2"))).toBeDefined();
+    expect(filas.find((f) => f[0].startsWith("Montante · A1 y A2"))).toBeDefined();
   });
 
   it("la batería, sin dimensiones del DB", () => {

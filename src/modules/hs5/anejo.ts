@@ -246,7 +246,7 @@ function parteRamalesColectores(j: JustificacionHs5, filas: FilaRed[]): ParteAne
   const ex = j.existente;
   if (ex) {
     tabla.filas.push([
-      "Colector general existente",
+      "Colector general existente (1)",
       "1",
       f(ex.udTotal, 1).replace(/,0$/, ""),
       fmt(ex.pendiente_pct, undefined, 1),
@@ -332,15 +332,23 @@ function parteArquetas(j: JustificacionHs5): ParteAnejo | null {
   const enterrado = j.red.decisiones.colectores === "enterrado";
   const pl = j.existente?.pluvialesSinTocar ? null : j.pluviales;
   const unitario = j.red.decisiones.alcantarillado === "unitario";
+  // Una vivienda en planta baja no tiene bajantes: sus ramales van al colector.
+  const bajantes = (j.residuales?.porTramo.some((t) => t.tipo === "bajante") ?? false) || (pl?.bajantes ?? 0) > 0;
   const p: Trozo[] = [];
   if (j.existente) {
     p.push("Lo intervenido acomete a la red de saneamiento existente del edificio: el pozo general y la acometida existentes no se modifican.");
   }
   if (enterrado) {
-    p.push(`${p.length > 0 ? " " : ""}Con los colectores enterrados, cada bajante acomete a una arqueta a pie de bajante, que no debe ser sifónica (ap. 3.3.1.4.2 pto 3).`);
+    p.push(
+      `${p.length > 0 ? " " : ""}${
+        bajantes
+          ? "Con los colectores enterrados, cada bajante acomete a una arqueta a pie de bajante, que no debe ser sifónica"
+          : "Con los colectores enterrados, los ramales acometen a la red con interposición de una arqueta, que no debe ser sifónica"
+      } (ap. 3.3.1.4.2 pto 3).`,
+    );
   } else {
     p.push(
-      `${p.length > 0 ? " " : ""}Con los colectores colgados, las bajantes se conectan mediante piezas especiales, sin arquetas, y no acometen más de dos colectores en un mismo punto (ap. 3.3.1.4.1 ptos 1 y 4).`,
+      `${p.length > 0 ? " " : ""}Con los colectores colgados, ${bajantes ? "las bajantes" : "los ramales"} se conectan mediante piezas especiales, sin arquetas, y no acometen más de dos colectores en un mismo punto (ap. 3.3.1.4.1 ptos 1 y 4).`,
     );
   }
   p.push(" En los tramos rectos se intercalan registros a distancias no mayores de 15 m (ap. 3.3.1.4.1 pto 5 y 3.3.1.4.2 pto 4); su posición se fija en los planos.");
