@@ -35,6 +35,7 @@ import { hs5EstadoDefaults, type Hs5Estado } from "../../modules/hs5/estado";
 import { justificarHs5, obraHs5De, type JustificacionHs5 } from "../../modules/hs5/justificacion";
 import { filasQueEntra as filasQueEntraHs5 } from "../../modules/hs5/entra";
 import { memoriaHs5 } from "../../modules/hs5/memoria";
+import { anejoHs5 } from "../../modules/hs5/anejo";
 import * as textosHs5 from "../../modules/hs5/textos";
 import { hs6EstadoDefaults, type Hs6Estado } from "../../modules/hs6/estado";
 import { justificarHs6, type JustificacionHs6 } from "../../modules/hs6/justificacion";
@@ -203,6 +204,7 @@ const hs5: ModuloObra = {
         return e ? incumplimientoDeFranja(textosHs5.franjaDe(e, j, "ko")) : null;
       },
       memoria: () => memoriaHs5(j),
+      anejo: () => anejoHs5(j),
     };
   },
 };

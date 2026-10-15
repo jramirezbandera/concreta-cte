@@ -240,6 +240,29 @@ texto coincidente en los dos PDF. Cambia el diseño de los pasos 2 y 3:
   calculados).
 - **Ventilación** (primaria, secundaria): la línea que ya da el motor.
 
+**Hecho (2026-10-15).** [anejo.ts](src/modules/hs5/anejo.ts) (`anejoHs5`, `arquetasHs5`,
+`arquetaTabla413`), con seis partes:
+- **Unidades de desagüe por aparato**: tabla 4.1 con los nombres del DB, una columna por unidad
+  tipo y sus UD totales. Los cuartos de baño y de aseo van como conjunto, como los cuenta el motor.
+- **Bajantes**: las dos comprobaciones de la tabla 4.4 (UD totales y ramal más cargado). Si sirve y
+  atraviesa plantas a distinto lado de 3, una nota explica el criterio de las dos columnas.
+- **Ramales y colectores**: los ramales iguales de varias plantas en una fila («· P1, P2 y P3»).
+  En reforma, el colector existente con sus UD y la nota de lo que le añade la obra.
+- **Arquetas**, con las reglas de K-MEM.18:
+  - con colector enterrado, una a pie de cada bajante de residuales y de pluviales, no
+    sifónicas, con el Ø del colector al que vierten;
+  - con colgado, piezas especiales y registros;
+  - pozo general siempre: uno con alcantarillado unitario y uno por red con separativo;
+  - con unitario, arqueta de trasdós y cierre hidráulico;
+  - separador de grasas si hay garaje;
+  - registros a ≤ 15 m, en una línea;
+  - en reforma, la acometida existente no se modifica.
+- **Pluviales**: f = i/100 y una tabla con sumideros o canalón, bajante y colector.
+- **Ventilación**.
+
+Tests: [anejo.test.ts](src/modules/hs5/test/anejo.test.ts) (10), con la coherencia
+memoria–anejo de las UD por vivienda y del colector general. 1666 en verde.
+
 ### Paso 4 · Remisiones y planos
 
 - **Planos.** Un campo `planos?: string` por instalación («I05–I07»), editable en la pantalla de

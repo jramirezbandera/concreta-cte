@@ -77,8 +77,8 @@ describe("anejoInstalaciones", () => {
 
   it("un módulo que calcula pero aún no da su anejo sale como pendiente, no como hecho", () => {
     const aps = anejoInstalaciones(demo()).apartados;
-    expect(aps.map((x) => x.tipo)).toEqual(["calculado", "pendiente", "pendiente"]);
-    for (const ap of aps.filter((x) => x.key !== "hs4")) {
+    expect(aps.map((x) => x.tipo)).toEqual(["calculado", "calculado", "pendiente"]);
+    for (const ap of aps.filter((x) => x.key === "rebt")) {
       if (ap.tipo === "pendiente") expect(ap.motivo).toMatch(/^Pendiente: el cálculo extenso de/);
     }
   });
