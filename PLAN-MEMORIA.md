@@ -4,6 +4,8 @@
 > en [feature-29.md](feature-29.md), fase 3 en [feature-30.md](feature-30.md), fase 4 en
 > [feature-31.md](feature-31.md), fase 5 en [feature-32.md](feature-32.md)). Siguiente: fase 6,
 > partida en 6a (HS 4 y HS 5, [feature-33.md](feature-33.md)) y 6b (REBT, feature-34).
+> Fase 8 (estudio de gestión de residuos y estudio básico de seguridad y salud) añadida el
+> 2026-10-15; su verificación previa está en §4.2.
 > Origen: comparación de la memoria de la app con tres memorias de ejecución reales del estudio,
 > en `ejemplos/` (ignorada por git: son datos de clientes):
 > - plurifamiliar de 6 viviendas (`01_MEM_26_05_2025.docx`);
@@ -80,6 +82,7 @@ HR y HE 0/HE 1 van pegados como imagen.
 | **5 · Habitabilidad (municipal y autonómica)** ✅ | Iluminación y ventilación por estancia, densidad de viviendas, con la norma declarada por el proyectista (§5.5). | El caso de reforma justifica huecos y densidad con la norma que el usuario declara, citada en cada fila. |
 | **6 · Anejo de cálculo de instalaciones** | Anejo 5.3: HS 4 por tramos, HS 5 por aparato y arquetas, REBT con circuitos, derivación individual y tierra; la memoria remite a él y a los planos (§5.6). | El anejo sustituye al de CYPE en la unifamiliar del ejemplo, sin contradecir la memoria. |
 | **7 · Otros reglamentos y coherencia** | HE 2/RITE, HE 3, ficha ICT del arquitecto, accesibilidad autonómica; comprobaciones cruzadas en «Antes de entregar» (§5.7). | Las contradicciones de los ejemplos (ACS, grupo de presión, garaje) no se pueden dar sin un aviso. |
+| **8 · Residuos y seguridad y salud** | Dos anejos nuevos: estudio de gestión de residuos de construcción y demolición (RD 105/2008) y estudio básico de seguridad y salud (RD 1627/1997), con los datos de obra que hoy no existen: PEM, plazo, trabajadores y m² de demolición (§5.8). | El estudio de residuos del caso «Reforma: local a vivienda» sustituye al de `25P011_MEMORIA.doc` sin contradecir la memoria; el estudio básico sale en los dos casos con sus riesgos por fase de obra. |
 
 **Orden.**
 - La 1 va primero: son errores de feature-27, recién cerrada.
@@ -89,6 +92,9 @@ HR y HE 0/HE 1 van pegados como imagen.
   cuadro de superficies (feature-13).
 - La 6 es la más grande, sobre todo por el REBT aguas abajo.
 - Dentro de la 7, cada módulo es independiente.
+- La 8 va después de la 6b y no depende de la 7. Su verificación (§4.2) no toca código y se puede
+  hacer antes. Dentro de la 8, primero residuos (más cálculo y ya tiene modelo en los ejemplos) y
+  después seguridad y salud.
 
 ## 4. Fase 0 · Qué verificar antes de escribir código
 
@@ -130,6 +136,27 @@ leyó con un lector que resume: hay que cotejarlo palabra por palabra antes de i
 | 6 | **Habitabilidad en Andalucía**: no hay norma autonómica con fracciones para la vivienda libre (Ley 5/2025, sin cifras). La de VPO (Orden 21-07-2008, art. 7) pide 10 % de iluminación y 5 % de ventilación, sin baños ni aseos. **El «Decreto 141/2009» no es andaluz**: es canario, de instalaciones eléctricas. | La fracción la fija el PGOU: sin plantilla autonómica para vivienda libre. Plantilla VPO solo si la vivienda es protegida (§5.5). |
 | 6b | **PGOU de Málaga** (art. 12.2.34, densidad / 70, y los artículos de huecos) y **PGOU de Benalmádena** (art. 136, remite a la Orden de 1944): **sin confirmar en el boletín**. La Orden de 1944 pide **1/6**, no 1/8 (cotejada en el BOE, K-MEM.17). La modificación del art. 136 de Benalmádena (2022) fija densidades por zonas para **frenar la conversión de locales en viviendas**. | Sin plantillas municipales hasta leer los textos. Aviso en «local a vivienda» en Benalmádena. |
 | 7 | **Decreto 293/2009**: zonas comunes que se construyen, reforman o cambian de uso; nada en el interior de la vivienda libre; en reforma, solo lo modificado; convive con SUA 9 y se cumple el más exigente. No hay «Decreto 64/2012». | Fase 7. |
+
+### 4.2 Pendiente para la fase 8
+
+Al agente `cte-normativa`, con cita y versión, antes de escribir feature-35. Nada de esto está
+verificado todavía.
+
+8. **RD 105/2008 tras la Ley 7/2022**: contenido del estudio (art. 4.1.a, 1.º a 7.º), el
+   inventario de residuos peligrosos en demolición y reforma, y si los umbrales de separación del
+   art. 5.5 siguen vigentes o los sustituye la separación en obra del art. 30 de la Ley 7/2022.
+   Si hay excepción para obra menor, y si la demolición selectiva ya es obligatoria.
+9. **Andalucía**: qué añade la normativa autonómica de residuos (Ley 3/2023 de economía circular,
+   Decreto 73/2012 y su vigencia) y cómo se fija la fianza. Lo mismo en las ordenanzas de Málaga
+   y Benalmádena.
+10. **Ratios de generación**: una fuente citable (la del ITEC que usa el ejemplo u otra oficial)
+    de m³ o t de residuos por m² y tipo de obra (nueva, demolición, reforma), y las densidades
+    para pasar de volumen a peso.
+11. **RD 1627/1997**: los supuestos del art. 4 que obligan al estudio completo (presupuesto,
+    duración y trabajadores a la vez, jornadas, túneles y presas), el contenido del estudio básico
+    (art. 6), los trabajos con riesgos especiales (anexo II) y los servicios higiénicos de obra
+    (anexo IV). Cómo se cuentan las jornadas, y qué se exige si hay amianto (RD 396/2006), que es
+    lo normal en una reforma de un edificio antiguo.
 
 ## 5. Por fase: qué cambia
 
@@ -365,6 +392,61 @@ libres. Se pueden añadir como parámetros después.
 - **Piscina privada**: ITC-BT-31 en REBT, vaciado en HS 5 y la frase de SUA 6. Pendiente de
   decidir si entra (§6).
 
+### 5.8 Fase 8 · Residuos y seguridad y salud
+
+No son apartados del CTE sino documentos del proyecto de ejecución. A diferencia de los módulos
+del CTE, comprueban poco: estiman cantidades y eligen textos de un catálogo. `25P011_MEMORIA.doc`
+trae un estudio de residuos completo (lista europea de residuos, ratios del ITEC, coste de la
+gestión) dentro de la memoria; sirve de esqueleto, con los mismos principios del §2.
+
+- **Documentos.** Dos anejos, con la misma cabecera y numeración que la memoria y el anejo de
+  instalaciones: «Estudio de gestión de residuos de construcción y demolición» y «Estudio básico
+  de seguridad y salud». La memoria remite a ellos.
+- **Datos nuevos de la obra.** Hoy la app no sabe nada de presupuesto ni de demoliciones (no
+  aparecen en `src/`). En Los datos de la obra:
+  - presupuesto de ejecución material;
+  - plazo de ejecución y número máximo de trabajadores a la vez;
+  - m² de obra nueva y m² de demolición por tipo (tabiquería, solados, alicatados, falsos techos,
+    carpinterías, instalaciones), que en obra existente salen de lo intervenido (fase 3);
+  - si hay o puede haber amianto.
+
+  Precios de gestión, gestor autorizado y fianza son datos del proyectista: no se suponen
+  (principio 4). Sin ellos, el apartado sale pendiente en «Antes de entregar».
+
+**Estudio de gestión de residuos** (RD 105/2008, art. 4.1.a, salvo lo que diga la verificación 8):
+
+| Contenido | Cómo |
+|---|---|
+| 1.º Estimación de la cantidad, por código de la lista europea | Motor: m² × ratio por tipo de obra (verificación 10) → m³ y t por código. Tabla «Código \| Residuo \| m³ \| t». |
+| 2.º Prevención | Texto de plantilla según el tipo de obra. |
+| 3.º Reutilización, valorización o eliminación | Tabla por código con el destino; el gestor, si lo declara el proyectista. |
+| 4.º Separación | Motor: las fracciones que hay que separar en obra, con el criterio vigente (verificación 8). |
+| 5.º Planos de las instalaciones de almacenamiento | Remisión a planos, como en la fase 6. |
+| 6.º Pliego | Texto de plantilla. |
+| 7.º Valoración del coste | t × precio declarado por el proyectista; capítulo propio del presupuesto. |
+| Inventario de residuos peligrosos (demolición y reforma) | Lista desde lo intervenido y el dato de amianto. |
+
+**Estudio básico de seguridad y salud** (RD 1627/1997):
+
+- **Si basta el básico.** Motor: los supuestos del art. 4 (verificación 11) con el PEM, el plazo y
+  los trabajadores. Si alguno se supera, el apartado lo dice y la app no redacta el estudio
+  completo.
+- **Riesgos por fase de obra.** Un catálogo verificado de fases (demoliciones, movimiento de
+  tierras, estructura, cerramientos, cubiertas, instalaciones, acabados), medios auxiliares
+  (andamios, escaleras) y maquinaria. Por cada uno: riesgos evitables y cómo se evitan, riesgos no
+  evitables con sus medidas y protecciones colectivas e individuales. La app propone las fases
+  desde los módulos y lo intervenido; el proyectista marca o quita. Lo que añada se guarda en
+  local para reutilizarlo, como «Mis normas» de habitabilidad.
+- **Trabajos con riesgos especiales** (anexo II): avisados cuando la obra los tiene (por ejemplo,
+  amianto o caída de altura en cubierta).
+- **Instalaciones provisionales y servicios higiénicos**: dimensionados por el número de
+  trabajadores (anexo IV).
+- **Trabajos posteriores** (art. 6.3): previsiones para el mantenimiento, desde las instalaciones
+  y la cubierta que ya conocen los módulos.
+
+**Coherencia.** El PEM, las superficies y las demoliciones son los mismos en los dos estudios y
+en la memoria; la fase 7 los añade a las comprobaciones de «Antes de entregar».
+
 ## 6. Decisiones a validar con el usuario
 
 1. **Prosa y tabla, o solo tabla** en SI y SUA (fase 4). Propuesta: tabla más el texto que la
@@ -381,3 +463,9 @@ libres. Se pueden añadir como parámetros después.
    ofrecerlas como plantillas?
 7. **Piscina privada**: ¿entra en la fase 7 o se deja fuera?
 8. **«Normativa aplicada»**: ¿apartado al final de la memoria o solo en el anejo de fichas?
+9. **Residuos y seguridad y salud**: ¿anejos aparte o dentro de la memoria, como en 25P011?
+   Propuesta: aparte, como el anejo de instalaciones.
+10. **Presupuesto y demoliciones**: ¿a mano (PEM y m² por tipo) o importando las partidas de la
+    medición (BC3)? Propuesta: a mano primero; el BC3, si hace falta, después.
+11. **Catálogo de riesgos**: ¿se parte del que usa el estudio en sus proyectos o de las guías del
+    INSST? Propuesta: el del estudio, revisado contra el RD 1627/1997 y las guías.
