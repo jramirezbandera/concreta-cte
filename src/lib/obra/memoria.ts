@@ -19,6 +19,7 @@ import type { Aplicabilidad, JustificacionKey, Proyecto, TipoObraExistente } fro
 import { tiposDeObra } from "../proyecto/alcance";
 import { NOMBRE_FASE } from "../estudio/estudio";
 import { notaAlcance, type NotaAlcance } from "./alcanceTexto";
+import { remisionAnejo } from "./remision";
 import { evaluarExpediente, type EvaluacionJustificacion } from "./evaluar";
 import { aplicabilidadEfectiva } from "../proyecto/aplicabilidad";
 import { CLAVES_ENERGIA, programaEnergia, referenciaExterna, resultadosDe, type ResultadoVerificacion } from "../energia/verificacion";
@@ -149,7 +150,14 @@ interface ApartadoBase {
 }
 
 export type ApartadoMemoria =
-  | (ApartadoBase & { tipo: "redactado"; doc: MemoriaDoc; porRevisar: number; alcance?: NotaAlcance })
+  | (ApartadoBase & {
+      tipo: "redactado";
+      doc: MemoriaDoc;
+      porRevisar: number;
+      alcance?: NotaAlcance;
+      /** La frase que remite al anejo de instalaciones y a los planos (feature-33). */
+      remision?: string;
+    })
   | (ApartadoBase & { tipo: "no_cumple"; doc: MemoriaDoc; motivos: string[]; alcance?: NotaAlcance })
   | (ApartadoBase & { tipo: "no_aplica"; parrafo: string; cita?: string })
   | (ApartadoBase & {
@@ -210,7 +218,16 @@ function apartadoDe(ev: EvaluacionJustificacion, p: Proyecto): ApartadoSinColoca
     case "cumple":
     case "revisar": {
       const doc = ev.calculado!.memoria();
-      return { ...base, ...alcance, encabezado: rotulo(doc.norma, doc.titulo), tipo: "redactado", doc, porRevisar: ev.avisos.length };
+      const remision = remisionAnejo(ev.key, ev.calculado!.anejo?.(), p.datosGenerales.planos?.[ev.key]);
+      return {
+        ...base,
+        ...alcance,
+        encabezado: rotulo(doc.norma, doc.titulo),
+        tipo: "redactado",
+        doc,
+        porRevisar: ev.avisos.length,
+        ...(remision ? { remision } : {}),
+      };
     }
     case "no_cumple": {
       const doc = ev.calculado!.memoria();
@@ -448,6 +465,7 @@ export function bloquesMemoria(m: MemoriaCte): BloqueMemoria[] {
             ...(t.ancha ? { ancha: true } : {}),
           });
         }
+        if (a.remision) b.push({ tipo: "parrafo", texto: a.remision });
         if (a.doc.fuente) b.push({ tipo: "nota", texto: fuenteCorta(a.doc.fuente) });
         break;
       case "no_cumple":

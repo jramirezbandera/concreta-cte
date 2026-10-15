@@ -14,30 +14,16 @@
 
 import type { AnejoDoc } from "../cte/presentacion";
 import { piezasMemoria, textoParrafo, textoTabla } from "../cte/memoria";
-import type { JustificacionKey, Proyecto } from "../proyecto/tipos";
+import type { Proyecto } from "../proyecto/tipos";
 import { evaluarExpediente, type EvaluacionJustificacion } from "./evaluar";
 import { fuenteCorta, numeroFijo, type BloqueMemoria } from "./memoria";
+import { INSTALACIONES_ANEJO, numeroTabla, type InstalacionAnejo } from "./remision";
+
+export { INSTALACIONES_ANEJO, numeroTabla, type InstalacionAnejo };
 
 export const TITULO_ANEJO_INSTALACIONES = "Instalaciones del edificio";
 /** El número del anejo en las memorias del estudio (5. Anejos · 5.3). Fijo, como los capítulos 3 y 4. */
 export const NUMERO_ANEJO_INSTALACIONES = "5.3";
-
-export interface InstalacionAnejo {
-  key: JustificacionKey;
-  /** «5.3.1». */
-  numero: string;
-  /** «Fontanería». */
-  titulo: string;
-  /** «DB-HS 4», «REBT»: la del encabezado, no la ITC que cita el módulo. */
-  norma: string;
-}
-
-/** Las instalaciones del anejo, en su orden y con su número fijo. */
-export const INSTALACIONES_ANEJO: readonly InstalacionAnejo[] = [
-  { key: "hs4", numero: "5.3.1", titulo: "Fontanería", norma: "DB-HS 4" },
-  { key: "hs5", numero: "5.3.2", titulo: "Saneamiento", norma: "DB-HS 5" },
-  { key: "rebt", numero: "5.3.3", titulo: "Electricidad", norma: "REBT" },
-];
 
 interface ApartadoAnejoBase extends InstalacionAnejo {
   codigo: string;
@@ -59,11 +45,6 @@ export interface AnejoInstalaciones {
   titulo: string;
   proyecto: string;
   apartados: ApartadoAnejo[];
-}
-
-/** «Tabla 5.3.1-2»: las tablas de cada instalación, numeradas en orden. */
-export function numeroTabla(numero: string, i: number): string {
-  return `Tabla ${numero}-${i + 1}`;
 }
 
 /** «el cálculo extenso de la fontanería». */

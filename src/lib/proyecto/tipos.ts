@@ -155,6 +155,11 @@ export interface DatosGenerales {
    * municipal y autonómica. Sin ella, el apartado de habitabilidad no se redacta.
    */
   habitabilidad?: HabitabilidadObra;
+  /**
+   * Los planos de cada instalación, como los numera el proyectista («I05–I07»),
+   * para que la memoria remita a ellos (feature-33).
+   */
+  planos?: Partial<Record<JustificacionKey, string>>;
 }
 
 /** Fase del proyecto, como la nombra el documento. */

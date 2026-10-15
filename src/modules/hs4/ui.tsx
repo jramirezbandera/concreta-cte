@@ -39,6 +39,10 @@ import { edificioParaModulo, obraExistenteDe } from "../../lib/proyecto/alcance"
 import { ajustar } from "../../lib/ui/ajustar";
 import { fmt } from "../../lib/units/format";
 import { DecisionesHs4 } from "./DecisionesHs4";
+import { idaAcsEstimada_m } from "./anejo";
+import { AHORRO_AGUA } from "./tablas";
+import { CampoNumeroOpcional, CampoPlanos, ParaElAnejo } from "../../components/justificacion/ParaElAnejo";
+import { conPlanos } from "../../lib/obra/remision";
 import { filasQueEntraHs4 } from "./entra";
 import { hs4EstadoDefaults, type Hs4Estado } from "./estado";
 import { toFichaData } from "./ficha";
@@ -243,14 +247,43 @@ export function Hs4Module() {
       }
     />
   );
+  const ida = idaAcsEstimada_m(j);
   const entradas = (
-    <DecisionesHs4
-      state={state}
-      setField={setField}
-      j={j}
-      onPresion={cambiarPresion}
-      presionConfirmada={revisados.includes("presion-red-supuesta")}
-    />
+    <>
+      <DecisionesHs4
+        state={state}
+        setField={setField}
+        j={j}
+        onPresion={cambiarPresion}
+        presionConfirmada={revisados.includes("presion-red-supuesta")}
+      />
+      <ParaElAnejo>
+        <CampoPlanos
+          id="hs4-planos"
+          valor={dg.planos?.hs4}
+          onChange={(v) => actualizarDatosGenerales({ ...proyecto.datosGenerales, planos: conPlanos(proyecto.datosGenerales.planos, "hs4", v) }, new Date().toISOString())}
+          ayuda="Los de fontanería, como los numeras («I05–I07»). La memoria remite a ellos y al anejo."
+        />
+        {j.red.unifamiliar && !j.existente && (
+          <CampoNumeroOpcional
+            id="hs4-contador"
+            etiqueta="Ø del contador"
+            valor={state.diametroContador_mm}
+            unidad="mm"
+            onChange={(v) => setField("diametroContador_mm", v)}
+            ayuda="El que fije la compañía. Vacío, el anejo toma el del tubo de alimentación para el armario de la tabla 4.1."
+          />
+        )}
+        <CampoNumeroOpcional
+          id="hs4-ida-acs"
+          etiqueta="Ida del ACS al punto más alejado"
+          valor={state.longitudIdaAcs_m}
+          unidad="m"
+          onChange={(v) => setField("longitudIdaAcs_m", v)}
+          ayuda={`Con ${AHORRO_AGUA.datos.retornoACSDesdeLongitudIda_m} m o más lleva retorno. Vacío, el anejo la estima sobre la red${ida !== null ? `: ${fmt(ida, undefined, 1)} m` : ""}.`}
+        />
+      </ParaElAnejo>
+    </>
   );
 
   // ── El dibujo ──────────────────────────────────────────────────────────────

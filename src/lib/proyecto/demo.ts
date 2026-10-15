@@ -78,6 +78,8 @@ const DATOS_GENERALES_DEMO: DatosGenerales = {
   terrenoTipo: "IV",
   nivelFreatico: { tipo: "no_detectado", reconocimiento_m: 10 },
   permeabilidadTerreno: "medio",
+  // Los planos de las instalaciones (feature-33): la memoria remite a ellos.
+  planos: { hs4: "I05", hs5: "I06 e I07" },
   // Habitabilidad (feature-32): NORMA DE DEMOSTRACIÓN, como el estudio
   // geotécnico. No es la de Cáceres: la herramienta no trae normas municipales
   // sin cotejar, y el rótulo lo dice para que no pase a una memoria real.

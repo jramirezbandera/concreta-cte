@@ -39,6 +39,8 @@ import { edificioParaModulo, obraExistenteDe } from "../../lib/proyecto/alcance"
 import { ajustar } from "../../lib/ui/ajustar";
 import { fmt } from "../../lib/units/format";
 import { DecisionesHs5 } from "./DecisionesHs5";
+import { CampoPlanos, ParaElAnejo } from "../../components/justificacion/ParaElAnejo";
+import { conPlanos } from "../../lib/obra/remision";
 import { filasQueEntra } from "./entra";
 import { hs5EstadoDefaults, type Hs5Estado } from "./estado";
 import { toFichaData } from "./ficha";
@@ -76,7 +78,7 @@ const ESTADO_TEXTO: Record<string, string> = {
 
 export function Hs5Module() {
   const { state, setField, reset, herencia } = useJustificacionState<Hs5State>("hs5", hs5EstadoDefaults);
-  const { proyecto, derivados, marcarRevisado } = useProyecto();
+  const { proyecto, derivados, marcarRevisado, actualizarDatosGenerales } = useProyecto();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [vista, setVista] = useState<VistaModulo>("esquema");
@@ -262,6 +264,14 @@ export function Hs5Module() {
         colgadoDe={j.red.colgadoDe}
         redExistente={j.existente ?? null}
       />
+      <ParaElAnejo>
+        <CampoPlanos
+          id="hs5-planos"
+          valor={proyecto.datosGenerales.planos?.hs5}
+          onChange={(v) => actualizarDatosGenerales({ ...proyecto.datosGenerales, planos: conPlanos(proyecto.datosGenerales.planos, "hs5", v) }, new Date().toISOString())}
+          ayuda="Los de saneamiento, como los numeras («I08–I10»). La memoria remite a ellos y al anejo."
+        />
+      </ParaElAnejo>
     </>
   );
 

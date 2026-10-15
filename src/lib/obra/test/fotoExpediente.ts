@@ -4,11 +4,13 @@ import { crearProyectoDemo } from "../../proyecto/demo";
 import type { Intervencion, JustificacionKey, Proyecto } from "../../proyecto/tipos";
 import { evaluarExpediente } from "../evaluar";
 import { memoriaCte, textoPlanoMemoriaCte } from "../memoria";
+import { anejoInstalaciones, textoPlanoAnejoInstalaciones } from "../anejoInstalaciones";
 
 // =============================================================================
 // Foto del expediente (feature-27, paso 8): por proyecto, la aplicabilidad, la
 // nota, la cita, el estado y el veredicto de cada justificación, y una huella
-// del texto entero de la memoria. Se genera igual con el código de partida
+// del texto entero de la memoria y, desde feature-33, la del anejo de
+// instalaciones. Se genera igual con el código de partida
 // (7e576d8) y con el de ahora: obra nueva y las reformas sin asistente deben
 // dar lo mismo.
 // =============================================================================
@@ -65,6 +67,7 @@ export function fotoExpedientes(): FotoExpediente {
       fila[e.key] = [j.aplicabilidad, j.estado, j.veredicto ?? "", huella(j.nota ?? ""), j.cita ?? ""].join("|");
     }
     fila.memoria = huella(textoPlanoMemoriaCte(memoriaCte(p)));
+    fila.anejo = huella(textoPlanoAnejoInstalaciones(anejoInstalaciones(p)));
     foto[id] = fila;
   }
   return foto;

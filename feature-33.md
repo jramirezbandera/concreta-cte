@@ -274,6 +274,30 @@ memoria–anejo de las UD por vivienda y del colector general. 1666 en verde.
 - **Antes de entregar.** Si hay apartado de instalaciones sin planos declarados, un pendiente
   suave: «Indica los planos de fontanería».
 
+**Hecho (2026-10-16).**
+- [remision.ts](src/lib/obra/remision.ts): la lista de instalaciones, `numeroTabla`, la frase de
+  remisión (`remisionAnejo`) y `conPlanos`. Lo usan la memoria y el anejo sin importarse el uno al
+  otro.
+- `DatosGenerales.planos`. El Demo lleva «I05» en HS 4 e «I06 e I07» en HS 5.
+- **Memoria**: al final de HS 4 y HS 5, antes de la fuente, va la frase «El cálculo extenso se
+  desarrolla en el anejo 5.3.1 (tablas 5.3.1-1 a 5.3.1-3). Ver plano I05.».
+  - Sale en el Word, en el PDF y en la página «Leer».
+  - Pone «plano» o «planos» según haya uno o varios.
+- **«Antes de entregar»**: «Indica los planos de fontanería» si falta el dato. Desaparece al
+  rellenarlo.
+- **Pantalla**: [ParaElAnejo.tsx](src/components/justificacion/ParaElAnejo.tsx), una sección
+  «Para el anejo» bajo las decisiones de HS 4 y HS 5.
+  - Planos, en los dos.
+  - En HS 4, además, la ida del ACS (con la estimada a la vista) y, en la unifamiliar nueva, el Ø
+    del contador.
+  - Se confirma al salir o con Enter; Escape lo deshace; vacío es sin dato.
+- **Foto del expediente**: se añade la huella del anejo. Solo cambian las 40 huellas de la memoria
+  y se añaden las 40 del anejo.
+- Tests: [remision.test.ts](src/lib/obra/test/remision.test.ts) y
+  [ParaElAnejo.test.tsx](src/components/justificacion/test/ParaElAnejo.test.tsx). 1676 en verde.
+- **Comprobado en el navegador**, en el servidor de desarrollo: los planos y la ida escritos en HS 4
+  salen en la memoria y en el anejo, sin errores de consola.
+
 ### Paso 5 · Casos y cierre
 
 - Tests puros de `anejoInstalaciones` sobre el demo, la unifamiliar y «Reforma: local a vivienda»:

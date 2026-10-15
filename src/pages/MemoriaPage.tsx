@@ -30,7 +30,7 @@ import { getJustificacion } from "../data/justificacionRegistry";
 // cumple se enseña con su motivo y no entra en lo que se descarga.
 // =============================================================================
 
-function Parrafos({ doc }: { doc: MemoriaDoc }): JSX.Element {
+function Parrafos({ doc, remision }: { doc: MemoriaDoc; remision?: string }): JSX.Element {
   return (
     <>
       {piezasMemoria(doc).map((x, i) =>
@@ -50,6 +50,7 @@ function Parrafos({ doc }: { doc: MemoriaDoc }): JSX.Element {
           </p>
         ),
       )}
+      {remision && <p className="mb-3">{remision}</p>}
       {doc.fuente && <p className="text-text-disabled mb-1 font-mono text-[10.5px] leading-relaxed">{fuenteCorta(doc.fuente)}</p>}
     </>
   );
@@ -123,7 +124,7 @@ function Apartado({ a, base }: { a: ApartadoMemoria; base: string }): JSX.Elemen
               memoria.
             </p>
           )}
-          <Parrafos doc={a.doc} />
+          <Parrafos doc={a.doc} {...(a.remision ? { remision: a.remision } : {})} />
         </>
       )}
       {a.tipo === "no_cumple" && (
