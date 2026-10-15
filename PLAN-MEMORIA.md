@@ -5,7 +5,7 @@
 > [feature-31.md](feature-31.md), fase 5 en [feature-32.md](feature-32.md)). Siguiente: fase 6,
 > partida en 6a (HS 4 y HS 5, [feature-33.md](feature-33.md)) y 6b (REBT, feature-34).
 > Fase 8 (estudio de gestión de residuos y estudio básico de seguridad y salud) añadida el
-> 2026-10-15; su verificación previa está en §4.2.
+> 2026-10-15; su verificación previa, hecha el 2026-10-16, está en §4.2 y §4.3.
 > Origen: comparación de la memoria de la app con tres memorias de ejecución reales del estudio,
 > en `ejemplos/` (ignorada por git: son datos de clientes):
 > - plurifamiliar de 6 viviendas (`01_MEM_26_05_2025.docx`);
@@ -137,10 +137,10 @@ leyó con un lector que resume: hay que cotejarlo palabra por palabra antes de i
 | 6b | **PGOU de Málaga** (art. 12.2.34, densidad / 70, y los artículos de huecos) y **PGOU de Benalmádena** (art. 136, remite a la Orden de 1944): **sin confirmar en el boletín**. La Orden de 1944 pide **1/6**, no 1/8 (cotejada en el BOE, K-MEM.17). La modificación del art. 136 de Benalmádena (2022) fija densidades por zonas para **frenar la conversión de locales en viviendas**. | Sin plantillas municipales hasta leer los textos. Aviso en «local a vivienda» en Benalmádena. |
 | 7 | **Decreto 293/2009**: zonas comunes que se construyen, reforman o cambian de uso; nada en el interior de la vivienda libre; en reforma, solo lo modificado; convive con SUA 9 y se cumple el más exigente. No hay «Decreto 64/2012». | Fase 7. |
 
-### 4.2 Pendiente para la fase 8
+### 4.2 Verificación de la fase 8
 
-Al agente `cte-normativa`, con cita y versión, antes de escribir feature-35. Nada de esto está
-verificado todavía.
+Preguntas al agente `cte-normativa`, con cita y versión, antes de escribir feature-35. Hechas el
+2026-10-16; el resultado está en §4.3.
 
 8. **RD 105/2008 tras la Ley 7/2022**: contenido del estudio (art. 4.1.a, 1.º a 7.º), el
    inventario de residuos peligrosos en demolición y reforma, y si los umbrales de separación del
@@ -157,6 +157,33 @@ verificado todavía.
     (art. 6), los trabajos con riesgos especiales (anexo II) y los servicios higiénicos de obra
     (anexo IV). Cómo se cuentan las jornadas, y qué se exige si hay amianto (RD 396/2006), que es
     lo normal en una reforma de un edificio antiguo.
+
+### 4.3 Lo que ha salido para la fase 8 (2026-10-16)
+
+Detalle, citas y grado de confirmación en
+[research/verificacion-residuos.md](research/verificacion-residuos.md) (K-RCD.1–17) y
+[research/verificacion-seguridad-salud.md](research/verificacion-seguridad-salud.md)
+(K-SYS.1–14). RD 105/2008, Ley 7/2022, Decreto 73/2012, Ley 3/2023, LEGAM, lista europea de
+residuos, RD 1627/1997, RD 396/2006, VII Convenio y Guía del INSST están cotejados en el texto de
+los PDF oficiales; la tabla C.1 del DB SE-AE, la Decisión 2025/934 y la fórmula de jornadas de la
+Guía, en imagen. El resto de normas citadas sigue «LEÍDO (web)».
+
+| # | Resultado | Para la app |
+|---|---|---|
+| 8 | **RD 105/2008** sin modificar desde 2008: art. 4.1.a 1.º–7.º (el 1.º pide t y m³ por código), inventario de peligrosos en el art. 4.1.b; el proyecto básico lleva 1.º–4.º, 7.º y el inventario (art. 4.2). **Ley 7/2022 art. 30**: desde 01-07-2022 se separan en obra madera, minerales, metales, vidrio, plástico y yeso **sin umbral**; el art. 5.5 solo sigue valiendo para papel y cartón (0,5 t). **Demolición selectiva obligatoria** desde 01-01-2024, retirando antes los peligrosos («en particular, el amianto»). La exclusión de obra menor está en la **DA 1.ª** (no en el art. 3): una reforma con proyecto o un cambio de uso **sí necesita estudio**. La lista se cita por la **Decisión 2014/955/UE**; la Orden MAM/304/2002 está derogada. La Decisión Delegada 2025/934 cambia el 16 06 (pilas) desde el **09-11-2026**. | Estudio en todo proyecto de la app. Separación con las seis fracciones, sin umbrales ni exención autonómica. Códigos versionados por fecha de obra. |
+| 9 | **Decreto 73/2012** vigente (arts. 79–89). La **LEGAM** (Ley 2/2026) deroga la GICA desde el 20-06-2026 pero mantiene sus reglamentos, y no regula los residuos de obra. **Fianza** (art. 81): por ordenanza municipal sobre el PEM, mínimos 2 % demolición, 1 % obra nueva, 2 % excavación; el RD 105/2008 (art. 6.3) la basa en el presupuesto del estudio. Art. 86: a vertedero solo si el tratamiento es inviable y se justifica. Ordenanzas de Málaga y Benalmádena **sin confirmar**. | Fianza: dato del proyectista, con el mínimo autonómico como aviso. Destino por defecto, planta de valorización. No citar el art. 104 de la GICA. |
+| 10 | Los ratios «del ITEC» de la plantilla son de **demolición completa**, en tres grupos y **sin fuente citable**. La guía **CGATE-CSCAE «Ratios Nacionales» (2020)** es la mejor fuente, pero sus tablas son imagen y su **licencia CC BY-NC-ND** impide meterlas en la app sin permiso. Densidades: **DB SE-AE anejo C** (tabla C.1 cotejada en imagen). | Reforma: estimación **por partidas** (m² × espesor × densidad del SE-AE, con su código). Obra nueva o demolición completa: ratio declarado por el proyectista, con su fuente. |
+| 11 | **Art. 4**: estudio completo si el **PEC** (no el PEM; la Guía: (PEM+GG+BI)×(1+IVA)) ≥ 450.759,08 €, o > 30 días laborables **y** > 20 trabajadores a la vez, o > 500 jornadas (Σ Tᵢ×Dᵢ, jornada de 8 h), o túneles, galerías, conducciones subterráneas o presas. Con proyecto siempre hay estudio o estudio básico. El básico es **descriptivo, sin presupuesto**, y la Guía pide **justificar** con datos por qué no es completo. **Amianto**: la identificación «deberá quedar reflejada» en el estudio básico (RD 396/2006 art. 10.2), vigente y sin modificar. **Servicios higiénicos**: el RD 1627 dice «número suficiente»; las ratios salen del **VII Convenio, art. 232.2** (1 ducha y 1 lavabo por cada 10, 1 retrete por cada 25 trabajadores a la vez). El aviso previo está derogado. **No hay catálogo oficial de riesgos por fases**: la Guía pide riesgos ligados a las fases de la obra, no listas genéricas. | Pedir PEM + GG, BI e IVA, días laborables y trabajadores. Tabla de justificación del art. 4 al principio. Apartado de amianto obligatorio. Catálogo propio con la estructura de los anexos I y IV del RD y la terminología del INSST. |
+
+**Fallos de la plantilla de 25P011** (K-RCD.17): normativa derogada (Ley 10/1998, RD 833/1988,
+Orden MAM/304/2002, Decisión 96/350/CE); normas de Madrid en una obra de Málaga; separación y
+demolición selectiva como opcionales o con umbrales; códigos de minería; un código contado dos
+veces; contenido del proyecto básico por debajo del art. 4.2.
+
+**Pendiente antes de cerrar feature-35**: ordenanzas de fianza de Málaga y Benalmádena; tabla C.3
+del DB SE-AE en imagen y la edición vigente del DB; si se ha publicado el nuevo RD de amianto (a
+2026-10-16 el consolidado del RD 396/2006 no lo marca derogado); modelo de estudio de la CNSST de
+2011; el esponjamiento de los escombros.
 
 ## 5. Por fase: qué cambia
 
@@ -404,23 +431,28 @@ gestión) dentro de la memoria; sirve de esqueleto, con los mismos principios de
   de seguridad y salud». La memoria remite a ellos.
 - **Datos nuevos de la obra.** Hoy la app no sabe nada de presupuesto ni de demoliciones (no
   aparecen en `src/`). En Los datos de la obra:
-  - presupuesto de ejecución material;
-  - plazo de ejecución y número máximo de trabajadores a la vez;
+  - presupuesto de ejecución material y los porcentajes de gastos generales, beneficio
+    industrial e IVA, para calcular el de ejecución por contrata (umbral del art. 4 del
+    RD 1627/1997, K-SYS.1);
+  - plazo de ejecución en días laborables y número máximo de trabajadores a la vez; las jornadas
+    solo si días × trabajadores pasa de 500;
   - m² de obra nueva y m² de demolición por tipo (tabiquería, solados, alicatados, falsos techos,
     carpinterías, instalaciones), que en obra existente salen de lo intervenido (fase 3);
-  - si hay o puede haber amianto.
+  - si hay amianto (no / posible / identificado), obligatorio en obra existente: lo piden los
+    dos estudios (K-RCD.3, K-SYS.9).
 
   Precios de gestión, gestor autorizado y fianza son datos del proyectista: no se suponen
-  (principio 4). Sin ellos, el apartado sale pendiente en «Antes de entregar».
+  (principio 4). La fianza avisa del mínimo del Decreto 73/2012 art. 81 (K-RCD.12). Sin ellos,
+  el apartado sale pendiente en «Antes de entregar».
 
-**Estudio de gestión de residuos** (RD 105/2008, art. 4.1.a, salvo lo que diga la verificación 8):
+**Estudio de gestión de residuos** (RD 105/2008, art. 4.1.a, con la Ley 7/2022; §4.3):
 
 | Contenido | Cómo |
 |---|---|
-| 1.º Estimación de la cantidad, por código de la lista europea | Motor: m² × ratio por tipo de obra (verificación 10) → m³ y t por código. Tabla «Código \| Residuo \| m³ \| t». |
+| 1.º Estimación de la cantidad, por código de la lista europea | Motor. Reforma: por partidas, m² × espesor × densidad del DB SE-AE, cada una con su código. Obra nueva o demolición completa: ratio que declara el proyectista con su fuente (K-RCD.16). Tabla «Código \| Residuo \| m³ \| t». |
 | 2.º Prevención | Texto de plantilla según el tipo de obra. |
-| 3.º Reutilización, valorización o eliminación | Tabla por código con el destino; el gestor, si lo declara el proyectista. |
-| 4.º Separación | Motor: las fracciones que hay que separar en obra, con el criterio vigente (verificación 8). |
+| 3.º Reutilización, valorización o eliminación | Tabla por código con el destino: planta de valorización por defecto; vertedero solo para rechazos o con la justificación del art. 86 del Decreto 73/2012. El gestor, si lo declara el proyectista. |
+| 4.º Separación | Las seis fracciones de la Ley 7/2022 art. 30.2, sin umbral; papel y cartón con el umbral de 0,5 t del art. 5.5. Demolición selectiva obligatoria. |
 | 5.º Planos de las instalaciones de almacenamiento | Remisión a planos, como en la fase 6. |
 | 6.º Pliego | Texto de plantilla. |
 | 7.º Valoración del coste | t × precio declarado por el proyectista; capítulo propio del presupuesto. |
@@ -428,10 +460,12 @@ gestión) dentro de la memoria; sirve de esqueleto, con los mismos principios de
 
 **Estudio básico de seguridad y salud** (RD 1627/1997):
 
-- **Si basta el básico.** Motor: los supuestos del art. 4 (verificación 11) con el PEM, el plazo y
-  los trabajadores. Si alguno se supera, el apartado lo dice y la app no redacta el estudio
-  completo.
-- **Riesgos por fase de obra.** Un catálogo verificado de fases (demoliciones, movimiento de
+- **Si basta el básico.** Motor: abre con una tabla de los supuestos del art. 4.1 (umbral, dato
+  del proyecto, si se supera), que es la justificación que pide la Guía del INSST. Si alguno se
+  supera, el apartado lo dice y la app no redacta el estudio completo. Sin presupuesto propio:
+  el estudio básico es descriptivo.
+- **Riesgos por fase de obra.** No hay catálogo oficial (K-SYS.12–13): uno propio con la
+  estructura de los anexos I y IV del RD y los nombres de riesgos del INSST, de fases (demoliciones, movimiento de
   tierras, estructura, cerramientos, cubiertas, instalaciones, acabados), medios auxiliares
   (andamios, escaleras) y maquinaria. Por cada uno: riesgos evitables y cómo se evitan, riesgos no
   evitables con sus medidas y protecciones colectivas e individuales. La app propone las fases
@@ -439,8 +473,11 @@ gestión) dentro de la memoria; sirve de esqueleto, con los mismos principios de
   local para reutilizarlo, como «Mis normas» de habitabilidad.
 - **Trabajos con riesgos especiales** (anexo II): avisados cuando la obra los tiene (por ejemplo,
   amianto o caída de altura en cubierta).
-- **Instalaciones provisionales y servicios higiénicos**: dimensionados por el número de
-  trabajadores (anexo IV).
+- **Amianto**: apartado propio en obra existente, con la identificación previa, empresa inscrita
+  en el RERA y plan de trabajo aprobado antes de empezar (RD 396/2006, arts. 10, 11 y 17). Sin
+  valores límite.
+- **Instalaciones provisionales y servicios higiénicos**: lo obligatorio por el VII Convenio,
+  art. 232.2 (por número de trabajadores a la vez), separado de lo que recomienda la Guía.
 - **Trabajos posteriores** (art. 6.3): previsiones para el mantenimiento, desde las instalaciones
   y la cubierta que ya conocen los módulos.
 
@@ -467,5 +504,9 @@ en la memoria; la fase 7 los añade a las comprobaciones de «Antes de entregar�
    Propuesta: aparte, como el anejo de instalaciones.
 10. **Presupuesto y demoliciones**: ¿a mano (PEM y m² por tipo) o importando las partidas de la
     medición (BC3)? Propuesta: a mano primero; el BC3, si hace falta, después.
-11. **Catálogo de riesgos**: ¿se parte del que usa el estudio en sus proyectos o de las guías del
-    INSST? Propuesta: el del estudio, revisado contra el RD 1627/1997 y las guías.
+11. **Catálogo de riesgos**: ¿se parte del que usa el estudio en sus proyectos? No hay catálogo
+    oficial (K-SYS.12). Propuesta: el del estudio, si lo hay, ordenado con la estructura del
+    RD 1627/1997 y la terminología del INSST.
+12. **Ratios de residuos en obra nueva**: ¿se pide permiso a CGATE y CSCAE para usar su guía de
+    ratios en la app (licencia CC BY-NC-ND), o el proyectista teclea el ratio y lo cita?
+    Propuesta: que lo teclee, y pedir el permiso aparte.
