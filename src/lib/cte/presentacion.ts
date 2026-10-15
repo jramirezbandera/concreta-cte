@@ -63,6 +63,11 @@ export interface TablaMemoria {
   notas?: string[];
   /** Cuántos párrafos van antes; sin decir, todos. */
   tras?: number;
+  /**
+   * Hasta 12 columnas en letra más pequeña, sin partir: una tabla de tramos
+   * partida por la columna 0 no se lee (feature-33).
+   */
+  ancha?: boolean;
 }
 
 /** La memoria redactada de una justificación. */
@@ -72,6 +77,26 @@ export interface MemoriaDoc {
   norma: string;
   parrafos: Trozo[][];
   tablas?: TablaMemoria[];
+  /** La línea de fuentes del pie. */
+  fuente: string;
+}
+
+/**
+ * Una parte del cálculo extenso de una instalación («Caudales por aparato»,
+ * «Camino crítico»): párrafos y tablas, como un apartado de la memoria.
+ */
+export interface ParteAnejo {
+  titulo: string;
+  parrafos: Trozo[][];
+  /** El anejo numera sus tablas («Tabla 5.3.1-1. …») delante del rótulo. */
+  tablas?: TablaMemoria[];
+}
+
+/** El cálculo extenso de una instalación, para el anejo de instalaciones (feature-33). */
+export interface AnejoDoc {
+  /** Las abreviaturas de sus tablas, una vez, al principio: [«Qb», «caudal bruto [l/s]»]. */
+  abreviaturas?: [string, string][];
+  partes: ParteAnejo[];
   /** La línea de fuentes del pie. */
   fuente: string;
 }

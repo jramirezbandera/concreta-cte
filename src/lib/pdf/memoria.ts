@@ -58,7 +58,9 @@ function texto(doc: jsPDF, t: string, y: number, e: Estilo): number {
 const ALINEA: Record<TipoColumna, "left" | "right" | "center"> = { texto: "left", dato: "right", norma: "center", proyecto: "center", cumple: "center" };
 
 /** Las celdas de las tablas: 7,5 pt, con su margen y su interlineado [mm]. */
-const CELDA = { size: 7.5, pad: 1.5, lh: 3.2, arriba: 3.1, abajo: 1.4 };
+const CELDA_NORMAL = { size: 7.5, pad: 1.5, lh: 3.2, arriba: 3.1, abajo: 1.4 };
+/** Las de una tabla `ancha` (tramos, feature-33): 6,5 pt. */
+const CELDA_ANCHA = { size: 6.5, pad: 1.1, lh: 2.8, arriba: 2.7, abajo: 1.2 };
 
 /**
  * Una tabla de la memoria. A diferencia de `drawTable` (las fichas), cada celda
@@ -68,8 +70,9 @@ const CELDA = { size: 7.5, pad: 1.5, lh: 3.2, arriba: 3.1, abajo: 1.4 };
  */
 function tabla(doc: jsPDF, b: Extract<BloqueMemoria, { tipo: "tabla" }>, y: number): number {
   const { cabecera, filas } = b;
+  const CELDA = b.ancha ? CELDA_ANCHA : CELDA_NORMAL;
   const tipos = columnasDe(b);
-  const anchos = anchosDeTabla(cabecera, filas).map((a) => (CW * a) / 100);
+  const anchos = anchosDeTabla(cabecera, filas, b.ancha === true).map((a) => (CW * a) / 100);
   doc.setFontSize(CELDA.size);
   const partir = (celdas: string[], negrita: (j: number) => boolean): string[][] =>
     anchos.map((w, j) => {
@@ -197,12 +200,13 @@ export function componerMemoriaPdf(bloques: BloqueMemoria[], membrete: Membrete)
   return doc;
 }
 
-export function renderMemoriaPdf(bloques: BloqueMemoria[], membrete: Membrete): PdfResult {
+/** El PDF de la memoria o, con `filename`, de otro documento con los mismos bloques (el anejo de instalaciones). */
+export function renderMemoriaPdf(bloques: BloqueMemoria[], membrete: Membrete, filename?: string): PdfResult {
   const doc = componerMemoriaPdf(bloques, membrete);
   const blob = doc.output("blob");
   return {
     blobUrl: URL.createObjectURL(blob),
-    filename: nombreArchivoMemoria(membrete.proyecto, "pdf"),
+    filename: filename ?? nombreArchivoMemoria(membrete.proyecto, "pdf"),
     pageCount: doc.getNumberOfPages(),
   };
 }

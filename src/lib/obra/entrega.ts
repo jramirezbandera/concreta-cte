@@ -10,6 +10,7 @@
 
 import type { JustificacionKey, Proyecto } from "../proyecto/tipos";
 import { evaluarExpediente, type EvaluacionJustificacion } from "./evaluar";
+import { anejoInstalaciones } from "./anejoInstalaciones";
 
 export interface PendienteEntrega {
   /** Estable: `<clave>:<id>`. */
@@ -61,6 +62,12 @@ export interface Entregables {
   fichas: RecuentoEntregable;
   /** Esquemas para el plano (DXF): saneamiento (HS5) y fontanería (HS4). */
   esquemas: RecuentoEntregable & { claves: JustificacionKey[] };
+  /**
+   * Anejo de instalaciones (feature-33): fontanería, saneamiento y
+   * electricidad. Listas, las desarrolladas y las que no aplican; la que aún
+   * no se desarrolla no cuenta.
+   */
+  instalaciones: RecuentoEntregable;
 }
 
 /** Los módulos con esquema para el plano, en el orden en que se entregan. */
@@ -77,6 +84,15 @@ function recuento(evs: EvaluacionJustificacion[]): RecuentoEntregable {
   };
 }
 
+function recuentoInstalaciones(p: Proyecto, evs: readonly EvaluacionJustificacion[]): RecuentoEntregable {
+  const aps = anejoInstalaciones(p, evs).apartados;
+  return {
+    listos: aps.filter((a) => a.tipo === "calculado" || a.tipo === "no_aplica").length,
+    total: aps.length,
+    noCumplen: aps.filter((a) => a.tipo === "no_cumple").map((a) => a.codigo),
+  };
+}
+
 export function entregables(p: Proyecto): Entregables {
   const evs = evaluarExpediente(p).justificaciones;
   const calculadas = evs.filter((ev) => CALCULADA.has(ev.estado));
@@ -85,5 +101,6 @@ export function entregables(p: Proyecto): Entregables {
     memoria: recuento(evs.filter((ev) => CALCULADA.has(ev.estado) || ev.estado === "no_aplica")),
     fichas: recuento(calculadas),
     esquemas: { ...recuento(esquemas), claves: esquemas.filter((ev) => LISTA.has(ev.estado)).map((ev) => ev.key) },
+    instalaciones: recuentoInstalaciones(p, evs),
   };
 }

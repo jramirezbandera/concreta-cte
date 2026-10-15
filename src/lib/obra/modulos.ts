@@ -11,7 +11,7 @@
 import type { FilaQueEntra } from "../../components/justificacion/QueEntra";
 import { zonaClimaticaDe } from "../../data/zonasClimaticasHE";
 import { estadosElementos } from "../cte/estados";
-import type { DetalleElemento, MemoriaDoc } from "../cte/presentacion";
+import type { AnejoDoc, DetalleElemento, MemoriaDoc } from "../cte/presentacion";
 import type { Aviso, ElementoResultado } from "../cte/resultado";
 import type { ProyectoModulo } from "../proyecto/alcance";
 import type { JustificacionKey, Veredicto } from "../proyecto/tipos";
@@ -94,6 +94,8 @@ export interface ModuloCalculado {
   textoIncumplimiento(el: ElementoResultado): TextoObra | null;
   /** La memoria redactada (la de la pestaña Memoria del módulo). Se calcula al pedirla. */
   memoria(): MemoriaDoc;
+  /** El cálculo extenso para el anejo de instalaciones, si el módulo lo tiene (feature-33). */
+  anejo?(): AnejoDoc;
 }
 
 export interface ModuloObra {

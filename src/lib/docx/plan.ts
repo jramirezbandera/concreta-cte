@@ -39,7 +39,8 @@ export type EstiloParrafo = "Heading1" | "Heading2" | "Heading3" | "Normal" | "C
 
 export type BloquePlan =
   | { tipo: "parrafo"; estilo: EstiloParrafo; texto: string }
-  | { tipo: "tabla"; filas: FilaPlan[]; anchos: number[] };
+  /** `ancha`: letra más pequeña (feature-33). */
+  | { tipo: "tabla"; filas: FilaPlan[]; anchos: number[]; ancha?: boolean };
 
 export interface PlanDocx {
   titulo: string;
@@ -50,6 +51,8 @@ export interface PlanDocx {
 
 /** Columnas que caben en un A4 vertical; por encima se trocea, nunca se gira la página. */
 export const MAX_COLUMNAS = 8;
+/** Las de una tabla `ancha` (tramos), a 7 pt: 18 + 11·6 = 84 ≤ 100 (feature-33). */
+export const MAX_COLUMNAS_ANCHA = 12;
 /** Tope del peso de una columna, en caracteres. */
 const PESO_MAX = 40;
 /** La columna 0 es la etiqueta: entre el 18 y el 40 %. */
@@ -125,15 +128,17 @@ export function repartirAnchos(pesos: number[]): number[] {
 /** El ancho útil del A4 [mm] y lo que ocupa cada carácter a 8 pt (medido en Word con Arial en negrita), con los márgenes de la celda. */
 const ANCHO_UTIL_MM = 174;
 const MM_POR_CARACTER = 1.8;
+/** A 7 pt, en las tablas `anchas`. */
+const MM_POR_CARACTER_ANCHA = 1.6;
 const MARGEN_CELDA_MM = 3;
 
 /**
  * Lo que pide la palabra más larga de una columna para no partirse [%]: una
  * columna estrecha («Cumple») partiría la palabra por la mitad (feature-31).
  */
-function minimoDeColumna(head: string[], filas: string[][], j: number): number {
+function minimoDeColumna(head: string[], filas: string[][], j: number, mmPorCaracter: number): number {
   const larga = Math.max(0, ...[head[j] ?? "", ...filas.map((f) => f[j] ?? "")].flatMap((t) => t.split(/\s+/)).map((p) => p.length));
-  return Math.min(30, Math.ceil(((larga * MM_POR_CARACTER + MARGEN_CELDA_MM) * 100) / ANCHO_UTIL_MM));
+  return Math.min(30, Math.ceil(((larga * mmPorCaracter + MARGEN_CELDA_MM) * 100) / ANCHO_UTIL_MM));
 }
 
 /**
@@ -141,9 +146,10 @@ function minimoDeColumna(head: string[], filas: string[][], j: number): number {
  * le cabe su palabra más larga, se lo dan las que más holgura tienen. Si los
  * mínimos no caben, el reparto se queda como está.
  */
-export function anchosDeTabla(head: string[], filas: string[][]): number[] {
+export function anchosDeTabla(head: string[], filas: string[][], ancha = false): number[] {
   const a = repartirAnchos(pesosDeColumnas(head, filas));
-  const min = head.map((_, j) => minimoDeColumna(head, filas, j));
+  const mm = ancha ? MM_POR_CARACTER_ANCHA : MM_POR_CARACTER;
+  const min = head.map((_, j) => minimoDeColumna(head, filas, j, mm));
   if (min.reduce((x, y) => x + y, 0) > 100) return a;
   for (let j = 0; j < a.length; j++) {
     while (a[j] < min[j]) {
@@ -163,10 +169,11 @@ interface TrozoTabla {
   tipos: TipoColumna[];
 }
 
-/** Una tabla más ancha que `MAX_COLUMNAS` se parte repitiendo la columna 0. */
-function trocearTabla(head: string[], filas: string[][], tipos: TipoColumna[]): TrozoTabla[] {
-  if (head.length <= MAX_COLUMNAS) return [{ head, filas, tipos }];
-  const porTrozo = MAX_COLUMNAS - 1;
+/** Una tabla más ancha que `MAX_COLUMNAS` (o `MAX_COLUMNAS_ANCHA`) se parte repitiendo la columna 0. */
+function trocearTabla(head: string[], filas: string[][], tipos: TipoColumna[], ancha: boolean): TrozoTabla[] {
+  const max = ancha ? MAX_COLUMNAS_ANCHA : MAX_COLUMNAS;
+  if (head.length <= max) return [{ head, filas, tipos }];
+  const porTrozo = max - 1;
   const trozos: TrozoTabla[] = [];
   for (let desde = 1; desde < head.length; desde += porTrozo) {
     const hasta = Math.min(desde + porTrozo, head.length);
@@ -188,7 +195,8 @@ function celdaPlan(texto: string, negrita: boolean, tipo: TipoColumna): CeldaPla
 function planificarTabla(b: Extract<BloqueMemoria, { tipo: "tabla" }>): BloquePlan[] {
   const out: BloquePlan[] = [];
   if (b.rotulo) out.push({ tipo: "parrafo", estilo: "RotuloTabla", texto: b.rotulo });
-  for (const trozo of trocearTabla(b.cabecera, b.filas, columnasDe(b))) {
+  const ancha = b.ancha === true;
+  for (const trozo of trocearTabla(b.cabecera, b.filas, columnasDe(b), ancha)) {
     out.push({
       tipo: "tabla",
       filas: [
@@ -199,7 +207,8 @@ function planificarTabla(b: Extract<BloqueMemoria, { tipo: "tabla" }>): BloquePl
           celdas: fila.map((texto, j) => celdaPlan(texto, j === 0 || (trozo.tipos[j] === "cumple" && esNoCumple(texto)), trozo.tipos[j])),
         })),
       ],
-      anchos: anchosDeTabla(trozo.head, trozo.filas),
+      anchos: anchosDeTabla(trozo.head, trozo.filas, ancha),
+      ...(ancha ? { ancha } : {}),
     });
   }
   for (const n of notasNumeradas(b.notas)) out.push({ tipo: "parrafo", estilo: "NotaTabla", texto: n });

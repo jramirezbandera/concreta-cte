@@ -101,6 +101,8 @@ describe("entregables", () => {
       memoria: { listos: 27, total: 27, noCumplen: [] },
       fichas: { listos: 25, total: 25, noCumplen: [] },
       esquemas: { listos: 2, total: 2, noCumplen: [], claves: ["hs5", "hs4"] },
+      // Ningún módulo desarrolla aún su anejo (feature-33, pasos 2 y 3).
+      instalaciones: { listos: 0, total: 3, noCumplen: [] },
     });
   });
 
@@ -109,6 +111,7 @@ describe("entregables", () => {
       memoria: { listos: 26, total: 27, noCumplen: ["HS4"] },
       fichas: { listos: 24, total: 25, noCumplen: ["HS4"] },
       esquemas: { listos: 1, total: 2, noCumplen: ["HS4"], claves: ["hs5"] },
+      instalaciones: { listos: 0, total: 3, noCumplen: ["HS4"] },
     });
   });
 });

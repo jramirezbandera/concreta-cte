@@ -265,7 +265,8 @@ describe("Lo que se entrega", () => {
     const p = demo();
     montar(<LoQueSeEntrega />, { ...p, datosGenerales: { ...p.datosGenerales, presionAcometida_kPa: 60 } });
     expect(screen.getByText("26 de 27 apartados")).toBeInTheDocument();
-    expect(screen.getAllByText("HS4 no cumple")).toHaveLength(3);
+    // Memoria, anejo de instalaciones, fichas y esquemas.
+    expect(screen.getAllByText("HS4 no cumple")).toHaveLength(4);
     expect(screen.getByText("1 de 2 esquemas")).toBeInTheDocument();
   });
 

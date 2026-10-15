@@ -359,6 +359,8 @@ export type BloqueMemoria =
       columnas?: TipoColumna[];
       /** Debajo, numeradas. */
       notas?: string[];
+      /** Hasta 12 columnas en letra más pequeña, sin partir (feature-33). */
+      ancha?: boolean;
     };
 
 /** El párrafo de una externa: con qué se justifica y su documento. */
@@ -443,6 +445,7 @@ export function bloquesMemoria(m: MemoriaCte): BloqueMemoria[] {
             ...(t.rotulo ? { rotulo: t.rotulo } : {}),
             ...(t.columnas ? { columnas: t.columnas } : {}),
             ...(t.notas && t.notas.length > 0 ? { notas: t.notas.map(sinSupuestos) } : {}),
+            ...(t.ancha ? { ancha: true } : {}),
           });
         }
         if (a.doc.fuente) b.push({ tipo: "nota", texto: fuenteCorta(a.doc.fuente) });
@@ -492,11 +495,16 @@ export function textoPlanoMemoriaCte(m: MemoriaCte): string {
 
 /** «Viviendas y local · C/ Mayor 12» → «memoria-cte-viviendas-y-local-c-mayor-12.pdf». */
 export function nombreArchivoMemoria(proyecto: string, ext: "pdf" | "docx"): string {
+  return nombreArchivo("memoria-cte", proyecto, ext);
+}
+
+/** El nombre de un documento del proyecto: «<prefijo>-<proyecto en minúsculas y sin acentos>.<ext>». */
+export function nombreArchivo(prefijo: string, proyecto: string, ext: "pdf" | "docx"): string {
   const slug = proyecto
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  return `memoria-cte-${slug || "proyecto"}.${ext}`;
+  return `${prefijo}-${slug || "proyecto"}.${ext}`;
 }

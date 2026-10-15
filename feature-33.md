@@ -130,6 +130,26 @@ texto coincidente en los dos PDF. Cambia el diseño de los pasos 2 y 3:
   nueva «Anejo de instalaciones» con Leer, Word y PDF, y su recuento en `entregables()`. El hook,
   como `useExportarMemoria`.
 
+**Hecho (2026-10-15).**
+- [anejoInstalaciones.ts](src/lib/obra/anejoInstalaciones.ts): `anejoInstalaciones(p)`,
+  `bloquesAnejoInstalaciones`, `numeroTabla` y `textoPlanoAnejoInstalaciones`.
+  - Cada módulo da su cálculo con `ModuloCalculado.anejo?(): AnejoDoc`: abreviaturas y partes
+    (H3, sin número), con párrafos y tablas.
+  - Un módulo que cumple pero aún no tiene `anejo()` sale como «Pendiente: el cálculo extenso de
+    … aún no se desarrolla en este anejo». No cuenta como listo.
+  - El párrafo de entrada remite a la memoria: fontanería (3.4.4), saneamiento (3.4.5) y
+    electricidad (4.1.1).
+- `TablaMemoria.ancha`: hasta 12 columnas sin partir, a 7 pt en el Word y a 6,5 pt en el PDF.
+- `memoriaDocx` recibe el asunto y la descripción; `renderMemoriaPdf`, el nombre del archivo.
+  `nombreArchivo(prefijo, …)`.
+- Lo que se entrega: la fila «Anejo de instalaciones» con Leer, Word y PDF, y el recuento
+  `entregables().instalaciones`. Hasta que HS 4 y HS 5 den su `anejo()` sale «0 de 3» y los
+  botones están desactivados.
+- Página «Leer» en `/p/:id/anejo-instalaciones`.
+- `useExportarMemoria` pasa a ser `useExportarDocumento`, con dos usos: la memoria y el anejo.
+- Tests: [anejoInstalaciones.test.ts](src/lib/obra/test/anejoInstalaciones.test.ts) (10). También
+  se ajustan los de entregables y los de Lo que se entrega. 1638 en verde.
+
 ### Paso 2 · Fontanería (5.3.1)
 
 - **Motor, sin cambiar números.** `ResultadoTramoHS4` gana `j_kPa_m` y `presionEntrada_kPa`. Se

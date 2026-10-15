@@ -1,6 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
-import { bloquesMemoria, memoriaCte, nombreArchivoMemoria } from "../../lib/obra/memoria";
+import type { Proyecto } from "../../lib/proyecto/tipos";
+import { bloquesMemoria, memoriaCte, nombreArchivo, nombreArchivoMemoria, type BloqueMemoria } from "../../lib/obra/memoria";
+import { anejoInstalaciones, bloquesAnejoInstalaciones } from "../../lib/obra/anejoInstalaciones";
+import type { MetaDocumento } from "../../lib/docx/render";
 import { descargarBlob, descargarUrl } from "../../lib/export/descargar";
 import { membreteDe } from "../../lib/estudio/estudio";
 import { useEstudio } from "../../lib/estudio/useEstudio";
@@ -9,10 +12,11 @@ import { PdfPreviewModal } from "../ui/PdfPreviewModal";
 import { showToast } from "../ui/Toast";
 
 // =============================================================================
-// Exportar la memoria CTE (feature-16 §D y §E): Word y PDF, con las librerías
-// cargadas bajo demanda (ni `docx` ni jsPDF entran en el bundle de La obra).
-// El PDF se abre en la previsualización, como el anejo; el Word se descarga.
-// Lo usan la tarjeta de La obra y la página de la memoria.
+// Exportar la memoria CTE (feature-16 §D y §E) y el anejo de instalaciones
+// (feature-33): Word y PDF, con las librerías cargadas bajo demanda (ni `docx`
+// ni jsPDF entran en el bundle de La obra). Los dos son bloques de memoria y
+// se pintan igual. El PDF se abre en la previsualización, como el anejo de
+// fichas; el Word se descarga. Lo usan La obra y las páginas de cada documento.
 // =============================================================================
 
 export interface ExportarMemoria {
@@ -23,7 +27,33 @@ export interface ExportarMemoria {
   modal: ReactNode;
 }
 
-export function useExportarMemoria(): ExportarMemoria {
+/** Un documento del proyecto hecho de bloques de memoria. */
+interface DocumentoExportable {
+  /** «la memoria», para los avisos. */
+  nombre: string;
+  bloques: (p: Proyecto) => BloqueMemoria[];
+  archivo: (proyecto: string, ext: "pdf" | "docx") => string;
+  /** Las propiedades del Word; sin decir, las de la memoria. */
+  meta?: MetaDocumento;
+}
+
+const MEMORIA: DocumentoExportable = {
+  nombre: "la memoria",
+  bloques: (p) => bloquesMemoria(memoriaCte(p)),
+  archivo: nombreArchivoMemoria,
+};
+
+const ANEJO_INSTALACIONES: DocumentoExportable = {
+  nombre: "el anejo de instalaciones",
+  bloques: (p) => bloquesAnejoInstalaciones(anejoInstalaciones(p)),
+  archivo: (proyecto, ext) => nombreArchivo("anejo-instalaciones", proyecto, ext),
+  meta: {
+    asunto: "Anejo de instalaciones del edificio",
+    descripcion: "Cálculo de las instalaciones del edificio redactado a partir del cálculo con Concreta Memorias",
+  },
+};
+
+function useExportarDocumento(d: DocumentoExportable): ExportarMemoria {
   const { proyecto } = useProyecto();
   const [estudio] = useEstudio();
   const [ocupado, setOcupado] = useState<"word" | "pdf" | null>(null);
@@ -36,16 +66,14 @@ export function useExportarMemoria(): ExportarMemoria {
     };
   }, [pdf]);
 
-  const bloques = () => bloquesMemoria(memoriaCte(proyecto));
-
   const word = async () => {
     setOcupado("word");
     try {
       const { memoriaDocx } = await import("../../lib/docx/render");
-      const blob = await memoriaDocx(bloques(), membreteDe(estudio, proyecto));
-      descargarBlob(blob, nombreArchivoMemoria(proyecto.nombre, "docx"));
+      const blob = await memoriaDocx(d.bloques(proyecto), membreteDe(estudio, proyecto), d.meta);
+      descargarBlob(blob, d.archivo(proyecto.nombre, "docx"));
     } catch {
-      showToast("No se pudo generar el Word de la memoria", { autoDismiss: 4000 });
+      showToast(`No se pudo generar el Word de ${d.nombre}`, { autoDismiss: 4000 });
     } finally {
       setOcupado(null);
     }
@@ -55,9 +83,9 @@ export function useExportarMemoria(): ExportarMemoria {
     setOcupado("pdf");
     try {
       const { renderMemoriaPdf } = await import("../../lib/pdf/memoria");
-      setPdf(renderMemoriaPdf(bloques(), membreteDe(estudio, proyecto)));
+      setPdf(renderMemoriaPdf(d.bloques(proyecto), membreteDe(estudio, proyecto), d.archivo(proyecto.nombre, "pdf")));
     } catch {
-      showToast("No se pudo generar el PDF de la memoria", { autoDismiss: 4000 });
+      showToast(`No se pudo generar el PDF de ${d.nombre}`, { autoDismiss: 4000 });
     } finally {
       setOcupado(null);
     }
@@ -74,4 +102,12 @@ export function useExportarMemoria(): ExportarMemoria {
   ) : null;
 
   return { word: () => void word(), pdf: () => void abrirPdf(), ocupado, modal };
+}
+
+export function useExportarMemoria(): ExportarMemoria {
+  return useExportarDocumento(MEMORIA);
+}
+
+export function useExportarAnejoInstalaciones(): ExportarMemoria {
+  return useExportarDocumento(ANEJO_INSTALACIONES);
 }

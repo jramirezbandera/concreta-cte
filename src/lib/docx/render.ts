@@ -47,6 +47,7 @@ const MARGEN = 1134;
 const FUENTE = "Arial";
 const CUERPO = 20; // 10 pt (OOXML cuenta en medios puntos)
 const TABLA = 16; // 8 pt
+const TABLA_ANCHA = 14; // 7 pt (feature-33)
 const NEGRO = "000000";
 const GRIS_CABECERA = "EFEFEF";
 const MARGEN_CELDA = { top: 40, bottom: 40, left: 70, right: 70 };
@@ -104,7 +105,7 @@ function parrafo(estilo: EstiloParrafo, texto: string): Paragraph {
 }
 
 /** Una celda: Word exige al menos un párrafo, y dentro de la tabla sin espacio debajo. */
-function celda(texto: string, negrita: boolean, ancho: number, cabecera: boolean, centrada: boolean): TableCell {
+function celda(texto: string, negrita: boolean, ancho: number, cabecera: boolean, centrada: boolean, size: number): TableCell {
   return new TableCell({
     width: { size: ancho, type: WidthType.PERCENTAGE },
     shading: cabecera ? { type: ShadingType.CLEAR, color: "auto", fill: GRIS_CABECERA } : undefined,
@@ -113,15 +114,15 @@ function celda(texto: string, negrita: boolean, ancho: number, cabecera: boolean
       new Paragraph({
         spacing: { before: 0, after: 0 },
         ...(centrada ? { alignment: AlignmentType.CENTER } : {}),
-        children: [new TextRun({ text: texto, bold: negrita, size: TABLA })],
+        children: [new TextRun({ text: texto, bold: negrita, size })],
       }),
     ],
   });
 }
 
-function fila(f: FilaPlan, anchos: number[]): TableRow {
+function fila(f: FilaPlan, anchos: number[], size: number): TableRow {
   return new TableRow({
-    children: f.celdas.map((c, j) => celda(c.texto, c.negrita, anchos[j], f.cabecera, c.centrada === true)),
+    children: f.celdas.map((c, j) => celda(c.texto, c.negrita, anchos[j], f.cabecera, c.centrada === true, size)),
     // La cabecera se repite en cada página y ninguna fila se parte.
     tableHeader: f.cabecera,
     cantSplit: true,
@@ -130,7 +131,7 @@ function fila(f: FilaPlan, anchos: number[]): TableRow {
 
 function tabla(b: Extract<BloquePlan, { tipo: "tabla" }>): Table {
   return new Table({
-    rows: b.filas.map((f) => fila(f, b.anchos)),
+    rows: b.filas.map((f) => fila(f, b.anchos, b.ancha ? TABLA_ANCHA : TABLA)),
     width: { size: 100, type: WidthType.PERCENTAGE },
     layout: TableLayoutType.FIXED,
     style: "TableGrid",
@@ -195,7 +196,18 @@ function pie(m: Membrete): Footer {
   });
 }
 
-export function documentoMemoria(bloques: BloqueMemoria[], membrete: Membrete): Document {
+/** Lo que dice el documento de sí mismo en sus propiedades: la memoria, salvo que se diga otra cosa (el anejo de instalaciones). */
+export interface MetaDocumento {
+  asunto: string;
+  descripcion: string;
+}
+
+const META_MEMORIA: MetaDocumento = {
+  asunto: "Justificación del CTE",
+  descripcion: "Memoria CTE redactada a partir del cálculo con Concreta Memorias",
+};
+
+export function documentoMemoria(bloques: BloqueMemoria[], membrete: Membrete, meta: MetaDocumento = META_MEMORIA): Document {
   const plan = planificarDocx(bloques);
   const children: (Paragraph | Table)[] = [];
   plan.bloques.forEach((b, i) => {
@@ -212,10 +224,10 @@ export function documentoMemoria(bloques: BloqueMemoria[], membrete: Membrete): 
   return new Document({
     styles: ESTILOS,
     title: plan.titulo,
-    subject: `Justificación del CTE · ${membrete.proyecto}`,
+    subject: `${meta.asunto} · ${membrete.proyecto}`,
     creator: "Concreta Memorias",
     lastModifiedBy: "Concreta Memorias",
-    description: "Memoria CTE redactada a partir del cálculo con Concreta Memorias",
+    description: meta.descripcion,
     keywords: "CTE, DB-HS, DB-HE, memoria justificativa, instalaciones",
     sections: [
       {
@@ -236,7 +248,7 @@ export function documentoMemoria(bloques: BloqueMemoria[], membrete: Membrete): 
   });
 }
 
-/** El .docx de la memoria, como blob. */
-export async function memoriaDocx(bloques: BloqueMemoria[], membrete: Membrete): Promise<Blob> {
-  return Packer.toBlob(documentoMemoria(bloques, membrete));
+/** El .docx de la memoria (o de otro documento con los mismos bloques), como blob. */
+export async function memoriaDocx(bloques: BloqueMemoria[], membrete: Membrete, meta?: MetaDocumento): Promise<Blob> {
+  return Packer.toBlob(documentoMemoria(bloques, membrete, meta));
 }

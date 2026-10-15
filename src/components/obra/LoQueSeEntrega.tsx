@@ -7,7 +7,7 @@ import { descargarBlob } from "../../lib/export/descargar";
 import { GeneradorAnejo } from "../proyecto/GeneradorAnejo";
 import { showToast } from "../ui/Toast";
 import { RotuloSeccion } from "./LoQueSeJustifica";
-import { useExportarMemoria } from "./useExportarMemoria";
+import { useExportarAnejoInstalaciones, useExportarMemoria } from "./useExportarMemoria";
 
 // =============================================================================
 // «Lo que se entrega» (feature-16 §D, maqueta v4 de La obra): la memoria CTE
@@ -19,12 +19,21 @@ import { useExportarMemoria } from "./useExportarMemoria";
 const ACCION =
   "text-accent hover:text-accent-hover focus-visible:outline-accent inline-flex items-center gap-1 text-[12.5px] font-medium hover:underline focus-visible:outline-2 disabled:cursor-wait disabled:opacity-60 disabled:no-underline";
 
-function Miniatura({ tipo }: { tipo: "memoria" | "fichas" | "esquemas" }): JSX.Element {
+type TipoEntregable = "memoria" | "anejo" | "fichas" | "esquemas";
+
+function Miniatura({ tipo }: { tipo: TipoEntregable }): JSX.Element {
   const trazo = "var(--color-text-disabled)";
   return (
     <svg width="56" height="70" viewBox="0 0 56 70" aria-hidden="true" className="shrink-0">
       <rect x="5" y="4" width="46" height="62" rx="2" fill="var(--color-bg-primary)" stroke="var(--color-border-main)" />
       {tipo === "memoria" && <path d="M12 14h22M12 22h32M12 27h32M12 32h26M12 40h32M12 45h32M12 50h18" stroke={trazo} strokeWidth="1.6" />}
+      {tipo === "anejo" && (
+        <>
+          <path d="M12 12h20" stroke={trazo} strokeWidth="1.6" />
+          <path d="M12 19h32M12 25h32M12 31h32M12 37h32M12 43h32M20 19v24M28 19v24M36 19v24" stroke={trazo} strokeWidth="1" />
+          <path d="M12 50h32M12 55h22" stroke={trazo} strokeWidth="1.6" />
+        </>
+      )}
       {tipo === "fichas" && (
         <>
           <path d="M12 12h20" stroke={trazo} strokeWidth="1.6" />
@@ -62,7 +71,7 @@ function Recuento({ r, unidad }: { r: RecuentoEntregable; unidad: [string, strin
 }
 
 function Entregable(props: {
-  tipo: "memoria" | "fichas" | "esquemas";
+  tipo: TipoEntregable;
   titulo: string;
   descripcion: string;
   estado: ReactNode;
@@ -87,6 +96,7 @@ export function LoQueSeEntrega(): JSX.Element {
   const { proyecto } = useProyecto();
   const e = entregables(proyecto);
   const memoria = useExportarMemoria();
+  const anejo = useExportarAnejoInstalaciones();
   const [dxf, setDxf] = useState(false);
 
   const descargarDxf = async () => {
@@ -124,6 +134,39 @@ export function LoQueSeEntrega(): JSX.Element {
               </button>
               <button type="button" onClick={memoria.pdf} disabled={memoria.ocupado !== null || e.memoria.total === 0} className={ACCION}>
                 {memoria.ocupado === "pdf" && girando}
+                PDF
+              </button>
+            </>
+          }
+        />
+        <Entregable
+          tipo="anejo"
+          titulo="Anejo de instalaciones"
+          descripcion="El cálculo extenso de fontanería, saneamiento y electricidad: tramos, unidades de desagüe y arquetas, al que remite la memoria."
+          estado={<Recuento r={e.instalaciones} unidad={["instalación", "instalaciones"]} />}
+          acciones={
+            <>
+              <Link to="anejo-instalaciones" aria-label="Leer el anejo de instalaciones" className={ACCION}>
+                Leer
+              </Link>
+              <button
+                type="button"
+                onClick={anejo.word}
+                disabled={anejo.ocupado !== null || e.instalaciones.listos === 0}
+                aria-label="Anejo de instalaciones en Word"
+                className={ACCION}
+              >
+                {anejo.ocupado === "word" && girando}
+                Word
+              </button>
+              <button
+                type="button"
+                onClick={anejo.pdf}
+                disabled={anejo.ocupado !== null || e.instalaciones.listos === 0}
+                aria-label="Anejo de instalaciones en PDF"
+                className={ACCION}
+              >
+                {anejo.ocupado === "pdf" && girando}
                 PDF
               </button>
             </>
@@ -171,6 +214,7 @@ export function LoQueSeEntrega(): JSX.Element {
         />
       </ul>
       {memoria.modal}
+      {anejo.modal}
     </section>
   );
 }
