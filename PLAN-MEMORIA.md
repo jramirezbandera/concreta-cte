@@ -512,9 +512,10 @@ en la memoria; la fase 7 los añade a las comprobaciones de «Antes de entregar�
 7. **Piscina privada**: ¿entra en la fase 7 o se deja fuera?
 8. **«Normativa aplicada»**: ¿apartado al final de la memoria o solo en el anejo de fichas?
 9. **Residuos y seguridad y salud**: ¿anejos aparte o dentro de la memoria, como en 25P011?
-   Propuesta: aparte, como el anejo de instalaciones.
+   Propuesta: aparte, como el anejo de instalaciones. **Validada (2026-10-16).**
 10. **Presupuesto y demoliciones**: ¿a mano (PEM y m² por tipo) o importando las partidas de la
-    medición (BC3)? Propuesta: a mano primero; el BC3, si hace falta, después.
+    medición (BC3)? Propuesta: a mano primero; el BC3, si hace falta, después. **Validada
+    (2026-10-16).**
 11. **Catálogo de riesgos**: ¿se parte del que usa el estudio en sus proyectos? No hay catálogo
     oficial (K-SYS.12). Propuesta: el del estudio, si lo hay, ordenado con la estructura del
     RD 1627/1997 y la terminología del INSST.
