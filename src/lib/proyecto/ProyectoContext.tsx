@@ -21,6 +21,7 @@ import type {
   Flexibilidad,
   Proyecto,
 } from "./tipos";
+import type { EstudioSeguridadSalud } from "../ebss/tipos";
 import { contextoDe } from "./derivar";
 import { guardarProyecto } from "./storage";
 
@@ -75,6 +76,8 @@ export interface ProyectoContextValue {
   ): void;
   /** Marca (o desmarca) un aviso de una justificación como revisado (feature-14). */
   marcarRevisado(key: JustificacionKey, avisoId: string, revisado: boolean): void;
+  /** Los datos del estudio de seguridad y salud (feature-35). Edición del usuario → toca `modificado`. */
+  actualizarSeguridadSalud(seguridadSalud: EstudioSeguridadSalud, nowIso: string): void;
   /**
    * Escribe YA el expediente en el navegador, sin esperar al debounce, y deja
    * nada pendiente. `false` si el navegador no lo admite (almacenamiento lleno).
@@ -252,6 +255,10 @@ export function ProyectoProvider(props: {
     });
   }, []);
 
+  const actualizarSeguridadSalud = useCallback((seguridadSalud: EstudioSeguridadSalud, nowIso: string) => {
+    setProyecto((prev) => ({ ...prev, seguridadSalud, modificado: nowIso }));
+  }, []);
+
   const value = useMemo<ProyectoContextValue>(
     () => ({
       proyecto,
@@ -265,6 +272,7 @@ export function ProyectoProvider(props: {
       setRefExterna,
       setVerificacionEnergetica,
       marcarRevisado,
+      actualizarSeguridadSalud,
       guardarAhora,
     }),
     [
@@ -279,6 +287,7 @@ export function ProyectoProvider(props: {
       setRefExterna,
       setVerificacionEnergetica,
       marcarRevisado,
+      actualizarSeguridadSalud,
       guardarAhora,
     ],
   );

@@ -165,6 +165,37 @@ leyendo, sin cambiar el schema). Tipos en `src/lib/ebss/tipos.ts`:
 
 Funciones puras con sus tests, como el resto de `src/lib/`.
 
+**Hecho (2026-10-16).** [src/lib/ebss/tipos.ts](src/lib/ebss/tipos.ts) y
+[src/lib/ebss/datos.ts](src/lib/ebss/datos.ts), con 22 tests en `src/lib/ebss/test/datos.test.ts`:
+- `Proyecto.seguridadSalud?` y `actualizarSeguridadSalud` en el contexto. Al leer del navegador o
+  importar, `parseSeguridadSalud` descarta lo que no tiene forma; un expediente sin el campo se
+  lee igual.
+- Mano de obra: `jornadasDePeriodos` (Σ Tᵢ × Dᵢ), `cotaJornadas` y `pideJornadas` (plazo ×
+  trabajadores > 500), `jornadasDeclaradas` (manda la tabla si la hay) y `estimarTrabajadores`.
+- `amiantoObligatorio`, `preguntaCabezaFamilia` y `pendientesSeguridadSalud`, la lista de lo que
+  falta, en el orden del documento, para «Antes de entregar».
+- Los dos datos del paso 0: `entorno.tensionLineas_kV` y `medios.gruaTorre` / `gruaMovil`.
+
+**Decisiones del paso 1, a validar:**
+1. **Derribo previo en obra nueva** (`demolicionPrevia`, dato nuevo): si se derriba una
+   construcción existente, el amianto es obligatorio como en una obra sobre edificio existente
+   (K-SYS.9 habla de «toda obra de demolición»).
+2. **La estimación pide también el coste de la hora** (€/h), sin valor por defecto, como el
+   porcentaje de mano de obra. Da las jornadas y la **media** de trabajadores (por exceso, mínimo 1),
+   no el máximo a la vez; el art. 4 solo usa lo que confirma el proyectista.
+3. **Cuentan como pendientes**, además de los de la lista del paso 6: los porcentajes del PEC, las
+   jornadas si la cota pasa de 500, el supuesto d), las dos preguntas de coordinación, la tabla
+   de servicios (con uno solo sin declarar), la tensión si hay líneas aéreas, la vía pública y,
+   en obra existente, el edificio en uso. **El cabeza de familia no**: sin respuesta, el estudio
+   no añade el párrafo del art. 2.3.
+4. **0 % de GG, BI o IVA** es un dato válido; el PEM tiene que ser mayor que 0 y el porcentaje de
+   mano de obra, como mucho el 100 %.
+5. **Las ediciones de una ficha se guardan por texto** (lo quitado es el texto del catálogo tal
+   cual): si el catálogo cambia ese texto, la medida vuelve a salir, que es lo prudente. Los
+   riesgos, por clave.
+6. **Las 28 claves de riesgo** (K-SYS.15) ya son un tipo (`ClaveRiesgo`); los nombres llegan con
+   el catálogo en el paso 3.
+
 ### Paso 2 · Motor: art. 4, coordinación y servicios higiénicos
 
 `src/lib/ebss/art4.ts`, puro:

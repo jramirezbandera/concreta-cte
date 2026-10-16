@@ -2,6 +2,7 @@ import type { DatosGenerales, Edificio, Proyecto } from "./tipos";
 import { LS_ACTIVO, LS_INDICE, LS_INDICE_V1, LS_PROYECTO_PREFIX, PROYECTO_SCHEMA_VERSION } from "./tipos";
 import { canonicalStringify as jsonCanonico, inputsFingerprint } from "../pdf/utils";
 import { crearProyectoDemo } from "./demo";
+import { parseSeguridadSalud } from "../ebss/datos";
 
 // =============================================================================
 // Persistencia multi-proyecto (feature-6 §B; schema 2 en feature-12).
@@ -134,10 +135,14 @@ export function sanearOrigenes(e: Edificio): Edificio {
   };
 }
 
-/** El proyecto con el edificio saneado (ver `sanearOrigenes`). */
+/**
+ * El proyecto con el edificio saneado (ver `sanearOrigenes`) y los datos del
+ * estudio de seguridad y salud sin lo que no tiene forma (`parseSeguridadSalud`).
+ */
 function conOrigenesSaneados(p: Record<string, unknown>): Proyecto {
-  const proyecto = p as unknown as Proyecto;
-  return { ...proyecto, edificio: sanearOrigenes(proyecto.edificio) };
+  const { seguridadSalud: ss, ...proyecto } = p as unknown as Proyecto;
+  const seguridadSalud = parseSeguridadSalud(ss);
+  return { ...proyecto, edificio: sanearOrigenes(proyecto.edificio), ...(seguridadSalud ? { seguridadSalud } : {}) };
 }
 
 // -----------------------------------------------------------------------------

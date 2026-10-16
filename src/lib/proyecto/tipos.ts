@@ -7,6 +7,7 @@ import type { Edificio, TipoCubierta } from "../edificio/tipos";
 import type { ResumenEdificio } from "../edificio/derivar";
 import type { VerificacionEnergetica } from "../energia/verificacion";
 import type { HabitabilidadObra } from "../habitabilidad/norma";
+import type { EstudioSeguridadSalud } from "../ebss/tipos";
 
 // Modelo de datos del EXPEDIENTE (feature-6 §A, UX-RECONCEPT §2–§3): el producto deja de ser
 // "5 calculadoras con sidebar" y pasa a ser gestor de expedientes de justificación CTE.
@@ -377,6 +378,12 @@ export interface Proyecto {
   edificio: Edificio;
   /** Estado por justificación; ausencia de clave = sin datos guardados (`sin_iniciar`). */
   justificaciones: Partial<Record<JustificacionKey, JustificacionEnProyecto>>;
+  /**
+   * Los datos del estudio básico de seguridad y salud (feature-35). No es una
+   * justificación del CTE: es un documento de la obra. Opcional, sin schema
+   * nuevo: los expedientes guardados se siguen leyendo.
+   */
+  seguridadSalud?: EstudioSeguridadSalud;
 }
 
 /**
