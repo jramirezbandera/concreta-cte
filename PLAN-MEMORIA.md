@@ -442,8 +442,16 @@ gestión) dentro de la memoria; sirve de esqueleto, con los mismos principios de
 - **Documentos.** Dos anejos, con la misma cabecera y numeración que la memoria y el anejo de
   instalaciones: «Estudio de gestión de residuos de construcción y demolición» y «Estudio básico
   de seguridad y salud». La memoria remite a ellos.
+- **Las mediciones vienen de concreta-mediciones** (`D:\PROGRAMACION\Mediciones`), no se
+  teclean partida a partida aquí. Esa app ya tiene el presupuesto en árbol de capítulos y
+  partidas, el resumen económico (PEM, GG, BI, IVA y PEC) y exporta FIEBDC-3 (.bc3). Puente
+  propuesto: importar su .bc3 (vale también para uno de Presto o CYPE) y asignar a cada partida
+  de demolición o de obra su código de residuo y su densidad. Dónde vive esa asignación (aquí o
+  en Mediciones) y si hay un formato propio entre las dos apps se decide al escribir feature-35.
+  La integración sirve también para el resto de cosas que necesitan mediciones (anejo de
+  instalaciones, superficies): pensarla como pieza común, no solo para residuos.
 - **Datos nuevos de la obra.** Hoy la app no sabe nada de presupuesto ni de demoliciones (no
-  aparecen en `src/`). En Los datos de la obra:
+  aparecen en `src/`). Lo que no traiga el .bc3, en Los datos de la obra:
   - presupuesto de ejecución material y los porcentajes de gastos generales, beneficio
     industrial e IVA, para calcular el de ejecución por contrata (umbral del art. 4 del
     RD 1627/1997, K-SYS.1);
@@ -462,7 +470,7 @@ gestión) dentro de la memoria; sirve de esqueleto, con los mismos principios de
 
 | Contenido | Cómo |
 |---|---|
-| 1.º Estimación de la cantidad, por código de la lista europea | Motor. Reforma: por partidas, m² × espesor × densidad del DB SE-AE, cada una con su código. Obra nueva o demolición completa: ratio que declara el proyectista con su fuente (K-RCD.16). Tabla «Código \| Residuo \| m³ \| t». |
+| 1.º Estimación de la cantidad, por código de la lista europea | Motor. Reforma: por partidas del presupuesto importado, medición × espesor × densidad del DB SE-AE, cada una con su código. Obra nueva o demolición completa: ratios por m² de una **tabla propia** (decisión 12), que el proyectista puede cambiar. Tabla «Código \| Residuo \| m³ \| t». |
 | 2.º Prevención | Texto de plantilla según el tipo de obra. |
 | 3.º Reutilización, valorización o eliminación | Tabla por código con el destino: planta de valorización por defecto; vertedero solo para rechazos o con la justificación del art. 86 del Decreto 73/2012. El gestor, si lo declara el proyectista. |
 | 4.º Separación | Las seis fracciones de la Ley 7/2022 art. 30.2, sin umbral; papel y cartón con el umbral de 0,5 t del art. 5.5. Demolición selectiva obligatoria. |
@@ -516,11 +524,14 @@ en la memoria; la fase 7 los añade a las comprobaciones de «Antes de entregar�
 9. **Residuos y seguridad y salud**: ¿anejos aparte o dentro de la memoria, como en 25P011?
    Propuesta: aparte, como el anejo de instalaciones. **Validada (2026-10-16).**
 10. **Presupuesto y demoliciones**: ¿a mano (PEM y m² por tipo) o importando las partidas de la
-    medición (BC3)? Propuesta: a mano primero; el BC3, si hace falta, después. **Validada
-    (2026-10-16).**
+    medición (BC3)? ~~Propuesta: a mano primero~~. **Decidido (2026-10-16): desde
+    concreta-mediciones**, porque medir partida a partida aquí no tiene sentido; a mano solo lo
+    que el presupuesto no traiga (§5.8).
 11. **Catálogo de riesgos**: ¿se parte del que usa el estudio en sus proyectos? No hay catálogo
     oficial (K-SYS.12). Propuesta: el del estudio, si lo hay, ordenado con la estructura del
     RD 1627/1997 y la terminología del INSST.
-12. **Ratios de residuos en obra nueva**: ¿se pide permiso a CGATE y CSCAE para usar su guía de
-    ratios en la app (licencia CC BY-NC-ND), o el proyectista teclea el ratio y lo cita?
-    Propuesta: que lo teclee, y pedir el permiso aparte.
+12. **Ratios de residuos en obra nueva**. **Decidido (2026-10-16): tabla propia**, elaborada a
+    partir de los estudios de residuos del estudio (ejemplos), la guía CGATE-CSCAE 2020 y las
+    demás fuentes consultadas, con su método y las fuentes citadas como referencia. Es una
+    elaboración nuestra (valores contrastados, agrupación propia), no una copia de la tabla de
+    la guía. Las tablas de la guía son imagen: hay que transcribirlas para contrastarlas.
