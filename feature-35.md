@@ -250,7 +250,6 @@ Tests: el documento de los casos de partida; la lista de prohibidos sobre el tex
 - Comparar con ss02 a ss04: lo que tienen y el nuestro no, y al revés.
 - Abrir el Word en Word.
 - Comprobar en el navegador: datos, selección de fichas, Leer, Word y PDF, sin errores de consola.
-- Decisiones a validar, al final de este documento.
 
 ## Fuera de alcance
 
@@ -265,9 +264,10 @@ Tests: el documento de los casos de partida; la lista de prohibidos sobre el tex
 - **Plan de seguridad y salud**, que es del contratista.
 - **Obra civil**: las fichas de carreteras y glorietas de ss08 y ss15 no entran.
 
-## Decisiones a validar (propuestas)
+## Decisiones (validadas el 2026-10-16)
 
-Las del análisis (§6), con una propuesta cada una:
+Las del análisis (§6). El usuario las valida todas; en la 5, no hay motivo para «encargar y
+visar»: se quita.
 
 1. **Formato de la ficha**: cuatro columnas *Riesgo | Medidas preventivas | Protecciones
    colectivas | EPI*, con los evitables en su propio apartado (7), en lugar de la tabla
@@ -277,7 +277,7 @@ Las del análisis (§6), con una propuesta cada una:
    que declare el proyectista; cuenta el dato que él confirma.
 4. **Aviso** si el PEC queda a menos de un 5 % del umbral del art. 4.1 a).
 5. **Compromiso del promotor** de la hoja del art. 4 (ss02 a ss04): se mantiene, sin «encargar y
-   visar» ni «Decreto 1627/1997». ¿Hay algún motivo para que diga «visar»?
+   visar» ni «Decreto 1627/1997».
 6. **Eficacia y frecuencia** (art. 6.2): una frase por ficha que dice qué medidas eliminan la
    exposición y cuáles la reducen; la frecuencia de uso (permanente / frecuente / ocasional), solo
    en el bloque «toda la obra».
