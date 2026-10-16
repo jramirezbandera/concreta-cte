@@ -17,7 +17,7 @@ Cinco son del estudio del usuario (ss02, ss03, ss04, ss11 y, casi seguro, ss14).
 - Este documento **consolida y deduplica** los cuatro catálogos y los contrasta con `verificacion-seguridad-salud.md`.
 - **Límite 1.** El estado de las normas que no están en K-SYS (por ejemplo, «el RD 1316/1989 lo derogó el RD 286/2006») lo dan los analistas y **no se ha cotejado en el BOE**. Basta para no citar la norma vieja. No basta para citar la nueva sin leerla (ver §5.3).
 - **Límite 2.** Las cifras de las medidas son las de los ejemplos. Solo las marcadas [V] están verificadas (ver §4.1).
-- **Límite 3.** En ss03 y ss04 la marca SÍ/NO de la tabla del art. 4 se pierde en el texto, y las tablas de normativa salen con las columnas desalineadas. No se han mirado en el PDF.
+- **Límite 3.** En ss03 y ss04 la marca SÍ/NO de la tabla del art. 4 se pierde en el texto, y las tablas de normativa salen con las columnas desalineadas. **Cotejado en imagen el 2026-10-16** (la hoja del art. 4 de cada uno): los cuatro supuestos van marcados «NO»; el PEC se desglosa con GG 13 %, BI 6 % e IVA 21 %; los supuestos b) y c) llevan solo la marca, sin los días, los trabajadores ni las jornadas de la obra; el compromiso del promotor dice «encargar y visar» y «Decreto 1627/1997» (se quitan: decisión 5 de feature-35). Las tablas de normativa no se han mirado.
 
 **Regla de datos.** Son documentos de clientes. Aquí **no** figuran nombres de personas ni de promotores, direcciones, referencias catastrales, expedientes, números de visado ni importes exactos de obra. Cada documento se cita por su número y una descripción genérica. El índice número → fichero queda en el scratchpad, fuera del repositorio.
 
@@ -1150,7 +1150,7 @@ Quedan **por confirmar** (los analistas lo marcan): órdenes de plomo y de cloru
 1. **Nombres de riesgo.** Cotejar la lista del §4.2 (la del método general del INSST que usan los ejemplos) con los 22 nombres de la NTP 908 que fija K-SYS.13, y decidir cuál manda.
 2. **Cifras en conflicto (§4.9).** Leer la ITC-BT-18 y la ITC-BT-33, el RD 1215/1997 (anexo II, aps. 4.2 y 4.3), el RD 614/2001, el RD 286/2006 y el RD 487/1997. Mientras tanto, la app imprime esas medidas sin cifra.
 3. **Normas de la lista corta** que siguen sin leer (§3) y las «por confirmar» del §5.3.
-4. **PDF de ss03 y ss04.** Mirar las marcas SÍ/NO de la hoja del art. 4 y la tabla de normativa, que en el texto salen desalineadas.
+4. ~~**PDF de ss03 y ss04.**~~ Hoja del art. 4 cotejada en imagen (2026-10-16, ver «Límite 3»). La tabla de normativa no hace falta: la lista corta sale de la verificación.
 
 **Decisiones a validar con el usuario**
 1. **Ayuda para estimar el número de trabajadores desde el PEM.** ss01, ss07 y ss09 lo hacen con el porcentaje de mano de obra, las horas al año y el coste por hora (con porcentajes del 6,67 al 50 %). La Guía no da método (K-SYS.2). **Propuesta:** la app lo ofrece como estimación, con el porcentaje que declare el proyectista, y el dato que cuenta es el que el proyectista confirma.

@@ -94,6 +94,52 @@ Lo que dejaron abierto la verificación (K-SYS) y el análisis (§6). Con `pdfto
 
 El resultado va como K-SYS.15 y siguientes en la verificación.
 
+**Hecho (2026-10-16), K-SYS.15–20.** Leído en los consolidados del BOE pasados a texto; la tabla 1
+del RD 614/2001 y la hoja del art. 4 de ss03 y ss04, en imagen. Cambia el diseño así:
+- **Nombres de riesgo** (K-SYS.15): **la NTP 908 no es una terminología** (trata de plantas de
+  tratamiento de frigoríficos) y la Guía no trae ninguna lista. Manda la del análisis §4.2: las 28
+  claves, con cinco nombres ajustados («Contactos eléctricos», «Exposición a agentes químicos»,
+  «… agentes biológicos», «Exposición al ruido», «Exposición al amianto»). Es INTERPRETACIÓN: no
+  hay terminología reglamentaria.
+- **Cifras** (K-SYS.16), las 19 del análisis §4.9:
+  - **fijadas**: toma de tierra por RA × Ia ≤ 24 V (ITC-BT-33 y 24; no un valor fijo en ohmios);
+    diferencial de 30 mA en toda base de enchufe; barandilla de 90 cm y protección desde 2 m de
+    caída; escalera de mano 1 m por encima, unos 75° y anticaídas a más de 3,5 m con esfuerzos
+    peligrosos; viento de 72 km/h solo en grúa torre (o el del fabricante); distancias a líneas
+    eléctricas por la tabla 1 del RD 614/2001 (3, 5 y 7 m sin delimitación precisa; cotejada en
+    imagen); ruido 80, 85 y 87 dB(A); IP45 y cables de 450/750 V en la instalación provisional;
+  - **sin cifra**: entibación, acopios y vehículos al borde, rodapié y resistencia de barandilla,
+    borriquetas, compresor, iluminación, anclajes y separación del andamio, bajante de escombros,
+    pies derechos. Los 25 kg de cargas no son del RD 487/1997: buena práctica, sin cita.
+- **Lista corta de normas** (K-SYS.17): 20 normas, todas vigentes, con título exacto y fecha de su
+  última modificación. Las de grúas, solo si la obra tiene grúa. Fuera: RD 486/1997, Orden
+  TAS/2947/2007, Orden TAS/2926/2002. Sin leer y quizá necesarias: RD 665/1997 (sílice) y RD 664/1997.
+- **Amianto** (K-SYS.18): el RD 396/2006 sigue sin modificaciones; el nuevo real decreto sigue en
+  proyecto. Se vuelve a mirar en el paso 7.
+- **Botiquín** (K-SYS.19): la Orden TAS/2947/2007 no es norma de la obra (solo dice que la mutua
+  paga el botiquín del RD 486/1997). Se imprime el RD 1627, anexo IV A.14, y el art. 234 del VII
+  Convenio (personal con formación en primeros auxilios, local si hay más de 50 trabajadores,
+  información del centro sanitario). Contenido, revisión y reposición, como buena práctica de la
+  Guía (folio 78).
+- **Comunicación de apertura** (K-SYS.20, Orden TIN/1071/2010): previa al comienzo, expuesta en
+  la obra y actualizada; la presenta el contratista con el plan aprobado; el promotor le facilita
+  los datos.
+
+**Lo que cambia en los pasos siguientes:**
+- **Paso 1**: dos datos más, la tensión de las líneas eléctricas próximas (kV) y si hay grúa
+  torre o grúa móvil.
+- **Paso 2**: la dotación suma el local de primeros auxilios con más de 50 trabajadores.
+- **Paso 3**: claves de K-SYS.15 y cifras de K-SYS.16 (fuera el «30 cm» del andamio y la
+  «protección auditiva a menos de 4 m» que proponía el análisis). La lista de prohibidos suma:
+  valores fijos de resistencia de tierra en ohmios, «300 mA en fuerza», los 25 kg atribuidos al
+  RD 487/1997, el RD 486/1997 o la Orden TAS/2947/2007 como base del botiquín y las distancias a
+  líneas sin base («6 m», «corte en 50 kV»). El RD 1627 C.3 b) dice «cinturones de seguridad con
+  anclaje»: el catálogo lo nombra «arnés anticaídas» y no cita ese literal, así que el prohibido
+  se mantiene.
+- **Paso 5**: el apartado 5 con la lista de K-SYS.17; el 6 con el botiquín de K-SYS.19; el 13 con
+  la comunicación de apertura de K-SYS.20; el 0 con los datos que el promotor facilita al
+  contratista, en el orden de la orden.
+
 ### Paso 1 · Datos de la obra para el estudio
 
 `Proyecto.seguridadSalud?: EstudioSeguridadSalud` (opcional: los expedientes guardados se siguen
@@ -297,5 +343,6 @@ visar»: se quita.
     la elaboración del proyecto (K-SYS.11).
 14. **La plantilla de 20 fichas del estudio** se sustituye entera por el catálogo; lo que el
     proyectista quiera conservar lo añade editando la ficha.
-15. **Botiquín**: el texto del anexo IV A.14 del RD 1627 (material de primeros auxilios, revisado y
-    repuesto) y, si el paso 0 confirma que aplica, el contenido de la Orden TAS/2947/2007.
+15. **Botiquín**: el texto del anexo IV A.14 del RD 1627 y el art. 234 del VII Convenio; el
+    contenido, la revisión y la reposición, como buena práctica de la Guía. Sin la Orden
+    TAS/2947/2007 (paso 0, K-SYS.19).
