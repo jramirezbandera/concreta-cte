@@ -415,6 +415,8 @@ la red de recarga del garaje, el cortocircuito y el unifilar.
 
 - **HE 2 / RITE**: generador, potencias de frío y calor, rendimiento, acumulación de ACS y
   documento exigible (0.3). Se alimenta del mismo dato de ACS y clima que HE 4 y REBT.
+  El REBT leerá de aquí la climatización de las viviendas (C8 o C9), que hoy se escribe en su
+  «Para el anejo» (feature-34, decisión 3).
 - **HE 3**: una línea en vivienda; zonas comunes de plurifamiliar con VEEI, potencia y control
   (0.4).
 - **ICT**: ficha de las previsiones del arquitecto (PAU, tomas por estancia, acometidas, recintos)

@@ -305,7 +305,10 @@ anejo.
 - **Pararrayos** (SUA 8): la tierra solo lo tiene en cuenta si el paso 0 dice que cambia la
   longitud del anillo.
 
-## Decisiones a validar (propuestas)
+## Decisiones (validadas el 2026-10-16)
+
+El usuario las valida todas. La 3 se revisa en la fase 7: la climatización saldrá del RITE (un dato,
+una fuente) en lugar de escribirse en el REBT.
 
 1. **Longitud máxima por circuito** en lugar de una longitud inventada: la sección es la mínima
    de la tabla 1 y el anejo dice hasta qué longitud cumple la caída de tensión.
