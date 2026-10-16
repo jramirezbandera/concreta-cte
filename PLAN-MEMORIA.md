@@ -83,7 +83,7 @@ HR y HE 0/HE 1 van pegados como imagen.
 | **5 · Habitabilidad (municipal y autonómica)** ✅ | Iluminación y ventilación por estancia, densidad de viviendas, con la norma declarada por el proyectista (§5.5). | El caso de reforma justifica huecos y densidad con la norma que el usuario declara, citada en cada fila. |
 | **6 · Anejo de cálculo de instalaciones** | Anejo 5.3: HS 4 por tramos, HS 5 por aparato y arquetas, REBT con circuitos, derivación individual y tierra; la memoria remite a él y a los planos (§5.6). | El anejo sustituye al de CYPE en la unifamiliar del ejemplo, sin contradecir la memoria. |
 | **7 · Otros reglamentos y coherencia** | HE 2/RITE, HE 3, ficha ICT del arquitecto, accesibilidad autonómica; comprobaciones cruzadas en «Antes de entregar» (§5.7). | Las contradicciones de los ejemplos (ACS, grupo de presión, garaje) no se pueden dar sin un aviso. |
-| **8 · Residuos y seguridad y salud** | Dos anejos nuevos: estudio de gestión de residuos de construcción y demolición (RD 105/2008) y estudio básico de seguridad y salud (RD 1627/1997), con los datos de obra que hoy no existen: PEM, plazo, trabajadores y m² de demolición (§5.8). | El estudio de residuos del caso «Reforma: local a vivienda» sustituye al de `25P011_MEMORIA.doc` sin contradecir la memoria; el estudio básico sale en los dos casos con sus riesgos por fase de obra. |
+| **8 · Seguridad y salud (y remisión a residuos)** | Anejo nuevo: estudio básico de seguridad y salud (RD 1627/1997), con los datos de obra que hoy no existen: PEM y PEC, plazo, trabajadores, amianto (§5.8). El estudio de gestión de residuos se hace en **concreta-mediciones**, que tiene las partidas; aquí solo se remite a él. | El estudio básico sale en los dos casos con sus riesgos por fase de obra, al nivel de los ejemplos del estudio y sin lo derogado. |
 
 **Orden.**
 - La 1 va primero: son errores de feature-27, recién cerrada.
@@ -93,9 +93,8 @@ HR y HE 0/HE 1 van pegados como imagen.
   cuadro de superficies (feature-13).
 - La 6 es la más grande, sobre todo por el REBT aguas abajo.
 - Dentro de la 7, cada módulo es independiente.
-- La 8 va después de la 6b y no depende de la 7. Su verificación (§4.2) no toca código y se puede
-  hacer antes. Dentro de la 8, primero residuos (más cálculo y ya tiene modelo en los ejemplos) y
-  después seguridad y salud.
+- La 8 va después de la 6b y no depende de la 7. Su verificación (§4.2) está hecha. El estudio de
+  residuos va por su lado en concreta-mediciones (decidido el 2026-10-16).
 
 ## 4. Fase 0 · Qué verificar antes de escribir código
 
@@ -432,41 +431,41 @@ la red de recarga del garaje, el cortocircuito y el unifilar.
 - **Piscina privada**: ITC-BT-31 en REBT, vaciado en HS 5 y la frase de SUA 6. Pendiente de
   decidir si entra (§6).
 
-### 5.8 Fase 8 · Residuos y seguridad y salud
+### 5.8 Fase 8 · Seguridad y salud (y remisión a residuos)
 
 No son apartados del CTE sino documentos del proyecto de ejecución. A diferencia de los módulos
-del CTE, comprueban poco: estiman cantidades y eligen textos de un catálogo. `25P011_MEMORIA.doc`
-trae un estudio de residuos completo (lista europea de residuos, ratios del ITEC, coste de la
-gestión) dentro de la memoria; sirve de esqueleto, con los mismos principios del §2.
+del CTE, comprueban poco: estiman cantidades y eligen textos de un catálogo.
 
-- **Documentos.** Dos anejos, con la misma cabecera y numeración que la memoria y el anejo de
-  instalaciones: «Estudio de gestión de residuos de construcción y demolición» y «Estudio básico
-  de seguridad y salud». La memoria remite a ellos.
-- **Las mediciones vienen de concreta-mediciones** (`D:\PROGRAMACION\Mediciones`), no se
-  teclean partida a partida aquí. Esa app ya tiene el presupuesto en árbol de capítulos y
-  partidas, el resumen económico (PEM, GG, BI, IVA y PEC) y exporta FIEBDC-3 (.bc3). Puente
-  propuesto: importar su .bc3 (vale también para uno de Presto o CYPE) y asignar a cada partida
-  de demolición o de obra su código de residuo y su densidad. Dónde vive esa asignación (aquí o
-  en Mediciones) y si hay un formato propio entre las dos apps se decide al escribir feature-35.
-  La integración sirve también para el resto de cosas que necesitan mediciones (anejo de
-  instalaciones, superficies): pensarla como pieza común, no solo para residuos.
+- **Reparto entre apps (2026-10-16).** El **estudio de gestión de residuos se hace en
+  concreta-mediciones** (`D:\PROGRAMACION\Mediciones`), que ya tiene las partidas, sus
+  mediciones, el resumen económico (PEM, GG, BI, IVA y PEC) y la exportación a Word. Se trabaja
+  en una sesión de ese repo, con la verificación de aquí (K-RCD.1–17) como base. En esta app,
+  la memoria solo remite a ese estudio. El apartado «Estudio de gestión de residuos» de abajo se
+  queda como referencia de lo que tiene que salir allí.
+- **Integración con concreta-mediciones**, como pieza común y no solo para residuos: de allí
+  pueden venir el PEM y el PEC (para el art. 4 del RD 1627/1997), y más adelante otras
+  mediciones (anejo de instalaciones, superficies). Formato (.bc3, o uno propio entre las dos
+  apps) por decidir cuando se aborde.
+- **Documento.** El «Estudio básico de seguridad y salud», anejo con la misma cabecera y
+  numeración que la memoria y el anejo de instalaciones. La memoria remite a él.
+- **Ejemplos.** `ejemplos/seguridad y salud/` (15 PDF, del estudio y de otros, básicos y
+  completos; aportados el 2026-10-16). Se analizan como los de la memoria: se toma el esqueleto y
+  el catálogo de riesgos, no lo derogado (resultado en
+  `research/analisis-ejemplos-ebss.md`).
 - **Datos nuevos de la obra.** Hoy la app no sabe nada de presupuesto ni de demoliciones (no
-  aparecen en `src/`). Lo que no traiga el .bc3, en Los datos de la obra:
+  aparecen en `src/`). Lo que no venga de concreta-mediciones, en Los datos de la obra:
   - presupuesto de ejecución material y los porcentajes de gastos generales, beneficio
     industrial e IVA, para calcular el de ejecución por contrata (umbral del art. 4 del
     RD 1627/1997, K-SYS.1);
   - plazo de ejecución en días laborables y número máximo de trabajadores a la vez; las jornadas
     solo si días × trabajadores pasa de 500;
-  - m² de obra nueva y m² de demolición por tipo (tabiquería, solados, alicatados, falsos techos,
-    carpinterías, instalaciones), que en obra existente salen de lo intervenido (fase 3);
-  - si hay amianto (no / posible / identificado), obligatorio en obra existente: lo piden los
-    dos estudios (K-RCD.3, K-SYS.9).
+  - si hay amianto (no / posible / identificado), obligatorio en obra existente (K-SYS.9);
+  - si hay varios proyectistas o varias empresas (coordinador, art. 3).
 
-  Precios de gestión, gestor autorizado y fianza son datos del proyectista: no se suponen
-  (principio 4). La fianza avisa del mínimo del Decreto 73/2012 art. 81 (K-RCD.12). Sin ellos,
-  el apartado sale pendiente en «Antes de entregar».
+  Sin ellos, el apartado sale pendiente en «Antes de entregar» (principio 4).
 
-**Estudio de gestión de residuos** (RD 105/2008, art. 4.1.a, con la Ley 7/2022; §4.3):
+**Estudio de gestión de residuos** — se hace en concreta-mediciones; referencia de lo que tiene
+que salir (RD 105/2008, art. 4.1.a, con la Ley 7/2022; §4.3):
 
 | Contenido | Cómo |
 |---|---|
@@ -485,8 +484,9 @@ gestión) dentro de la memoria; sirve de esqueleto, con los mismos principios de
   del proyecto, si se supera), que es la justificación que pide la Guía del INSST. Si alguno se
   supera, el apartado lo dice y la app no redacta el estudio completo. Sin presupuesto propio:
   el estudio básico es descriptivo.
-- **Riesgos por fase de obra.** No hay catálogo oficial (K-SYS.12–13): uno propio con la
-  estructura de los anexos I y IV del RD y los nombres de riesgos del INSST, de fases (demoliciones, movimiento de
+- **Riesgos por fase de obra.** No hay catálogo oficial (K-SYS.12–13): uno propio, sacado de
+  los ejemplos del estudio, con la estructura de los anexos I y IV del RD y los nombres de
+  riesgos del INSST, de fases (demoliciones, movimiento de
   tierras, estructura, cerramientos, cubiertas, instalaciones, acabados), medios auxiliares
   (andamios, escaleras) y maquinaria. Por cada uno: riesgos evitables y cómo se evitan, riesgos no
   evitables con sus medidas y protecciones colectivas e individuales. La app propone las fases
@@ -502,8 +502,9 @@ gestión) dentro de la memoria; sirve de esqueleto, con los mismos principios de
 - **Trabajos posteriores** (art. 6.3): previsiones para el mantenimiento, desde las instalaciones
   y la cubierta que ya conocen los módulos.
 
-**Coherencia.** El PEM, las superficies y las demoliciones son los mismos en los dos estudios y
-en la memoria; la fase 7 los añade a las comprobaciones de «Antes de entregar».
+**Coherencia.** El PEM y las superficies son los mismos en el estudio básico, en la memoria y en
+el presupuesto de concreta-mediciones; la fase 7 los añade a las comprobaciones de «Antes de
+entregar».
 
 ## 6. Decisiones a validar con el usuario
 
@@ -528,8 +529,8 @@ en la memoria; la fase 7 los añade a las comprobaciones de «Antes de entregar�
     concreta-mediciones**, porque medir partida a partida aquí no tiene sentido; a mano solo lo
     que el presupuesto no traiga (§5.8).
 11. **Catálogo de riesgos**: ¿se parte del que usa el estudio en sus proyectos? No hay catálogo
-    oficial (K-SYS.12). Propuesta: el del estudio, si lo hay, ordenado con la estructura del
-    RD 1627/1997 y la terminología del INSST.
+    oficial (K-SYS.12). **Decidido (2026-10-16): de los ejemplos** de `ejemplos/seguridad y
+    salud/`, ordenado con la estructura del RD 1627/1997 y la terminología del INSST.
 12. **Ratios de residuos en obra nueva**. **Decidido (2026-10-16): tabla propia**, elaborada a
     partir de los estudios de residuos del estudio (ejemplos), la guía CGATE-CSCAE 2020 y las
     demás fuentes consultadas, con su método y las fuentes citadas como referencia. Es una
