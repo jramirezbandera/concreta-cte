@@ -6,7 +6,8 @@
 > 6a, el documento del anejo con HS 4 y HS 5 (hecha, [feature-33.md](feature-33.md)), y 6b, REBT
 > aguas abajo (hecha, [feature-34.md](feature-34.md)).
 > Fase 8 (estudio de gestión de residuos y estudio básico de seguridad y salud) añadida el
-> 2026-10-15; su verificación previa, hecha el 2026-10-16, está en §4.2 y §4.3.
+> 2026-10-15; su verificación previa, hecha el 2026-10-16, está en §4.2 y §4.3, y el plan, en
+> [feature-35.md](feature-35.md).
 > Origen: comparación de la memoria de la app con tres memorias de ejecución reales del estudio,
 > en `ejemplos/` (ignorada por git: son datos de clientes):
 > - plurifamiliar de 6 viviendas (`01_MEM_26_05_2025.docx`);
@@ -83,7 +84,7 @@ HR y HE 0/HE 1 van pegados como imagen.
 | **5 · Habitabilidad (municipal y autonómica)** ✅ | Iluminación y ventilación por estancia, densidad de viviendas, con la norma declarada por el proyectista (§5.5). | El caso de reforma justifica huecos y densidad con la norma que el usuario declara, citada en cada fila. |
 | **6 · Anejo de cálculo de instalaciones** | Anejo 5.3: HS 4 por tramos, HS 5 por aparato y arquetas, REBT con circuitos, derivación individual y tierra; la memoria remite a él y a los planos (§5.6). | El anejo sustituye al de CYPE en la unifamiliar del ejemplo, sin contradecir la memoria. |
 | **7 · Otros reglamentos y coherencia** | HE 2/RITE, HE 3, ficha ICT del arquitecto, accesibilidad autonómica; comprobaciones cruzadas en «Antes de entregar» (§5.7). | Las contradicciones de los ejemplos (ACS, grupo de presión, garaje) no se pueden dar sin un aviso. |
-| **8 · Seguridad y salud (y remisión a residuos)** | Anejo nuevo: estudio básico de seguridad y salud (RD 1627/1997), con los datos de obra que hoy no existen: PEM y PEC, plazo, trabajadores, amianto (§5.8). El estudio de gestión de residuos se hace en **concreta-mediciones**, que tiene las partidas; aquí solo se remite a él. | El estudio básico sale en los dos casos con sus riesgos por fase de obra, al nivel de los ejemplos del estudio y sin lo derogado. |
+| **8 · Seguridad y salud (y remisión a residuos)** | En [feature-35.md](feature-35.md). Anejo nuevo: estudio básico de seguridad y salud (RD 1627/1997), con los datos de obra que hoy no existen: PEM y PEC, plazo, trabajadores, amianto (§5.8). El estudio de gestión de residuos se hace en **concreta-mediciones**, que tiene las partidas; aquí solo se remite a él. | El estudio básico sale en los dos casos con sus riesgos por fase de obra, al nivel de los ejemplos del estudio y sin lo derogado. |
 
 **Orden.**
 - La 1 va primero: son errores de feature-27, recién cerrada.
