@@ -262,6 +262,24 @@ export interface SeleccionFichas {
 }
 
 /**
+ * Lo que el proyectista declara para la dotación de servicios higiénicos
+ * (K-SYS.5). Todo opcional: sin reparto por sexos se imprime la ratio del
+ * convenio y la frase de la Guía; sin «corta duración», la dotación entera.
+ */
+export interface ServiciosHigienicosDatos {
+  /**
+   * Obra de corta duración o de escasa importancia (VII CGSC art. 231.4; Guía
+   * folios 79–80): admite soluciones alternativas a la dotación.
+   */
+  cortaDuracion?: boolean;
+  /** La solución alternativa, en palabras del proyectista («aseo de la vivienda, cedido por el promotor»). */
+  alternativa?: string;
+  /** Reparto por sexos, para la dotación recomendada de la Guía. */
+  hombres?: number;
+  mujeres?: number;
+}
+
+/**
  * Lo que el proyecto guarda para el estudio básico (`Proyecto.seguridadSalud`).
  * Opcional y sin schema nuevo: los expedientes guardados se siguen leyendo.
  */
@@ -282,6 +300,7 @@ export interface EstudioSeguridadSalud {
   coordinacion?: Coordinacion;
   entorno?: Entorno;
   medios?: MediosObra;
+  serviciosHigienicos?: ServiciosHigienicosDatos;
   seleccion?: SeleccionFichas;
   /** Los planos del estudio, como los numera el proyectista («SS01–SS02»; decisión 10). */
   planos?: string;

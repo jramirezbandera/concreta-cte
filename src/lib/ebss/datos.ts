@@ -30,6 +30,7 @@ import {
   type RiesgoAnadido,
   type SeleccionFichas,
   type ServicioAfectado,
+  type ServiciosHigienicosDatos,
 } from "./tipos";
 
 /** Horas de una jornada: «un día de trabajo equivale a una jornada de 8 horas» (Guía folio 25). */
@@ -48,6 +49,10 @@ const noNegativo = (v: unknown): number | undefined => (typeof v === "number" &&
 const positivo = (v: unknown): number | undefined => (typeof v === "number" && Number.isFinite(v) && v > 0 ? v : undefined);
 const entero = (v: unknown): number | undefined => {
   const n = positivo(v);
+  return n !== undefined && Number.isInteger(n) ? n : undefined;
+};
+const enteroNoNegativo = (v: unknown): number | undefined => {
+  const n = noNegativo(v);
   return n !== undefined && Number.isInteger(n) ? n : undefined;
 };
 const booleano = (v: unknown): boolean | undefined => (typeof v === "boolean" ? v : undefined);
@@ -154,6 +159,16 @@ function parseMedios(r: unknown): MediosObra | undefined {
   return compacto({ gruaTorre: booleano(r.gruaTorre), gruaMovil: booleano(r.gruaMovil) });
 }
 
+function parseServiciosHigienicos(r: unknown): ServiciosHigienicosDatos | undefined {
+  if (!esObj(r)) return undefined;
+  return compacto({
+    cortaDuracion: booleano(r.cortaDuracion),
+    alternativa: texto(r.alternativa),
+    hombres: enteroNoNegativo(r.hombres),
+    mujeres: enteroNoNegativo(r.mujeres),
+  });
+}
+
 function parseEdicionLista(r: unknown): EdicionLista | undefined {
   if (!esObj(r)) return undefined;
   return compacto({ quitados: textos(r.quitados), anadidos: textos(r.anadidos) });
@@ -215,6 +230,7 @@ export function parseSeguridadSalud(raw: unknown): EstudioSeguridadSalud | undef
     coordinacion: parseCoordinacion(raw.coordinacion),
     entorno: parseEntorno(raw.entorno),
     medios: parseMedios(raw.medios),
+    serviciosHigienicos: parseServiciosHigienicos(raw.serviciosHigienicos),
     seleccion: parseSeleccion(raw.seleccion),
     planos: texto(raw.planos),
   });

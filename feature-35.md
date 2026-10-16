@@ -218,6 +218,39 @@ Funciones puras con sus tests, como el resto de `src/lib/`.
 Tests: los cuatro supuestos en el límite (450.759,07 / 450.759,08; 30 y 20; 500), el atajo de
 jornadas, el redondeo de la dotación y los casos de ss02 a ss04 con sus cifras.
 
+**Hecho (2026-10-16).** [src/lib/ebss/art4.ts](src/lib/ebss/art4.ts), puro, con 35 tests en
+`src/lib/ebss/test/art4.test.ts`:
+- `calcularPec` da el desglose (PEM, GG, BI, total, IVA, PEC); `evaluarSupuestos` las cuatro filas
+  de la tabla «Supuesto | Umbral | Proyecto | ¿Se supera?» con su nota; `art4(e)` lo monta desde lo
+  guardado; `avisoCercaniaPec` el aviso del 5 %; `coordinadores` las dos fases con su motivo;
+  `dotacionHigienica` la dotación del convenio, la de la Guía si hay reparto por sexos, el local de
+  primeros auxilios (más de 50) y la solución alternativa.
+- Los casos del estudio: ss02 (PEM 312.672,94 €, PEC 450.217,77 €, a 541,31 € del umbral: avisa),
+  ss03 (PEC 35.997,50 €) y ss04 (PEC 56.516,08 €, cuyo IVA redondea 9.808,575 hacia arriba), los tres
+  básicos y con sus cifras cotejadas en el PDF con `pdftotext`.
+- Datos nuevos, opcionales, en `EstudioSeguridadSalud.serviciosHigienicos`: obra de corta duración o
+  de escasa importancia, la solución alternativa en texto y el reparto hombres / mujeres.
+
+**Decisiones del paso 2, a validar:**
+1. **El PEC se redondea línea a línea a céntimos**, como en la hoja del estudio (ss02 a ss04), en
+   céntimos enteros para que 9.808,575 dé 9.808,58 y no dependa de la coma flotante.
+2. **Tres resultados, no dos**: `basico`, `completo` y `pendiente`. Un supuesto sin dato queda «sin
+   datos», no «no se supera» (principio 4). `completo` manda aunque falten otros datos; `pendiente`
+   es «ninguno se supera de los que se pueden decidir, pero falta alguno».
+3. **Supuesto b)**: con una de las dos condiciones que no se cumple basta para descartarlo, aunque
+   falte la otra (30 días sin máximo de trabajadores ya es «no»).
+4. **Supuesto c)**: las jornadas declaradas mandan sobre el atajo, también si el atajo las descartaría.
+5. **Las duchas se cuentan como obligatorias del convenio**, ⌈n/10⌉; la condición «cuando el tipo de
+   actividad o la salubridad lo requieran» y la recomendación de la Guía van como texto en el paso 5.
+   Los vestuarios no se cuentan: en toda obra, con la alternativa de la obra corta.
+6. **La solución alternativa solo la declara el proyectista** (`cortaDuracion`), con su texto; no se
+   deduce del plazo ni de que la obra sea en edificio existente. Los datos de servicios higiénicos
+   **no cuentan como pendientes**: sin ellos sale la dotación del convenio.
+7. **Coordinador en ejecución «no procede»** lleva la reserva del art. 3.2: si durante la obra
+   interviene más de una empresa, o empresa y autónomos, el promotor lo designa en cuanto se constate.
+8. **Los textos del art. 3 van parafraseados**, no entre comillas: la verificación los da por
+   cotejados pero no trae el literal.
+
 ### Paso 3 · El catálogo como datos
 
 `src/lib/ebss/catalogo.ts`: las 89 entradas del análisis (§4.3–4.7), versionadas como las tablas
