@@ -53,6 +53,9 @@ describe("antesDeEntregar", () => {
       "REBT:revisar",
       "REBT:revisar",
       "REBT:revisar",
+      // feature-34: las longitudes de la LGA y las derivaciones, y el terreno de la tierra.
+      "REBT:revisar",
+      "REBT:revisar",
     ]);
     expect(l[0]).toMatchObject({ id: "hs1:clima-supuesto", ruta: "hs/humedad" });
     expect(l[0].detalle.length).toBeGreaterThan(10);
@@ -88,7 +91,7 @@ describe("antesDeEntregar", () => {
         he4: { revisados: ["perdidas", "scop"] },
         he5: { revisados: ["construida", "mixto"] },
         he6: { revisados: ["mixto"] },
-        rebt: { revisados: ["ascensor-supuesto", "servicios", "humo"] },
+        rebt: { revisados: ["ascensor-supuesto", "servicios", "humo", "longitudes-estimadas", "terreno-supuesto"] },
         hr: { revisados: ["huecos", "ld", "colindancias", "local"] },
       },
     };
@@ -102,8 +105,8 @@ describe("entregables", () => {
       memoria: { listos: 27, total: 27, noCumplen: [] },
       fichas: { listos: 25, total: 25, noCumplen: [] },
       esquemas: { listos: 2, total: 2, noCumplen: [], claves: ["hs5", "hs4"] },
-      // HS4 y HS5 ya desarrollan su anejo (feature-33, pasos 2 y 3); REBT, aún no.
-      instalaciones: { listos: 2, total: 3, noCumplen: [] },
+      // HS 4 y HS 5 desarrollan su anejo desde feature-33; el REBT, desde feature-34.
+      instalaciones: { listos: 3, total: 3, noCumplen: [] },
     });
   });
 
@@ -112,7 +115,7 @@ describe("entregables", () => {
       memoria: { listos: 26, total: 27, noCumplen: ["HS4"] },
       fichas: { listos: 24, total: 25, noCumplen: ["HS4"] },
       esquemas: { listos: 1, total: 2, noCumplen: ["HS4"], claves: ["hs5"] },
-      instalaciones: { listos: 1, total: 3, noCumplen: ["HS4"] },
+      instalaciones: { listos: 2, total: 3, noCumplen: ["HS4"] },
     });
   });
 });

@@ -12,6 +12,7 @@ import { fichaSi, ORIGEN_DECISION, ORIGEN_EDIFICIO, ORIGEN_SUPUESTO } from "../s
 import { dibujoRebt } from "./dibujo";
 import { rebtEstadoDefaults, type RebtEstado } from "./estado";
 import { justificarRebt, type ElementoRebt, type JustificacionRebt } from "./justificacion";
+import { anejoRebt } from "./anejo";
 import { memoriaRebt } from "./memoria";
 import { CONTADORES_REBT, CRITERIOS_REBT, EDICION_REBT, GARAJES_REBT, GRADO_REBT, LOCALES_REBT, PROYECTO_REBT, RECARGA_REBT, SIMULTANEIDAD_REBT } from "./tablas";
 import {
@@ -91,6 +92,7 @@ export const rebt: DefinicionSi<RebtEstado, JustificacionRebt> = {
   describirDibujo: describirDibujoRebt,
   seleccionInicial: (j) => j.elementos.find((e) => e.veredicto === "fail")?.id ?? "total",
   memoria: memoriaRebt,
+  anejo: anejoRebt,
   ficha: (j, o): FichaData => {
     const datosPartida: FilaDato[] = [];
     for (const v of j.viviendas) {

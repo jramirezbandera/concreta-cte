@@ -29,6 +29,14 @@ export type Spl = "con_spl" | "sin_spl";
 
 export type Opcion<T> = T | "habitual";
 
+/**
+ * La climatización eléctrica de las viviendas elevadas, para sus circuitos
+ * (feature-34, K-REBT.35): la bomba de calor aire-aire (split o multisplit) va
+ * en un C9; la aire-agua de calefacción, en un C8; los emisores eléctricos por
+ * estancia (radiadores, suelo radiante), en C8 con sus tomas de la tabla 2.
+ */
+export type Climatizacion = "ninguna" | "aire_aire" | "aire_agua" | "emisores";
+
 export type RebtEstado = {
   electrificacion: Opcion<Electrificacion>;
   /** Potencia del ascensor [kW]; null = la de la Guía BT-10 para el tipo habitual (supuesta). */
@@ -42,6 +50,24 @@ export type RebtEstado = {
   plazaParcela: boolean;
   /** Potencia del garaje con control de humo mecánico [kW] (ventiladores, alumbrado…); null = sin estudiar. */
   garaje_kW: number | null;
+
+  // ── Para el anejo (feature-34): no cambian la previsión ────────────────────
+  /** La climatización de las viviendas elevadas; «habitual» = aire-aire. */
+  climatizacion?: Opcion<Climatizacion>;
+  /** Secadora independiente (C10) en las viviendas elevadas. */
+  secadora?: boolean;
+  /** Automatización, gestión de la energía o seguridad (C11) en las viviendas elevadas. */
+  automatizacion?: boolean;
+  /** Longitud de la línea general de alimentación [m]; null = la estimada. */
+  longitudLga_m?: number | null;
+  /** Longitud de la derivación individual más larga de las viviendas [m]; null = las estimadas. */
+  longitudDi_m?: number | null;
+  /** Unifamiliar: la derivación individual va enterrada (CPM en el límite de la parcela). */
+  diEnterrada?: boolean;
+  /** Longitud del anillo de puesta a tierra [m]; null = el perímetro estimado. */
+  perimetroTierra_m?: number | null;
+  /** Resistividad del terreno [Ω·m]; null = supuesta, la peor de la ITC-BT-18 tabla 4. */
+  resistividad_ohm_m?: number | null;
 };
 
 export const rebtEstadoDefaults: RebtEstado = {
@@ -52,6 +78,14 @@ export const rebtEstadoDefaults: RebtEstado = {
   plazasRecarga: null,
   plazaParcela: false,
   garaje_kW: null,
+  climatizacion: "habitual",
+  secadora: false,
+  automatizacion: false,
+  longitudLga_m: null,
+  longitudDi_m: null,
+  diEnterrada: false,
+  perimetroTierra_m: null,
+  resistividad_ohm_m: null,
 };
 
 export interface DecisionesRebt {
@@ -61,8 +95,27 @@ export interface DecisionesRebt {
 
 export const HABITUALES_REBT: DecisionesRebt = { electrificacion: "elevada", spl: "sin_spl" };
 
+/** La climatización habitual de una vivienda elevada (criterio, K-REBT.35). */
+export const CLIMATIZACION_HABITUAL: Climatizacion = "aire_aire";
+
 function resolver<T>(v: Opcion<T> | undefined, h: T): T {
   return v === "habitual" || v === undefined ? h : v;
+}
+
+/** Los equipos de la vivienda que deciden sus circuitos: solo en la elevada por equipos. */
+export interface EquiposVivienda {
+  climatizacion: Climatizacion;
+  secadora: boolean;
+  automatizacion: boolean;
+}
+
+export function equiposDe(e: Partial<RebtEstado>, d: DecisionesRebt): EquiposVivienda {
+  if (d.electrificacion !== "elevada") return { climatizacion: "ninguna", secadora: false, automatizacion: false };
+  return {
+    climatizacion: resolver(e.climatizacion, CLIMATIZACION_HABITUAL),
+    secadora: e.secadora === true,
+    automatizacion: e.automatizacion === true,
+  };
 }
 
 export function resolverRebt(e: RebtEstado): DecisionesRebt {

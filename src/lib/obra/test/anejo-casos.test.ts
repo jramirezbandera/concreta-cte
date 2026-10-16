@@ -74,6 +74,15 @@ describe("la memoria y el anejo dicen lo mismo", () => {
     expect(colector[0]).toMatch(/^Colector (general|de lo intervenido)$/);
     const [, ud, d] = /recoge (\d+) UD y se resuelve en Ø(\d+) mm/.exec(apartado(m, "3.4.5. HS 5")) ?? [];
     expect([colector[2], colector[4]]).toEqual([ud, d]);
+
+    // REBT (feature-34): la carga total y el IGA de cada vivienda tipo.
+    const rebt = doc(a, "rebt");
+    const prevision = parte(rebt, "Previsión de cargas");
+    const total = /se justifica en la memoria: ([\d.,]+ k?W)/.exec(texto(prevision))?.[1];
+    // En la reforma el anejo da la carga antes y después de la obra, no la frase de la total.
+    if (_n !== "reforma_local_vivienda") expect(total).toBeDefined();
+    if (total) expect(apartado(m, "4.1.1.")).toContain(total);
+    for (const fila of prevision.tablas?.[0]?.filas ?? []) expect(apartado(m, "4.1.1.")).toContain(`${fila.at(-1)} A`);
   });
 });
 
@@ -96,6 +105,15 @@ describe("la reforma: solo lo intervenido", () => {
     expect(ex[0]).toBe("Colector general existente (1)");
     expect(m).toContain(`recibe ${ex[2]} UD, 23 de ellas de lo intervenido`);
     expect(t.notas).toEqual(["El colector existente no consta: con las UD de la obra hecha necesita al menos Ø110 (tabla 4.5)."]);
+  });
+
+  it("electricidad: la vivienda nueva en planta baja, la LGA y la tierra existentes", () => {
+    const rebt = doc(a, "rebt");
+    const lineas = parte(rebt, "Línea general de alimentación y derivaciones individuales");
+    expect(lineas.tablas![0].filas.map((f) => f[0])).toEqual(["Vivienda A (PB) (1)"]);
+    expect(texto(lineas)).toContain("La línea general de alimentación es la existente y no se modifica.");
+    expect(texto(parte(rebt, "Puesta a tierra"))).toMatch(/^La instalación de la obra se conecta a la puesta a tierra existente/);
+    expect(texto(parte(rebt, "Contadores"))).toBe("Los contadores de la obra se añaden a la centralización existente: 1 más. La caja general de protección es la existente.");
   });
 
   it("sin bajantes: los ramales van al colector, en la memoria y en el anejo", () => {
@@ -122,7 +140,11 @@ describe("sin HS 4 ni HS 5", () => {
     const t = textoPlanoAnejoInstalaciones(a);
     expect(t).toContain("5.3.1. Fontanería (DB-HS 4)");
     expect(t).not.toContain("Tabla 5.3.1-");
-    expect(textoPlanoMemoriaCte(memoriaCte(p))).not.toContain("El cálculo extenso se desarrolla en el anejo 5.3.");
+    const m = textoPlanoMemoriaCte(memoriaCte(p));
+    expect(m).not.toContain("El cálculo extenso se desarrolla en el anejo 5.3.1");
+    expect(m).not.toContain("El cálculo extenso se desarrolla en el anejo 5.3.2");
+    // La electricidad sí: la vivienda nueva lleva su derivación y sus circuitos (feature-34).
+    expect(m).toContain("El cálculo extenso se desarrolla en el anejo 5.3.3");
   });
 
   it("el Word se genera", async () => {

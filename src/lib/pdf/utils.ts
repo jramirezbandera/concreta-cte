@@ -42,6 +42,8 @@ export function pdfStr(s: string): string {
     .replace(/Σ/g, "Sum")
     .replace(/Δ/g, "Delta")
     .replace(/Ψ/g, "Psi")
+    // Ohmios y resistividad de la puesta a tierra (feature-34): «37 Ω», «ρ = 500 Ω·m».
+    .replace(/Ω/g, "ohm")
     // Greek lowercase
     .replace(/λ̄/g, "lam")
     .replace(/λ/g, "lam")
@@ -56,6 +58,7 @@ export function pdfStr(s: string): string {
     .replace(/θ/g, "th")
     .replace(/ε/g, "eps")
     .replace(/ψ/g, "psi")
+    .replace(/ρ/g, "rho")
     // Other symbols
     .replace(/≤/g, "<=")
     .replace(/≥/g, ">=")

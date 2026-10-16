@@ -75,12 +75,9 @@ describe("anejoInstalaciones", () => {
     expect(a.apartados.map((x) => x.enMemoria)).toEqual(["3.4.4", "3.4.5", "4.1.1"]);
   });
 
-  it("un módulo que calcula pero aún no da su anejo sale como pendiente, no como hecho", () => {
+  it("las tres instalaciones dan su cálculo extenso (el REBT desde feature-34)", () => {
     const aps = anejoInstalaciones(demo()).apartados;
-    expect(aps.map((x) => x.tipo)).toEqual(["calculado", "calculado", "pendiente"]);
-    for (const ap of aps.filter((x) => x.key === "rebt")) {
-      if (ap.tipo === "pendiente") expect(ap.motivo).toMatch(/^Pendiente: el cálculo extenso de/);
-    }
+    expect(aps.map((x) => x.tipo)).toEqual(["calculado", "calculado", "calculado"]);
   });
 
   it("lo que no cumple no entra: sale como pendiente, con sus motivos", () => {

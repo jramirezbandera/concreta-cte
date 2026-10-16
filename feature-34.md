@@ -4,6 +4,9 @@
 > tras cerrar la 6a ([feature-33.md](feature-33.md)), que dejó hecho el documento «Anejo 5.3 ·
 > Instalaciones del edificio» con fontanería (5.3.1) y saneamiento (5.3.2), y el hueco del 5.3.3
 > («Pendiente: el cálculo extenso de la instalación eléctrica aún no se desarrolla en este anejo»).
+>
+> **Cerrada el 2026-10-16**, salvo abrir el Word en Word. Lo que cambió respecto a este plan va en el
+> «Hecho» de cada paso; lo que hay que validar, al final.
 
 ## Lo que hay hoy
 
@@ -105,6 +108,24 @@ falten, bajadas a `research/pdf/`), en imagen donde haya tablas:
 Se apunta como K-REBT.20 y siguientes en
 [research/verificacion-rebt.md](research/verificacion-rebt.md).
 
+**Hecho (2026-10-16): bloque N y K-REBT.19–36** (la serie acababa en el 18). Consolidado del BOE leído
+en imagen; guías BT-13, 14, 15, 18, 19, 21, 22, 24, 25 y 26 y Anexo 2, bajadas a `research/pdf/`.
+Lo que cambia el diseño:
+- **No hay una sola tabla de intensidades admisibles.** La tabla 1 de la ITC-BT-19 es la de 1994. La
+  Guía BT-19 recomienda la de 2004, que da hasta un 10 % menos con XLPE, y la ITC-BT-02 ya remite a la
+  UNE-HD 60364-5-52:2022, que no tenemos (P8). Se toma la menor de las dos (K-REBT.19).
+- **La DI de una vivienda se calcula con el IGA**, no con la previsión con simultaneidad (ITC-BT-25
+  ap. 1). Casi siempre manda la caída.
+- **Los calibres de los fusibles los fija la distribuidora** (P10). Se da el intervalo que protege la
+  LGA: de Ib a 0,906·Iz (Guía BT-22, gG con I2 = 1,6·In).
+- **El anillo: 25 mm² en el reglamento**, 35 mm² en las guías. Se proyecta de 35 y se cita el 25.
+- **El pararrayos sí cambia la resistencia orientativa**: 15 Ω con él y 37 Ω sin él (Guía BT-26). Se
+  lee de SUA 8.
+- **La fila C13 está en la tabla 1 de la ITC-BT-25** del consolidado (la Guía BT-25, de 2012, no la
+  tiene). Su «3» (máximo de puntos), cotejado en imagen a 220 ppp (P9 hecho).
+- Ni el REBT ni su guía dicen nada de la bomba de calor: aire-aire en C9 y aire-agua en C8, por criterio
+  (K-REBT.35).
+
 ### Paso 1 · Tablas y decisiones
 
 - [tablas.ts](src/modules/rebt/tablas.ts): `CIRCUITOS_ITC_BT_25` (tabla 1), `PUNTOS_ITC_BT_25`
@@ -120,6 +141,19 @@ Se apunta como K-REBT.20 y siguientes en
 - **Terreno** (estado nuevo, opcional): tipo de terreno de la tabla de resistividades, o la
   resistividad medida; sin dato, el del lado de la seguridad que diga el paso 0, con aviso.
 
+**Hecho (2026-10-16).**
+- [tablasInstalacion.ts](src/modules/rebt/tablasInstalacion.ts), aparte de `tablas.ts` (que es la
+  previsión): tablas 1 y 2 de la ITC-BT-25, caídas, LGA y DI, intensidades admisibles (ITC-BT-19, su
+  Guía y la ITC-BT-07), tubos, protección, fórmulas y tierra, cada una con su procedencia. Los
+  criterios, en `CRITERIOS_INSTALACION`.
+- [estado.ts](src/modules/rebt/estado.ts): `climatizacion` (habitual, aire-aire), `secadora`,
+  `automatizacion`, `longitudLga_m`, `longitudDi_m`, `diEnterrada`, `perimetroTierra_m` y
+  `resistividad_ohm_m`, todos opcionales. `equiposDe` los resuelve: solo cuentan con la electrificación
+  elevada. La resistividad es un número (con los valores de la tabla 4 en la ayuda), no un tipo de
+  terreno.
+- **Desviación:** los equipos no van en las decisiones sino en «Para el anejo», porque no cambian la
+  previsión. Ninguna cifra de la previsión cambia.
+
 ### Paso 2 · Circuitos y puntos de utilización
 
 - `circuitosVivienda(vivienda, estancias, equipos)`, puro:
@@ -133,6 +167,18 @@ Se apunta como K-REBT.20 y siguientes en
   - **diferenciales**: cuántos y de qué sensibilidad.
 - En `JustificacionRebt`: `circuitos` por vivienda tipo. En oficinas y locales, la instalación
   interior es del proyecto de cada local: una línea que lo dice.
+
+**Hecho (2026-10-16).** [interior.ts](src/modules/rebt/interior.ts): `interiorVivienda` y
+`longitudMaxima`.
+- Estancias de Habitabilidad o, sin ellas, `estanciasPropuestas`. Se añaden acceso (timbre, que no
+  cuenta como punto), vestíbulo y, con recarga, el garaje. El estar-cocina suma salón y cocina; el aseo
+  va como baño; «otra», como terraza o vestidor; el pasillo, sin longitud, con un punto y una toma.
+- Los adicionales reparten los puntos por igual (25 en dos C1 → 13 y 12). El C4 no se desdobla en C12
+  (nota 8). Con más de 160 m², un C7.
+- Lmáx = e·U·γ·S / (2·IA), redondeada a la baja: C1 24,8 m; C2, C5 y C10 25,8; C4 33,1; C3, C8 y C9
+  39,7; C13 (5 %, 16 A) 43,1.
+- Diferenciales: ⌈circuitos sin el C13 / 5⌉, y el del C13 aparte.
+- Aviso `puntos-elevada-<tipo>` si una vivienda básica pide circuitos adicionales.
 
 ### Paso 3 · Derivación individual y LGA
 
@@ -150,6 +196,22 @@ Se apunta como K-REBT.20 y siguientes en
   admite (dato que la app no tiene), «Antes de entregar» pide comprobarla. Las DI nuevas sí se
   calculan.
 
+**Hecho (2026-10-16).** [lineas.ts](src/modules/rebt/lineas.ts) (`intensidadAdmisible`,
+`caidaTension`, `dimensionar`, `lineaGeneral`, `derivacionIndividual`) e
+[instalacion.ts](src/modules/rebt/instalacion.ts), que lo arma todo desde la previsión.
+- LGA: RZ1-K (AS), XLPE, γ = 44, Iz de tres conductores cargados, 0,5 %.
+- DI de vivienda: ES07Z1-K (AS), como PVC, γ = 48, con la capacidad del IGA, 1 % (1,5 % en la
+  unifamiliar). Enterrada (opción de la unifamiliar), RZ1-K con las intensidades de la ITC-BT-07 y la
+  Guía.
+- DI de servicios generales (con el garaje) y de cada local: trifásicas con cos φ 0,9 y el calibre
+  normalizado igual o mayor; el local de hasta 14 490 W, monofásico con su escalón de IGA.
+- La longitud de la DI que da el proyectista se aplica a todas las viviendas (la más larga, del lado de
+  la seguridad).
+- En la reforma, solo la DI de la vivienda nueva, en su planta (no en la del tipo en el resto del
+  edificio). La LGA, existente, con su carga después de la obra.
+- Interruptor general de maniobra de 160 o 250 A con más de dos usuarios (ITC-BT-16 ap. 3).
+- Aviso `longitudes-estimadas`.
+
 ### Paso 4 · Puesta a tierra
 
 - Conductor en anillo bajo la cimentación, con la longitud del perímetro del edificio (de El
@@ -157,6 +219,19 @@ Se apunta como K-REBT.20 y siguientes en
   resistividad del terreno.
 - Comprobación de la resistencia frente a la que exige el diferencial (paso 0, pto 8); línea
   principal y conductores de protección.
+
+**Hecho (2026-10-16).** [tierra.ts](src/modules/rebt/tierra.ts).
+- Longitud del anillo: la del proyecto, la planta de SUA 8 (largo y ancho) o un cuadrado con la
+  superficie de la cubierta. El pararrayos, de la decisión de SUA 8.
+- R = 2ρ/L y R = ρ/L; picas en paralelo, como si no se influyeran (se dice que es optimista).
+- **Desviación de K-REBT.31:** tensión de contacto de **50 V**, la del reglamento fuera de local
+  conductor (el agente proponía 24 V). Diferencial de referencia de 30 mA en la unifamiliar y de
+  300 mA en el edificio.
+- **Desviación de K-REBT.30:** con el terreno supuesto (3 000 Ω·m), las picas solo para el límite del
+  reglamento. Con el terreno declarado, también para los 37 o 15 Ω de la Guía. Con 3 000 Ω·m y la Guía,
+  saldrían decenas de picas sobre un dato inventado.
+- Más de 20 picas: aviso `tierra-picas`. Sin terreno: aviso `terreno-supuesto`.
+- En obra existente, se conecta a la tierra que hay.
 
 ### Paso 5 · El anejo 5.3.3
 
@@ -174,6 +249,14 @@ Se apunta como K-REBT.20 y siguientes en
 
 La tabla de líneas es la ancha (`TablaMemoria.ancha`).
 
+**Hecho (2026-10-16).** [anejo.ts](src/modules/rebt/anejo.ts), enganchado con `DefinicionSi.anejo?` y
+`moduloSi` ([modulos.ts](src/lib/obra/modulos.ts)): cualquier módulo de la pantalla común puede dar su
+anejo.
+- Partes: previsión (con la tabla de viviendas tipo), instalación interior por vivienda tipo (puntos y
+  circuitos), líneas (11 columnas, con «Manda»: mínima, Iz o e), contadores y CGP, y puesta a tierra.
+- En oficinas, una línea: el interior de cada local es de su proyecto.
+- La caída se llama «e», no «ΔU» (la fuente del PDF no tiene Δ). `pdfStr` pasa Ω y ρ a «ohm» y «rho».
+
 ### Paso 6 · Remisiones, pantalla, casos y cierre
 
 - **Memoria**: al final del 4.1.1, la frase de remisión de [remision.ts](src/lib/obra/remision.ts)
@@ -187,6 +270,27 @@ La tabla de líneas es la ancha (`TablaMemoria.ancha`).
 - **Foto del expediente**: cambian las huellas del anejo y, en la memoria, solo la frase de
   remisión del REBT.
 - Abrir el Word en Word.
+
+**Hecho (2026-10-16).**
+- **Memoria**: la remisión al 5.3.3 sale sola, porque `remisionAnejo` ya admitía `rebt`. Comparado el
+  texto de la memoria antes y después en cinco casos: solo se añade esa frase.
+- **Pantalla**: «Para el anejo» en el REBT, con planos, climatización, secadora, automatización,
+  longitudes (con la estimada a la vista), DI enterrada en la unifamiliar, anillo y resistividad.
+  `CampoOpciones` nuevo en [ParaElAnejo.tsx](src/components/justificacion/ParaElAnejo.tsx). Revisada en el
+  navegador.
+- **Demo**: planos «I08–I11». Gana dos avisos del REBT (longitudes y terreno): 34 en «Antes de
+  entregar».
+- **Avisos** sin elemento, como el de las longitudes de HS 4, para que la carga total no salga «por
+  revisar» por algo que no la cambia.
+- **Foto del expediente**: cambian las 40 huellas del anejo y las 40 de la memoria. Además, el REBT de
+  las 8 unifamiliares pasa de «cumple» a «revisar» por las longitudes y el terreno supuestos.
+- **Tests**: [anejo.test.ts](src/modules/rebt/test/anejo.test.ts) (23) y la pantalla en
+  [ui.test.tsx](src/modules/rebt/test/ui.test.tsx). En
+  [anejo-casos.test.ts](src/lib/obra/test/anejo-casos.test.ts), la coherencia memoria–anejo (carga total
+  e IGA) en el Demo y los cinco casos, y la reforma (DI en PB, LGA y tierra existentes). 1714 en verde;
+  tsc, eslint y build limpios.
+- PDF del Demo y de la unifamiliar revisados en imagen: la tabla de líneas cabe sin partir.
+- **Pendiente: abrir el Word en Word**, que no se puede hacer desde aquí.
 
 ## Fuera de alcance
 
@@ -205,11 +309,18 @@ La tabla de líneas es la ancha (`TablaMemoria.ancha`).
 
 1. **Longitud máxima por circuito** en lugar de una longitud inventada: la sección es la mínima
    de la tabla 1 y el anejo dice hasta qué longitud cumple la caída de tensión.
-2. **Longitudes de LGA y DI estimadas** desde El edificio, rotuladas y en «Antes de entregar»,
-   con el valor del proyecto como dato opcional.
-3. **Equipos como casillas** (C8–C11) en lugar de la sola opción «elevada».
+2. **Longitudes de LGA y DI estimadas** desde El edificio (10 m de LGA; 3 m + subida + 10 m por DI;
+   15 m en la unifamiliar), rotuladas y en «Antes de entregar». La DI que se da vale para todas las
+   viviendas.
+3. **Equipos en «Para el anejo»** (climatización, secadora, automatización), y la bomba de calor
+   aire-aire en C9 como habitual de la elevada.
 4. **Estancias de Habitabilidad**, sin pedirlas de nuevo; sin superficie, el mínimo de
-   «hasta 10 m²».
-5. **Una DI por vivienda tipo**, la de su planta más alejada de la centralización, no una por
-   vivienda.
+   «hasta 10 m²»; acceso y vestíbulo siempre.
+5. **Una DI por vivienda tipo**, la de su planta más alejada de la centralización.
 6. **Interior de locales, oficinas y zonas comunes fuera**: solo su DI.
+7. **Iz, la menor de la ITC-BT-19 y de la Guía BT-19** (K-REBT.19), a la espera de la UNE-HD
+   60364-5-52:2022.
+8. **Fusibles de la CGP como intervalo** (de Ib a 0,906·Iz), no como calibre: lo fija la distribuidora.
+9. **Tierra**: 50 V de tensión de contacto, 300 mA de diferencial de referencia en el edificio,
+   3 000 Ω·m sin dato, y picas para la Guía BT-26 solo con el terreno declarado.
+10. **El REBT de la unifamiliar pasa a «revisar»** mientras las longitudes y el terreno sean supuestos.

@@ -198,7 +198,8 @@ describe("Antes de entregar", () => {
   it("los avisos sin revisar del Demo, cada uno hacia su módulo", () => {
     montar(<AntesDeEntregar />);
     const items = screen.getAllByRole("listitem");
-    expect(items).toHaveLength(32);
+    // feature-34: el REBT pide las longitudes de sus líneas y el terreno de la tierra.
+    expect(items).toHaveLength(34);
     // HR (feature-25): el porcentaje de huecos, el Ld, las colindancias supuestas y el local.
     expect(within(items[20]).getByRole("link")).toHaveAttribute("href", "/hr/ruido");
     expect(items[21]).toHaveTextContent(/HR · Indica el Ld/);
@@ -207,6 +208,7 @@ describe("Antes de entregar", () => {
     expect(items[27]).toHaveTextContent(/HE5 · /);
     expect(within(items[30]).getByRole("link")).toHaveAttribute("href", "/rebt/prevision");
     expect(items[30]).toHaveTextContent(/REBT · /);
+    expect(items[33]).toHaveTextContent(/REBT · Indica la resistividad del terreno/);
     expect(within(items[0]).getByRole("link")).toHaveAttribute("href", "/hs/humedad");
     expect(items[0]).toHaveTextContent("HS1 · Faltan datos del clima: se ha supuesto zona pluviométrica I.");
     expect(within(items[1]).getByRole("link")).toHaveAttribute("href", "/hs/residuos");
@@ -247,7 +249,7 @@ describe("Antes de entregar", () => {
         he4: { revisados: ["perdidas", "scop"] },
         he5: { revisados: ["construida", "mixto"] },
         he6: { revisados: ["mixto"] },
-        rebt: { revisados: ["ascensor-supuesto", "servicios", "humo"] },
+        rebt: { revisados: ["ascensor-supuesto", "servicios", "humo", "longitudes-estimadas", "terreno-supuesto"] },
         hr: { revisados: ["huecos", "ld", "colindancias", "local"] },
       },
     });

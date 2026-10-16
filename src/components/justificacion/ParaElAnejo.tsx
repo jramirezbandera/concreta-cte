@@ -112,6 +112,34 @@ export function CampoNumeroOpcional(props: {
   );
 }
 
+/** Una elección entre pocas opciones (feature-34: la climatización, la DI enterrada…). */
+export function CampoOpciones<T extends string>(props: {
+  id: string;
+  etiqueta: string;
+  valor: T;
+  opciones: { valor: T; label: string }[];
+  onChange: (v: T) => void;
+  ayuda: string;
+}): JSX.Element {
+  const { id, etiqueta, valor, opciones, onChange, ayuda } = props;
+  return (
+    <Fila
+      id={id}
+      etiqueta={etiqueta}
+      ayuda={ayuda}
+      control={
+        <select id={id} value={valor} onChange={(e) => onChange(e.currentTarget.value as T)} className={`${INPUT} max-w-[200px]`}>
+          {opciones.map((o) => (
+            <option key={o.valor} value={o.valor}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      }
+    />
+  );
+}
+
 /** La sección, con su rótulo, debajo de las decisiones. */
 export function ParaElAnejo({ children }: { children: ReactNode }): JSX.Element {
   return (

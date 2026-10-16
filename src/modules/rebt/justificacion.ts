@@ -36,6 +36,7 @@ import { edificioSi, superficies, type ZonaSi } from "../si/edificio";
 import { SECTORES_TABLA_1_1 } from "../si/tablas";
 import type { ElementoSi, JustificacionSiBase } from "../si/tipos";
 import { edificioSua } from "../sua/edificio";
+import { instalacionRebt, type InstalacionRebt } from "./instalacion";
 import { noNegativo, resolverRebt, HABITUALES_REBT, type DecisionesRebt, type RebtEstado, type Spl } from "./estado";
 import {
   ANEXO2_GUIA_BT52,
@@ -186,6 +187,8 @@ export interface JustificacionRebt extends JustificacionSiBase {
   total_W: number;
   /** En un edificio existente con el asistente respondido (feature-30). */
   existente?: ExistenteRebt;
+  /** Aguas abajo de la previsión, para el anejo (feature-34): circuitos, líneas y tierra. */
+  instalacion: InstalacionRebt;
 }
 
 /**
@@ -253,7 +256,17 @@ function nombreAlumbrado(z: ZonaSi): { que: string; W_m2: number } {
     : { que: `Escalera (${z.plantas})`, W_m2: S.alumbradoEscalera_W_m2.fluorescencia };
 }
 
+/**
+ * La previsión (feature-23) y, con ella, lo que va aguas abajo para el anejo
+ * (feature-34): circuitos, LGA, derivaciones y tierra, con sus avisos.
+ */
 export function justificarRebt(estado: RebtEstado, p: ProyectoSi): JustificacionRebt {
+  const j = justificarPrevision(estado, p);
+  const { instalacion, avisos } = instalacionRebt(j, estado, p);
+  return { ...j, avisos: [...j.avisos, ...avisos], instalacion };
+}
+
+function justificarPrevision(estado: RebtEstado, p: ProyectoSi): Omit<JustificacionRebt, "instalacion"> {
   const e = edificioSi(p.edificio);
   const r = e.resumen;
   const unifamiliar = r.esUnifamiliar;
@@ -567,7 +580,7 @@ export function justificarRebt(estado: RebtEstado, p: ProyectoSi): Justificacion
       const o = obraDeZona(z, ex.intervencion);
       return o === "nueva" || o === "cambia_uso";
     };
-    const antes = justificarRebt(estado, { ...p, edificio: edificioAntes(ex), existente: undefined });
+    const antes = justificarPrevision(estado, { ...p, edificio: edificioAntes(ex), existente: undefined });
     const enObra = viviendasDe(soloZonas(p.edificio, nueva), false);
     const viviendasNuevas = enObra.flatMap(({ tipo, cantidad }) => {
       const v = viviendas.find((x) => x.tipoId === tipo.id);

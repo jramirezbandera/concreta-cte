@@ -9,7 +9,7 @@
 // =============================================================================
 
 import type { FilaQueEntra } from "../../components/justificacion/QueEntra";
-import type { DetalleElemento, EstadoPresentacion, MemoriaDoc } from "../../lib/cte/presentacion";
+import type { AnejoDoc, DetalleElemento, EstadoPresentacion, MemoriaDoc } from "../../lib/cte/presentacion";
 import type { Aviso } from "../../lib/cte/resultado";
 import type { Edificio } from "../../lib/edificio/tipos";
 import type { FichaData } from "../../lib/pdf/renderFicha";
@@ -89,6 +89,8 @@ export interface DefinicionSi<E extends Record<string, unknown>, J extends Justi
 
   // ── Memoria y ficha ───────────────────────────────────────────────────────
   memoria(j: J): MemoriaDoc;
+  /** El cálculo extenso para el anejo de instalaciones (feature-34: REBT). */
+  anejo?(j: J): AnejoDoc;
   ficha(j: J, o: OpcionesFichaSi<E>): FichaData;
   /** Id del clon oculto del dibujo en papel. */
   pdfSvgId: string;

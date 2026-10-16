@@ -280,6 +280,7 @@ function moduloSi<E extends Record<string, unknown>, J extends JustificacionSiBa
           return e ? def.textoIncumplimiento(e) : null;
         },
         memoria: () => def.memoria(j),
+        ...(def.anejo ? { anejo: () => def.anejo!(j) } : {}),
       };
     },
   };

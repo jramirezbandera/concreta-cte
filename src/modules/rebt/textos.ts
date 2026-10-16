@@ -457,7 +457,36 @@ export function franjaRebt(el: ElementoSi<unknown>, j: JustificacionRebt, estado
 // ── Avisos e incumplimientos ────────────────────────────────────────────────
 
 export function textoAvisoRebt(a: Aviso): TextoSi {
+  if (a.id.startsWith("puntos-elevada-")) {
+    const piden = (a.datos.piden as string[] | undefined) ?? [];
+    return {
+      titulo: a.datos.unifamiliar ? "La vivienda pide electrificación elevada por sus puntos." : `La vivienda ${String(a.datos.nombre)} pide electrificación elevada por sus puntos.`,
+      detalle: `Por ${lista(piden)} necesita circuitos adicionales, y eso la hace elevada (ITC-BT-25 ap. 2.3.2). Elige «Elevada» en la electrificación (${W(G.elevada_W)}, IGA de 40 A) o revisa las estancias en Habitabilidad.`,
+    };
+  }
   switch (a.id) {
+    case "estancias-sin-superficie":
+      return {
+        titulo: a.datos.deHab ? "Indica la superficie de las estancias en Habitabilidad." : "Indica las estancias de las viviendas en Habitabilidad.",
+        detalle: `Los puntos de utilización de la tabla 2 de la ITC-BT-25 dependen de la superficie de cada estancia: dos puntos de luz con más de 10 m² y una toma de uso general por cada 6 m² en el salón y los dormitorios. ${a.datos.deHab ? "Sin ella" : "Mientras, las estancias se deducen de los dormitorios, baños y aseos del tipo, y sin superficie"}, el anejo pone el mínimo de hasta 10 m².`,
+      };
+    case "longitudes-estimadas":
+      return {
+        titulo: a.datos.lga ? "Confirma las longitudes de la línea general y de las derivaciones." : "Confirma la longitud de la derivación individual.",
+        detalle: a.datos.unifamiliar
+          ? "El anejo dimensiona la derivación individual con 15 m, una longitud tipo de la caja de protección y medida al cuadro de la vivienda. Indica la del proyecto en «Para el anejo»: con la caída de tensión, la sección depende de ella."
+          : "El anejo dimensiona las secciones con longitudes tipo: 10 m de línea general y, en cada derivación, 3 m en la centralización, la subida por las alturas de planta de El edificio y 10 m en planta. Indica las del proyecto en «Para el anejo»: con la caída de tensión, la sección depende de ellas.",
+      };
+    case "terreno-supuesto":
+      return {
+        titulo: "Indica la resistividad del terreno.",
+        detalle: `Sin ella, la puesta a tierra se calcula con 3 000 Ω·m, la peor de la tabla 4 de la ITC-BT-18 (suelos pedregosos desnudos, arenas secas): ${num(Number(a.datos.r), 1)} Ω${Number(a.datos.picas) > 0 ? ` con ${String(a.datos.picas)} picas` : ""}. Con la del estudio geotécnico o la medida, el anejo dimensiona además las picas para la resistencia orientativa de la Guía BT-26 (37 Ω, o 15 Ω con pararrayos).`,
+      };
+    case "tierra-picas":
+      return {
+        titulo: "El terreno pide demasiadas picas.",
+        detalle: `Con esa resistividad harían falta más de ${String(a.datos.picas)} picas de 2 m para llegar a la resistencia buscada. Mide la resistividad, alarga el anillo o mejora el terreno, y comprueba la resistencia con la medida.`,
+      };
     case "servicios": {
       const falta = [...(a.datos.ascensor ? ["la potencia del ascensor"] : []), ...(a.datos.otros ? ["los demás servicios generales"] : [])];
       return {

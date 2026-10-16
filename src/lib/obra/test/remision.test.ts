@@ -63,7 +63,7 @@ describe("la memoria remite al anejo y a los planos", () => {
     const b = bloquesMemoria(memoriaCte(q));
     expect(b.some((x) => x.tipo === "parrafo" && x.texto === "El cálculo extenso se desarrolla en el anejo 5.3.1 (tablas 5.3.1-1 a 5.3.1-3).")).toBe(true);
     const pend = antesDeEntregar(q).filter((x) => x.id.endsWith(":planos"));
-    expect(pend.map((x) => `${x.id}|${x.titulo}`)).toEqual(["hs4:planos|Indica los planos de fontanería."]);
+    expect(pend.map((x) => `${x.id}|${x.titulo}`)).toEqual(["hs4:planos|Indica los planos de fontanería.", "rebt:planos|Indica los planos de electricidad."]);
     expect(pend[0].ruta).toBe("hs/fontaneria");
   });
 });

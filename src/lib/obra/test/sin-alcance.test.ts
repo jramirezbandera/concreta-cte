@@ -19,6 +19,9 @@ import antes from "./foto-antes.json";
 // la fila «hab» y cambia la huella de la memoria; nada más. En feature-33 (anejo
 // de instalaciones) se añade la huella del anejo y cambia la de la memoria, por
 // la frase que remite al anejo y a los planos; nada más.
+// En feature-34 (el REBT en el anejo) cambian la huella del anejo y la de la
+// memoria, por la remisión al 5.3.3, y el REBT de las 8 unifamiliares pasa a
+// «revisar» por las longitudes y el terreno supuestos; nada más.
 // =============================================================================
 
 describe("sin asistente de alcance, nada cambia", () => {
