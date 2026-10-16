@@ -1,5 +1,5 @@
 import { useState, type JSX } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Pencil, PenLine, Plus, Trash2 } from "lucide-react";
 import { InputLabel } from "../ui/InputLabel";
 import { showToast } from "../ui/Toast";
 import { useEstudio } from "../../lib/estudio/useEstudio";
@@ -21,6 +21,12 @@ const MAX_PERSONAS = 4;
 
 function nuevaPersona(): Firmante {
   return { id: crypto.randomUUID(), nombre: "", titulacion: "", colegiacion: "" };
+}
+
+/** «Ana Pérez» → «AP», para el avatar del firmante. */
+function iniciales(nombre: string): string {
+  const partes = nombre.trim().split(/\s+/).filter(Boolean);
+  return ((partes[0]?.[0] ?? "") + (partes.length > 1 ? (partes[partes.length - 1]?.[0] ?? "") : "")).toUpperCase() || "·";
 }
 
 function Campo(props: { id: string; label: string; valor: string; placeholder?: string; onChange: (v: string) => void }): JSX.Element {
@@ -60,42 +66,64 @@ export function TuEstudio(): JSX.Element {
   };
 
   return (
-    <section aria-labelledby="tu-estudio" className="mt-8">
-      <div className="mb-3 flex items-baseline justify-between gap-3">
-        <h2 id="tu-estudio" className="text-text-primary text-[13px] font-semibold tracking-wide uppercase">
-          Tu estudio
-        </h2>
+    <section aria-labelledby="tu-estudio" className="border-border-sub bg-bg-surface mt-10 rounded-xl border p-4 sm:p-5">
+      <div className="flex flex-wrap items-start gap-3">
+        <div className="bg-tint-accent text-accent flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+          <PenLine size={16} aria-hidden="true" />
+        </div>
+        <div className="min-w-0 flex-1 basis-56">
+          <h2 id="tu-estudio" className="text-text-primary text-[15px] leading-tight font-semibold">
+            Tu estudio
+          </h2>
+          <p className="text-text-secondary mt-0.5 text-[12.5px] leading-snug">
+            Quién firma y cómo se le localiza: va a la cabecera de la memoria y a la portada del anejo. Se guarda en este navegador, para
+            todos los proyectos.
+          </p>
+        </div>
         {!editando && (
-          <button type="button" onClick={abrir} className="text-accent hover:text-accent-hover text-[12.5px] hover:underline">
+          <button
+            type="button"
+            onClick={abrir}
+            className={
+              vacio
+                ? "bg-btn-primary-bg hover:bg-btn-primary-bg-hover text-btn-primary-fg flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium"
+                : "border-border-main bg-bg-primary text-text-secondary hover:text-text-primary flex shrink-0 items-center gap-1.5 rounded-md border px-3 py-1.5 text-[13px] font-medium"
+            }
+          >
+            {vacio ? <Plus size={14} aria-hidden="true" /> : <Pencil size={13} aria-hidden="true" />}
             {vacio ? "Añadir" : "Editar"}
           </button>
         )}
       </div>
 
-      {!editando && vacio && (
-        <p className="border-border-sub bg-bg-surface text-text-secondary rounded border px-3 py-2 text-[12.5px] leading-snug">
-          Quién firma y cómo se le localiza: va a la cabecera de la memoria y a la portada del anejo. Se guarda en este navegador, para todos
-          los proyectos.
-        </p>
-      )}
-
       {!editando && !vacio && (
-        <div className="border-border-sub bg-bg-surface rounded border px-3 py-2 text-[12.5px] leading-relaxed">
-          {estudio.firmantes.map((f) => (
-            <p key={f.id} className="text-text-primary">
-              {f.nombre}
-              {f.titulacion && <span className="text-text-secondary">, {f.titulacion}</span>}
-              {f.colegiacion && <span className="text-text-disabled"> · {f.colegiacion}</span>}
-            </p>
-          ))}
+        <div className="mt-4 flex flex-col gap-3 sm:pl-12">
+          <ul className="flex flex-wrap gap-x-6 gap-y-3">
+            {estudio.firmantes.map((f) => (
+              <li key={f.id} className="flex min-w-0 items-center gap-2.5">
+                <span
+                  className="bg-bg-elevated text-text-secondary flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold"
+                  aria-hidden="true"
+                >
+                  {iniciales(f.nombre)}
+                </span>
+                <span className="min-w-0 text-[12.5px] leading-tight">
+                  <span className="text-text-primary block font-medium">{f.nombre}</span>
+                  {(f.titulacion || f.colegiacion) && (
+                    <span className="text-text-secondary block">{[f.titulacion, f.colegiacion].filter(Boolean).join(" · ")}</span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
           {(estudio.direccion || estudio.telefonos || estudio.correo) && (
-            <p className="text-text-secondary">{[estudio.direccion, estudio.telefonos, estudio.correo].filter(Boolean).join(" · ")}</p>
+            <p className="text-text-secondary text-[12.5px]">{[estudio.direccion, estudio.telefonos, estudio.correo].filter(Boolean).join(" · ")}</p>
           )}
         </div>
       )}
 
       {editando && (
-        <div className="border-border-sub bg-bg-surface flex flex-col gap-4 rounded border px-3 py-3">
+        <div className="border-border-sub mt-4 flex flex-col gap-4 border-t pt-4">
           <fieldset className="flex flex-col gap-3">
             <legend className="text-text-secondary mb-1 text-[12px]">
               Quién firma. En cada proyecto se elige una persona o dos; por defecto, la primera.
