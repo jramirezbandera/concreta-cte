@@ -75,6 +75,12 @@ export interface ProyectoContextValue {
   ): void;
   /** Marca (o desmarca) un aviso de una justificación como revisado (feature-14). */
   marcarRevisado(key: JustificacionKey, avisoId: string, revisado: boolean): void;
+  /**
+   * Escribe YA el expediente en el navegador, sin esperar al debounce, y deja
+   * nada pendiente. `false` si el navegador no lo admite (almacenamiento lleno).
+   * Lo usa el menú de obra antes de exportar, duplicar o cambiar de obra.
+   */
+  guardarAhora(): boolean;
 }
 
 export const ProyectoContext = createContext<ProyectoContextValue | null>(null);
@@ -133,6 +139,26 @@ export function ProyectoProvider(props: {
     if (!pendienteRef.current) return;
     pendienteRef.current = false;
     if (persistir) guardarProyecto(proyectoRef.current);
+  }, [persistir]);
+
+  const guardarAhora = useCallback((): boolean => {
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    // El ref puede ir un render por detrás del estado si el efecto aún no ha
+    // corrido; el menú se abre con un clic, así que en la práctica están al día.
+    if (!persistir) {
+      pendienteRef.current = false;
+      return true;
+    }
+    try {
+      guardarProyecto(proyectoRef.current);
+      pendienteRef.current = false;
+      return true;
+    } catch {
+      return false;
+    }
   }, [persistir]);
 
   // Programación del persist: efecto sobre `proyecto` (no dentro de los updaters
@@ -239,6 +265,7 @@ export function ProyectoProvider(props: {
       setRefExterna,
       setVerificacionEnergetica,
       marcarRevisado,
+      guardarAhora,
     }),
     [
       proyecto,
@@ -252,6 +279,7 @@ export function ProyectoProvider(props: {
       setRefExterna,
       setVerificacionEnergetica,
       marcarRevisado,
+      guardarAhora,
     ],
   );
 

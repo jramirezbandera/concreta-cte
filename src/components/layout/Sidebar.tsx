@@ -1,6 +1,7 @@
 import { useContext, type JSX } from "react";
 import { Link, NavLink } from "react-router";
-import { Building2, ChevronsUpDown, HardHat, ScrollText, X } from "lucide-react";
+import { Building2, HardHat, ScrollText, X } from "lucide-react";
+import { ObraMenu } from "./ObraMenu";
 import { justificacionesPorGrupo, type JustificacionEntry } from "../../data/justificacionRegistry";
 import { ProyectoContext } from "../../lib/proyecto/ProyectoContext";
 import { estadoDe } from "../../lib/proyecto/progreso";
@@ -11,6 +12,8 @@ import { ENGINE_VERSION } from "../../lib/version";
 // =============================================================================
 // Sidebar v4 (REDISENO-V4 §3.3). La barra lateral enseña TODO el expediente:
 //
+//   - Arriba, el menú de obra (ObraMenu): nueva, datos, duplicar, guardar,
+//     exportar/importar .json y recientes.
 //   - «Proyecto»: La obra, El edificio y la Memoria CTE con sus apartados
 //     listos (feature-16).
 //   - Todas las justificaciones del registry agrupadas por DB, con su código y
@@ -189,18 +192,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </button>
       </div>
 
-      {proyecto !== null && (
-        <Link
-          to="/"
-          onClick={onClose}
-          className="border-border-main bg-bg-primary text-text-primary hover:border-text-disabled mx-2.5 mt-2.5 mb-1 flex h-[34px] items-center gap-2 rounded border px-2.5 text-[12.5px] transition-colors"
-          title={`${proyecto.nombre} — cambiar de proyecto`}
-          aria-label={`Proyecto: ${proyecto.nombre}. Volver a la lista de proyectos`}
-        >
-          <span className="min-w-0 flex-1 truncate">{proyecto.nombre}</span>
-          <ChevronsUpDown size={13} className="text-text-disabled shrink-0" aria-hidden="true" />
-        </Link>
-      )}
+      {proyecto !== null && <ObraMenu onNavegar={onClose} />}
 
       <nav className="scroll-hide flex-1 overflow-y-auto pb-3" aria-label="Expediente">
         {proyecto !== null && (

@@ -262,6 +262,17 @@ export function exportarProyecto(p: Proyecto): string {
   });
 }
 
+/** «concreta-proyecto-vivienda-c-mayor-12.json»: sin diacríticos, kebab-case. */
+export function nombreArchivoExport(p: Proyecto): string {
+  const s = p.nombre
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `concreta-proyecto-${s === "" ? "proyecto" : s}.json`;
+}
+
 /**
  * Valida e importa un archivo de proyecto. Todos los rechazos llevan mensaje en
  * español: JSON malformado, schema ajeno, versión 1 (sin migración), versión

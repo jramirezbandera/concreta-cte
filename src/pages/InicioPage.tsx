@@ -14,8 +14,10 @@ import {
   inicializarStorage,
   listarProyectos,
   contarProyectosV1,
+  nombreArchivoExport,
   setProyectoActivo,
 } from "../lib/proyecto/storage";
+import { descargarBlob } from "../lib/export/descargar";
 import { etiquetaEdificio, resumenEdificio } from "../lib/edificio/derivar";
 import { resumenProyecto } from "../lib/proyecto/progreso";
 import type { Intervencion, Proyecto } from "../lib/proyecto/tipos";
@@ -43,30 +45,6 @@ function formatearFecha(iso: string): string {
     month: "short",
     year: "numeric",
   }).format(d);
-}
-
-/** Slug para el nombre de archivo de export: sin diacríticos, kebab-case. */
-function slug(nombre: string): string {
-  const s = nombre
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return s === "" ? "proyecto" : s;
-}
-
-/** Descarga un string como archivo .json vía Blob + <a download>. */
-function descargarJson(nombreArchivo: string, contenido: string): void {
-  const blob = new Blob([contenido], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = nombreArchivo;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
 }
 
 const BTN_FILA =
@@ -97,7 +75,7 @@ export function InicioPage(): JSX.Element {
   };
 
   const onExportar = (p: Proyecto) => {
-    descargarJson(`concreta-proyecto-${slug(p.nombre)}.json`, exportarProyecto(p));
+    descargarBlob(new Blob([exportarProyecto(p)], { type: "application/json" }), nombreArchivoExport(p));
     showToast(`Proyecto «${p.nombre}» exportado.`, { autoDismiss: 4000 });
   };
 
