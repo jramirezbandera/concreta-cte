@@ -115,7 +115,7 @@ export const INSTALACIONES_PROVISIONALES: readonly FichaCatalogo[] = [
       "Dos calicatas como mínimo para confirmar el trazado",
       "Excavación mecánica hasta 0,50 m de la conducción y, desde ahí, a mano",
       "Si la compañía no da garantías, comunicarlo por escrito y no empezar",
-      "Desvío, corte o consignación por escrito antes del trabajo y descargo por escrito después",
+      { texto: "Desvío, corte o consignación por escrito antes del trabajo y descargo por escrito después", evitable: "electrico" },
       "Si aparece un servicio no previsto, parar, no tocarlo y avisar a la compañía y a la dirección facultativa",
       "Líneas eléctricas aéreas: distancias de la tabla 1 del anexo I del RD 614/2001; donde no se pueda delimitar la zona con precisión, 3 m hasta 66 kV, 5 m de 110 a 220 kV y 7 m a 380 kV",
       "No llevar a hombro pértigas, reglas ni escaleras bajo las líneas; escaleras aislantes cerca de ellas",
@@ -222,7 +222,7 @@ export const INSTALACIONES_PROVISIONALES: readonly FichaCatalogo[] = [
     epi: [],
     eficacia:
       "La dotación del convenio y la limpieza diaria eliminan la falta de higiene; el botiquín y la información del centro sanitario reducen las consecuencias de un accidente",
-    notas: [
+    avisos: [
       "La atención tardía de un accidente no es una forma de accidente: por eso esta ficha lleva un solo riesgo y la asistencia va en las medidas",
     ],
     fuentes: ["ss01", "ss02", "ss03", "ss04", "ss05", "ss06", "ss07", "ss08", "ss09", "ss10", "ss11", "ss12", "ss13", "ss14", "ss15"],
@@ -319,7 +319,7 @@ export const INSTALACIONES_PROVISIONALES: readonly FichaCatalogo[] = [
     epi: ["Los de cada tajo"],
     eficacia:
       "La separación física y el acceso independiente eliminan la presencia de los ocupantes en la zona de obra; los avisos, la limpieza diaria y las protecciones fuera de horario reducen el riesgo en lo que se comparte",
-    notas: [
+    avisos: [
       "Ficha redactada por la app (decisión 11): ningún ejemplo trae una ficha útil para este caso. El proyectista la revisa antes de entregar",
       "Lo que se pacte con los ocupantes va también al apartado 9 del estudio (otras actividades en el lugar)",
     ],

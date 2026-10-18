@@ -38,7 +38,7 @@ export const FASES_1: readonly FichaCatalogo[] = [
       {
         texto: "No trabajar en el exterior con viento fuerte, lluvia, nieve o heladas",
         frecuencia: "ocasional",
-        evitable: true,
+        evitable: "temperaturas",
       },
       { texto: "Coordinación entre oficios, sin trabajos superpuestos en la misma vertical", frecuencia: "permanente" },
       { texto: "Normas de acceso y circulación por la obra", frecuencia: "permanente" },
@@ -93,7 +93,10 @@ export const FASES_1: readonly FichaCatalogo[] = [
     medidas: [
       "Estudio previo del edificio por la dirección facultativa, con testigos en las medianeras y en los elementos dudosos",
       "Identificación previa de los materiales con amianto, en el apartado propio del estudio (RD 396/2006, art. 10.2)",
-      "Acometidas anuladas con las compañías (electricidad, agua, gas, telecomunicaciones), saneamiento taponado y depósitos vaciados",
+      {
+        texto: "Acometidas anuladas con las compañías (electricidad, agua, gas, telecomunicaciones), saneamiento taponado y depósitos vaciados",
+        evitable: "electrico",
+      },
       "Retirada previa de vidrios y aparatos sanitarios, sin trocearlos",
       "Plano del estado actual con la superficie y el volumen a demoler",
       "Orden inverso al de construcción: de arriba abajo, planta a planta y aligerando de forma simétrica; nadie trabaja en la misma vertical",
@@ -135,7 +138,7 @@ export const FASES_1: readonly FichaCatalogo[] = [
     eficacia:
       "Anular las acometidas y retirar el amianto antes de demoler eliminan esos riesgos; el orden de derribo, los apeos y las barandillas reducen el hundimiento y la caída",
     notas: [
-      "Otros agentes del edificio existente (plomo en pinturas y tuberías, residuos de depósitos): se identifican antes de empezar, los retira personal con los medios adecuados y van al gestor como residuo peligroso (decisión 12)",
+      "Otros agentes del edificio existente (plomo en pinturas y tuberías, residuos de depósitos): se identifican antes de empezar, los retira personal con los medios adecuados y van al gestor como residuo peligroso",
     ],
     fuentes: ["ss02", "ss03", "ss04", "ss10", "ss11", "ss14"],
   },
@@ -184,7 +187,7 @@ export const FASES_1: readonly FichaCatalogo[] = [
       r("atrapamiento", "martillo en máquina"),
     ],
     medidas: [
-      "Localizar las instalaciones empotradas o enterradas antes de picar",
+      { texto: "Localizar las instalaciones empotradas o enterradas antes de picar", evitable: "electrico" },
       "Riego sin encharcar; mascarilla cuando el polvo no se pueda eliminar",
       "Con exposición diaria al ruido de 80 dB(A) o más, protectores a disposición, y obligatorios desde 85 dB(A), con información y vigilancia de la salud (RD 286/2006, arts. 5 y 7)",
       "Radio libre de 5 m alrededor del martillo montado en máquina; nadie trabaja por debajo",
@@ -289,7 +292,7 @@ export const FASES_1: readonly FichaCatalogo[] = [
     eficacia:
       "La entibación colocada desde fuera elimina el sepultamiento; las tapas, las pasarelas y la escalera anclada reducen la caída al interior",
     notas: [
-      "Una zanja a cielo abierto no es una «conducción subterránea» del art. 4.1 d) del RD 1627/1997 (Guía del INSST; K-SYS.1)",
+      "Una zanja a cielo abierto no es una «conducción subterránea» del art. 4.1 d) del RD 1627/1997 (Guía técnica del INSST)",
     ],
     fuentes: ["ss01", "ss02", "ss07", "ss08", "ss09", "ss11", "ss15"],
   },
@@ -776,7 +779,7 @@ export const FASES_1: readonly FichaCatalogo[] = [
     anexoII: [{ apartado: 1 }],
     eficacia:
       "El andamio perimetral con protección en la coronación elimina la caída por el alero; las pasarelas de reparto y la línea de vida en la cumbrera reducen la caída en el faldón",
-    notas: ["Ficha débil: ningún ejemplo trae la ejecución completa (análisis §4.8); conviene que el proyectista la complete"],
+    avisos: ["Ficha débil: ningún ejemplo trae la ejecución completa (análisis §4.8); conviene que el proyectista la complete"],
     fuentes: ["ss06", "ss07", "ss09", "ss11", "ss12"],
   },
   {

@@ -22,6 +22,7 @@ import { notaAlcance, type NotaAlcance } from "./alcanceTexto";
 import { remisionAnejo } from "./remision";
 import { evaluarExpediente, type EvaluacionJustificacion } from "./evaluar";
 import { aplicabilidadEfectiva } from "../proyecto/aplicabilidad";
+import { art4 } from "../ebss/art4";
 import { CLAVES_ENERGIA, programaEnergia, referenciaExterna, resultadosDe, type ResultadoVerificacion } from "../energia/verificacion";
 
 export const TITULO_MEMORIA = "Cumplimiento del CTE";
@@ -187,6 +188,8 @@ export interface MemoriaCte {
   apartados: ApartadoMemoria[];
   /** Lo que la herramienta aún no redacta (o no tiene nada que redactar), con el número que le toca. */
   pendientes: { key: JustificacionKey; codigo: string; label: string; numero: string }[];
+  /** La línea que remite al estudio de seguridad y salud y al de residuos (feature-35, decisión 9). */
+  remisionEstudios: string;
 }
 
 /** «DB-HS2» → «DB-HS 2», «DB-HE0 / DB-HE1» → «DB-HE 0 / DB-HE 1»: como los redactados (feature-28). */
@@ -311,7 +314,17 @@ export function memoriaCte(p: Proyecto): MemoriaCte {
   }
   // Una justificación nueva que aún no tiene sitio en el documento: al final, sin número.
   for (const a of porClave.values()) apartados.push({ ...a, capitulo: 4, grupo: "Otras justificaciones", titulo: a.encabezado });
-  return { titulo: TITULO_MEMORIA, proyecto: p.nombre, obra: obraDe(p), apartados, pendientes };
+  return { titulo: TITULO_MEMORIA, proyecto: p.nombre, obra: obraDe(p), apartados, pendientes, remisionEstudios: remisionEstudios(p) };
+}
+
+/**
+ * Los dos estudios van aparte (feature-35, decisión 9): el de seguridad y salud
+ * (el básico, salvo que el art. 4.1 pida el completo) y el de residuos, que se
+ * hace en concreta-mediciones.
+ */
+export function remisionEstudios(p: Pick<Proyecto, "seguridadSalud">): string {
+  const cual = art4(p.seguridadSalud).resultado === "completo" ? "El estudio de seguridad y salud" : "El estudio básico de seguridad y salud";
+  return `${cual} y el estudio de gestión de residuos se presentan como documentos aparte.`;
 }
 
 const NOMBRE_OBRA: Record<TipoObraExistente, string> = { reforma: "reforma", ampliacion: "ampliación", cambio_uso: "cambio de uso" };
@@ -324,7 +337,8 @@ function tipoObras(p: Proyecto): string {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-function obraDe(p: Proyecto): ObraMemoria {
+/** La fila del tipo de obra (también la usan los datos generales del estudio básico, feature-35). */
+export function obraDe(p: Proyecto): ObraMemoria {
   const dg = p.datosGenerales;
   const fase = dg.documento?.fase;
   const a = dg.alcance;
@@ -420,6 +434,7 @@ export function cuadroInicial(m: MemoriaCte): BloqueMemoria[] {
         }),
       ),
     },
+    { tipo: "parrafo", texto: m.remisionEstudios },
   ];
 }
 

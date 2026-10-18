@@ -431,6 +431,62 @@ puros, como el anejo. Apartados (analisis §3):
 Tests: el documento de los casos de partida; la lista de prohibidos sobre el texto entero; con
 `completo`, el documento solo dice que hace falta el estudio completo; sin datos, los pendientes.
 
+**Hecho (2026-10-18).** [src/lib/obra/estudioBasico.ts](src/lib/obra/estudioBasico.ts), puro, con los textos
+fijos en [src/lib/ebss/textos.ts](src/lib/ebss/textos.ts) y 48 tests en `src/lib/obra/test/estudioBasico.test.ts`
+(más 3 en `catalogo.test.ts`):
+- `estudioBasico(p, { firmantes, fecha })` da los apartados con sus bloques y la lista `pendientes`
+  (para «Antes de entregar», paso 6); `bloquesEstudioBasico`, `textoPlanoEstudioBasico`,
+  `nombreArchivoEstudioBasico` («estudio-basico-ss-…») y `META_ESTUDIO_BASICO` para el Word.
+- `NORMAS_EBSS` (K-SYS.17, las de grúas solo con la grúa o con M6 / M7 marcadas), objeto, primeros
+  auxilios (A.14 literal, convenio 234, botiquín de la Guía), amianto, obligaciones (comunicación de
+  apertura de K-SYS.20 literal, libro de incidencias con el 13.4) y cabeza de familia.
+- La memoria remite a los dos estudios al final del cuadro inicial (`remisionEstudios`). La foto del
+  expediente se regenera: solo cambia la huella de la memoria de los 40 proyectos.
+- Catálogo: las notas para el proyectista pasan a `avisos` (no se imprimen) y 6 medidas llevan
+  `evitable` con la clave del riesgo que evitan.
+- Comprobado: en los cuatro casos, ningún prohibido, ningún id de ficha ni referencia interna, ningún
+  apartado vacío; el Word y el PDF se componen (la reforma, más de 10 hojas).
+
+**Decisiones del paso 5, a validar:**
+1. **Datos generales delante, sin número**, y los apartados del 1 al 14 (la tabla del plan tenía un
+   0). Los datos van en el orden de la Orden TIN/1071/2010, art. 2.2, con PEM y PEC al final.
+2. **Las cuatro columnas de la ficha son listas independientes**, una entrada por fila, como en los
+   ejemplos de tres columnas (ss10, ss12): así ninguna fila crece y la tabla se parte entre hojas. Al
+   principio del 8, una frase lo aclara («las medidas de una ficha se aplican a todos sus riesgos»).
+3. **Riesgos evitables (7)**: las medidas del catálogo marcadas `evitable` (F0 clima, F1 acometidas
+   anuladas, F3 localizar instalaciones antes de picar, F22 conectar sin tensión, F35 sustituir
+   productos peligrosos, IP3 desvío o corte del servicio) y dos de la obra: con línea aérea, su
+   desvío o corte (RD 1627 anexo IV C.10 c); con amianto posible o identificado, retirarlo antes de
+   demoler. Salen de la tabla de su ficha. Cierra con «no se relacionan los que el proyecto ya ha
+   evitado» (Guía folio 27).
+4. **Notas internas fuera del documento**: las de F17, F40–F42, IP6 e IP9 pasan a `avisos`; a las de
+   F1 y F5 se les quita «(decisión 12)» y «K-SYS.1».
+5. **Remisiones entre fichas**: «(ver MA10)» se imprime con el título de la ficha entre comillas, y
+   desaparece si esa ficha no está en el estudio.
+6. **Dónde va cada grupo**: IP en el 6 (IP6, servicios higiénicos, en 6.2, tras la dotación
+   calculada); F0, F, MA y M en el 8; TP en el 12, con dos tablas (previsiones e informaciones útiles;
+   riesgos y medidas).
+7. **Orden de ejecución propio** para el 4 y el 8: F40 tras el picado, F41 tras los cerramientos, F42
+   tras la climatización; F36–F38 al final como «trabajos que se dan en varias fases». No se inventa
+   la «fase única» ni la tabla proceso → cuadrilla (la app no sabe las cuadrillas).
+8. **Anexo II**: los datos deciden el 2 (amianto) y el 4 (alta tensión: más de 1 kV declarado); sin
+   dato, la condición del catálogo va entre paréntesis («si hay una línea de alta tensión próxima»).
+   Cada apartado lleva una medida específica de texto fijo. Sin ninguno, «no se prevén» con el motivo.
+9. **Con `completo`**, solo el apartado 1, sin el compromiso del promotor, y un pendiente.
+10. **Compromiso del promotor** al final del 1 (en `basico` y `pendiente`) y una línea «Conforme con
+    el compromiso del apartado 1, el promotor» en la firma.
+11. **Pendientes en su apartado**: la vía pública y el edificio en uso solo en el 9; lo del art. 4 en
+    el 1; centro, servicios y tensión en el 3. La lista `pendientes` suma promotor, firmantes, fichas
+    sin revisar, sin unidades de obra y sin trabajos posteriores.
+12. **Fecha y lugar**: el municipio y la fecha que se pasa; sin fecha, «en la fecha de la firma».
+13. **Autor del estudio**: el coordinador en proyecto si procede (art. 6.1); si no, los firmantes como
+    «técnico competente designado por el promotor».
+14. **Parafraseado sin cotejar el literal** (no está en K-SYS): el art. 13.2 (el libro lo facilita el
+    colegio del técnico que aprueba el plan), la notificación del 13.4 al contratista y a los
+    representantes, y el art. 14 (paralización). Conviene cotejarlos en el paso 7.
+15. **Cifras**: los euros con el formato de `art4` (es-ES: «7200,00 €», sin punto en cuatro cifras,
+    como pide la RAE); las distancias del RD 614/2001 en metros con dos decimales.
+
 ### Paso 6 · Pantalla, entrega y avisos
 
 - **Pantalla** «Seguridad y salud» en `/p/:id/seguridad-salud`, con el mismo lenguaje visual que los

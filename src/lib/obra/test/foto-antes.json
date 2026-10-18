@@ -30,7 +30,7 @@
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "hab": "aplica|cumple|ok|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "66e0e1c1",
+  "memoria": "ca7ce71d",
   "anejo": "73799723"
  },
  "demo|obra_nueva|piscina": {
@@ -64,7 +64,7 @@
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "hab": "aplica|cumple|ok|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "5ea7d69b",
+  "memoria": "38e81c5d",
   "anejo": "73799723"
  },
  "demo|reforma|sin": {
@@ -98,7 +98,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "ea6dffc5",
+  "memoria": "9f9f8a09",
   "anejo": "73799723"
  },
  "demo|reforma|piscina": {
@@ -132,7 +132,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "b70dd737",
+  "memoria": "7a20ae75",
   "anejo": "73799723"
  },
  "demo|ampliacion|sin": {
@@ -166,7 +166,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "4bb7a14e",
+  "memoria": "71516a9c",
   "anejo": "73799723"
  },
  "demo|ampliacion|piscina": {
@@ -200,7 +200,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "b325cb04",
+  "memoria": "c003c240",
   "anejo": "73799723"
  },
  "demo|cambio_uso|sin": {
@@ -234,7 +234,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "eacdb287",
+  "memoria": "3061ee33",
   "anejo": "73799723"
  },
  "demo|cambio_uso|piscina": {
@@ -268,7 +268,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|cumple|ok|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "c01f2185",
+  "memoria": "42598333",
   "anejo": "73799723"
  },
  "unifamiliar|obra_nueva|sin": {
@@ -302,7 +302,7 @@
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "hab": "aplica|no_cumple|fail|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "73d47139",
+  "memoria": "3c54aa8d",
   "anejo": "0e9f5a6e"
  },
  "unifamiliar|obra_nueva|piscina": {
@@ -336,7 +336,7 @@
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "hab": "aplica|no_cumple|fail|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "967dbd34",
+  "memoria": "f5f8d3f8",
   "anejo": "0e9f5a6e"
  },
  "unifamiliar|reforma|sin": {
@@ -370,7 +370,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "93e9539a",
+  "memoria": "a7d36b5e",
   "anejo": "0e9f5a6e"
  },
  "unifamiliar|reforma|piscina": {
@@ -404,7 +404,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "f2c1d1ef",
+  "memoria": "a4271043",
   "anejo": "0e9f5a6e"
  },
  "unifamiliar|ampliacion|sin": {
@@ -438,7 +438,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "e484ccfd",
+  "memoria": "c00a3e1b",
   "anejo": "0e9f5a6e"
  },
  "unifamiliar|ampliacion|piscina": {
@@ -472,7 +472,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "a54efba0",
+  "memoria": "c0f879c6",
   "anejo": "0e9f5a6e"
  },
  "unifamiliar|cambio_uso|sin": {
@@ -506,7 +506,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "cf102d04",
+  "memoria": "c20d18c0",
   "anejo": "0e9f5a6e"
  },
  "unifamiliar|cambio_uso|piscina": {
@@ -540,7 +540,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "44911209",
+  "memoria": "24ca4355",
   "anejo": "0e9f5a6e"
  },
  "plurifamiliar|obra_nueva|sin": {
@@ -574,7 +574,7 @@
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "hab": "aplica|no_cumple|fail|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "29288c56",
+  "memoria": "d0c9f312",
   "anejo": "bc8a6007"
  },
  "plurifamiliar|obra_nueva|piscina": {
@@ -608,7 +608,7 @@
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "hab": "aplica|no_cumple|fail|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "d177f774",
+  "memoria": "673c7a8a",
   "anejo": "bc8a6007"
  },
  "plurifamiliar|reforma|sin": {
@@ -642,7 +642,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "847830ad",
+  "memoria": "05c902a9",
   "anejo": "bc8a6007"
  },
  "plurifamiliar|reforma|piscina": {
@@ -676,7 +676,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "3924411b",
+  "memoria": "8e29add5",
   "anejo": "bc8a6007"
  },
  "plurifamiliar|ampliacion|sin": {
@@ -710,7 +710,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "55ac753e",
+  "memoria": "d43a3198",
   "anejo": "bc8a6007"
  },
  "plurifamiliar|ampliacion|piscina": {
@@ -744,7 +744,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "31e4bb98",
+  "memoria": "376788dc",
   "anejo": "bc8a6007"
  },
  "plurifamiliar|cambio_uso|sin": {
@@ -778,7 +778,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "78938cd3",
+  "memoria": "f85690b7",
   "anejo": "bc8a6007"
  },
  "plurifamiliar|cambio_uso|piscina": {
@@ -812,7 +812,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "3aab2c45",
+  "memoria": "e5f389ff",
   "anejo": "bc8a6007"
  },
  "plurifamiliar_locales|obra_nueva|sin": {
@@ -846,7 +846,7 @@
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "hab": "aplica|no_cumple|fail|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "5650a7ae",
+  "memoria": "7556d6ba",
   "anejo": "7a8115b2"
  },
  "plurifamiliar_locales|obra_nueva|piscina": {
@@ -880,7 +880,7 @@
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "hab": "aplica|no_cumple|fail|811c9dc5|",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "be17949c",
+  "memoria": "3d95aafa",
   "anejo": "7a8115b2"
  },
  "plurifamiliar_locales|reforma|sin": {
@@ -914,7 +914,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "fdf7aeb2",
+  "memoria": "b57b8526",
   "anejo": "7a8115b2"
  },
  "plurifamiliar_locales|reforma|piscina": {
@@ -948,7 +948,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "c20c11a8",
+  "memoria": "c3892042",
   "anejo": "7a8115b2"
  },
  "plurifamiliar_locales|ampliacion|sin": {
@@ -982,7 +982,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "4ef90ce1",
+  "memoria": "ce6b7cdb",
   "anejo": "7a8115b2"
  },
  "plurifamiliar_locales|ampliacion|piscina": {
@@ -1016,7 +1016,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "b0d7b1f3",
+  "memoria": "a527faff",
   "anejo": "7a8115b2"
  },
  "plurifamiliar_locales|cambio_uso|sin": {
@@ -1050,7 +1050,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "609d30d8",
+  "memoria": "72d54964",
   "anejo": "7a8115b2"
  },
  "plurifamiliar_locales|cambio_uso|piscina": {
@@ -1084,7 +1084,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "aplica|no_cumple|fail|50cc7540|CTE Parte I, art. 2",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "87d36672",
+  "memoria": "454d0664",
   "anejo": "7a8115b2"
  },
  "oficinas|obra_nueva|sin": {
@@ -1118,7 +1118,7 @@
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "hab": "no_aplica|no_aplica||2b84d585|Norma de habitabilidad del municipio",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "a69cb12e",
+  "memoria": "82a4aab8",
   "anejo": "4790c57f"
  },
  "oficinas|obra_nueva|piscina": {
@@ -1152,7 +1152,7 @@
   "rebt": "aplica|revisar|warn|811c9dc5|",
   "hab": "no_aplica|no_aplica||2b84d585|Norma de habitabilidad del municipio",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "7f6824c4",
+  "memoria": "e130dac8",
   "anejo": "4790c57f"
  },
  "oficinas|reforma|sin": {
@@ -1186,7 +1186,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "no_aplica|no_aplica||2b84d585|Norma de habitabilidad del municipio",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "515485ea",
+  "memoria": "ca6602e4",
   "anejo": "4790c57f"
  },
  "oficinas|reforma|piscina": {
@@ -1220,7 +1220,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "no_aplica|no_aplica||2b84d585|Norma de habitabilidad del municipio",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "08862c24",
+  "memoria": "11bb4638",
   "anejo": "4790c57f"
  },
  "oficinas|ampliacion|sin": {
@@ -1254,7 +1254,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "no_aplica|no_aplica||2b84d585|Norma de habitabilidad del municipio",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "a19eb3c1",
+  "memoria": "0ac551bd",
   "anejo": "4790c57f"
  },
  "oficinas|ampliacion|piscina": {
@@ -1288,7 +1288,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "no_aplica|no_aplica||2b84d585|Norma de habitabilidad del municipio",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "fb1750b1",
+  "memoria": "e81b8b0b",
   "anejo": "4790c57f"
  },
  "oficinas|cambio_uso|sin": {
@@ -1322,7 +1322,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "no_aplica|no_aplica||2b84d585|Norma de habitabilidad del municipio",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "f8760a54",
+  "memoria": "af2e94ce",
   "anejo": "4790c57f"
  },
  "oficinas|cambio_uso|piscina": {
@@ -1356,7 +1356,7 @@
   "rebt": "aplica|revisar|warn|50cc7540|CTE Parte I, art. 2",
   "hab": "no_aplica|no_aplica||2b84d585|Norma de habitabilidad del municipio",
   "dbse": "externo|externo||ab000d92|DB-SE",
-  "memoria": "e139df9a",
+  "memoria": "dfc9dcb6",
   "anejo": "4790c57f"
  }
 }

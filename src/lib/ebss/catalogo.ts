@@ -175,6 +175,7 @@ export function textoFicha(f: FichaCatalogo): string {
     ...(f.anexoII ?? []).map((a) => `Anexo II, apartado ${a.apartado}${a.cuando ? `: ${a.cuando}` : ""}`),
     f.eficacia,
     ...(f.notas ?? []),
+    ...(f.avisos ?? []),
     ...(f.previsiones ?? []),
     ...(f.informaciones ?? []),
   ];

@@ -339,9 +339,10 @@ export interface RiesgoFicha {
 /**
  * Una medida, protección colectiva o EPI. Casi siempre un texto; en el bloque
  * «toda la obra» lleva la frecuencia, y las medidas que evitan un riesgo con
- * una decisión de esta obra (apartado 7) van marcadas `evitable`.
+ * una decisión de esta obra van marcadas `evitable` con la clave del riesgo
+ * que evitan: salen en el apartado 7 del estudio, no en la ficha (decisión 1).
  */
-export type ItemFicha = string | { texto: string; frecuencia?: Frecuencia; evitable?: true };
+export type ItemFicha = string | { texto: string; frecuencia?: Frecuencia; evitable?: ClaveRiesgo };
 
 /** Los diez apartados del anexo II del RD 1627/1997 (K-SYS.4). */
 export type ApartadoAnexoII = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
@@ -374,6 +375,8 @@ export interface FichaCatalogo {
   eficacia: string;
   /** Avisos que se imprimen con la ficha (plomo en demoliciones, zanjas y el art. 4.1 d…). */
   notas?: string[];
+  /** Avisos para el proyectista en la pantalla de selección; NO se imprimen (ficha débil, redactada por la app…). */
+  avisos?: string[];
   /** Solo trabajos posteriores (K-SYS.14): los elementos de seguridad que el proyecto prevé. */
   previsiones?: string[];
   /** Solo trabajos posteriores: los datos de la obra que importan para mantenerla. */

@@ -286,3 +286,27 @@ describe("remisiones entre fichas", () => {
     }
   });
 });
+
+// feature-35, paso 5: lo que el documento imprime de cada ficha.
+describe("lo que se imprime y lo que no (paso 5)", () => {
+  const items = (f: FichaCatalogo) => [...f.medidas, ...f.protecciones, ...f.epi];
+
+  it("las medidas evitables nombran un riesgo válido y no llevan frecuencia salvo en F0", () => {
+    const evitables = FICHAS_EBSS.flatMap((f) => items(f).flatMap((i) => (typeof i === "object" && i.evitable ? [[f.id, i] as const] : [])));
+    expect(evitables.map(([id]) => id).sort()).toEqual(["F0", "F1", "F22", "F3", "F35", "IP3"]);
+    for (const [id, i] of evitables) {
+      expect(claves.has(i.evitable!), id).toBe(true);
+      if (id !== "F0") expect(i.frecuencia, id).toBeUndefined();
+    }
+  });
+
+  it("las notas que se imprimen no hablan al proyectista ni citan el análisis", () => {
+    for (const f of FICHAS_EBSS) {
+      for (const n of f.notas ?? []) expect(n, f.id).not.toMatch(/proyectista|redactada por la app|K-SYS|decisión|análisis|ss\d\d/);
+    }
+  });
+
+  it("las redactadas por la app avisan al proyectista en `avisos`", () => {
+    for (const f of fichasRedactadasPorApp()) expect(f.avisos?.some((a) => /redactada por la app/.test(a)), f.id).toBe(true);
+  });
+});

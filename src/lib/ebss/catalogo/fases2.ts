@@ -99,7 +99,7 @@ export const FASES_2: readonly FichaCatalogo[] = [
       r("termicos"),
     ],
     medidas: [
-      "Conectar siempre sin tensión, comprobada con detector",
+      { texto: "Conectar siempre sin tensión, comprobada con detector", evitable: "electrico" },
       "Pruebas solo con la instalación terminada, anunciadas a todo el personal y después de revisar conexiones, protecciones y cuadros",
       "Aparamenta montada por un especialista; herramienta aislada",
       "Orden y limpieza al abrir y cerrar rozas",
@@ -521,7 +521,7 @@ export const FASES_2: readonly FichaCatalogo[] = [
     medidas: [
       "Almacén ventilado, con extintor y señales (ver IP8); envases cerrados y lejos del calor",
       "En el tajo, solo el producto de una jornada",
-      "Sustituir los productos peligrosos por otros que lo sean menos",
+      { texto: "Sustituir los productos peligrosos por otros que lo sean menos", evitable: "quimicos" },
       "Trapos en un recipiente metálico cerrado, para el gestor",
       "Ventilación natural o forzada; lijado con ventilación localizada o bajo corriente de aire; pigmentos vertidos desde poca altura",
       "Prohibido fumar y comer donde se pinta con disolventes; ni soldadura ni oxicorte cerca",
@@ -704,7 +704,7 @@ export const FASES_2: readonly FichaCatalogo[] = [
     anexoII: [{ apartado: 1, cuando: "hundimiento del muro o sepultamiento en el batache" }],
     eficacia:
       "El apeo calculado y los bataches alternos eliminan el hundimiento durante la apertura y el recalce; los medios mecánicos para los perfiles y el riego reducen los sobreesfuerzos y el polvo",
-    notas: [
+    avisos: [
       "Ficha redactada por la app (decisión 11): los ejemplos de este tipo de obra (ss02) solo traen fichas genéricas. El proyectista la revisa antes de entregar",
     ],
     fuentes: [],
@@ -750,7 +750,7 @@ export const FASES_2: readonly FichaCatalogo[] = [
     anexoII: [{ apartado: 1, cuando: "caída de altura y hundimiento del vuelo" }],
     eficacia:
       "La marquesina y el cierre del paso bajo el tajo eliminan la caída de objetos sobre los viandantes; el apeo del vuelo y el andamio con barandilla reducen el hundimiento y la caída del operario",
-    notas: [
+    avisos: [
       "Ficha redactada por la app (decisión 11): ss03 tenía este caso y no lo trata. El proyectista la revisa antes de entregar",
     ],
     fuentes: [],
@@ -796,7 +796,7 @@ export const FASES_2: readonly FichaCatalogo[] = [
     ],
     eficacia:
       "Cortar el paso bajo la carga y estabilizar la grúa sobre apoyo comprobado eliminan la caída del equipo sobre terceros y el vuelco; los cabos de guía y la recepción amarrada reducen el golpe y la caída en el borde",
-    notas: [
+    avisos: [
       "Ficha redactada por la app (decisión 11): ss09 tenía justo esta obra y no lo trata. El proyectista la revisa antes de entregar",
     ],
     fuentes: [],

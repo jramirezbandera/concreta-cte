@@ -22,6 +22,9 @@ import antes from "./foto-antes.json";
 // En feature-34 (el REBT en el anejo) cambian la huella del anejo y la de la
 // memoria, por la remisión al 5.3.3, y el REBT de las 8 unifamiliares pasa a
 // «revisar» por las longitudes y el terreno supuestos; nada más.
+// En feature-35 (paso 5) cambia la huella de la memoria de los 40 proyectos,
+// por la línea que remite al estudio de seguridad y salud y al de residuos;
+// nada más.
 // =============================================================================
 
 describe("sin asistente de alcance, nada cambia", () => {
