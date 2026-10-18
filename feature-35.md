@@ -349,6 +349,54 @@ guarda por ficha.
 Tests: la propuesta de los casos de partida (unifamiliar, plurifamiliar, «Reforma: local a
 vivienda»); una ficha quitada sigue quitada al cambiar la obra; una nueva propuesta aparece.
 
+**Hecho (2026-10-18).** [src/lib/ebss/propuesta.ts](src/lib/ebss/propuesta.ts), puro, con 24 tests en
+`src/lib/ebss/test/propuesta.test.ts`:
+- `REGLAS_PROPUESTA`: la tabla del análisis como reglas «motivo → fichas», de lo general a lo
+  particular; `fichasPropuestas(p)` da cada ficha con sus motivos («aplica HS 4», «cubierta
+  inclinada», «se modifican los huecos de fachada»), en el orden del catálogo.
+- `seleccionDeFichas(p)`: todo el catálogo con `propuesta`, `motivos` y `marcada`, para la pantalla
+  del paso 6. `marcarFicha` y `conEdicion` escriben la diferencia (`SeleccionFichas`) sin listas
+  vacías, igual que la lee `parseSeguridadSalud`.
+- `fichaEditada` aplica lo que edita el proyectista; `fichasDelEstudio(p)` da las fichas del
+  documento (paso 5), ya editadas; `fichasSinRevisar(p)`, las «redactadas por la app» marcadas y
+  sin revisar, para «Antes de entregar».
+- Lo que sale en los casos: la unifamiliar, 51 fichas (cubierta inclinada con línea de vida,
+  andamio de fachada con el anexo II.1); la plurifamiliar, 51 (cubierta plana, ICT); la reforma
+  «local a vivienda», 34 (demoliciones, picado, apertura de huecos, puntales, bajante, martillo
+  rompedor, particiones, carpintería, aseos e instalaciones; sin cimentación, estructura, cubierta
+  ni andamio).
+
+**Decisiones del paso 4, a validar:**
+1. **Lo común a toda obra** (F0, IP1, IP3–IP7, MA2, MA5, M13, M22) se propone también en edificio
+   existente; el análisis lo daba solo en obra nueva.
+2. **IP2 (vía pública) solo si se declara** que se ocupa; el análisis la daba en toda obra nueva.
+   IP9, con el edificio o el local en uso.
+3. **En obra nueva, la cubierta, las instalaciones y el andamio no van en bloque**: la cubierta
+   según El edificio (F16 + F18 si es plana, F17 + MA9 si es inclinada), las instalaciones por las
+   justificaciones y el andamio por las plantas.
+4. **Andamio de fachada (MA1) desde dos plantas sobre rasante**; con una sola, la torre móvil
+   (MA3). El aviso del anexo II.1 lo lleva la propia ficha MA1.
+5. **Apertura de huecos (F40)** con actuación en la estructura **o con los huecos de fachada en el
+   alcance**: el local que pasa a vivienda abre o cambia huecos. Si solo se cambian carpinterías,
+   el proyectista la quita.
+6. **Línea de vida (MA9) con cubierta inclinada**, que no estaba en la tabla.
+7. **«Aplica» es la aplicabilidad efectiva distinta de «no aplica»**, también en obra nueva y
+   también la forzada o «externo»: HE 6 sin aparcamiento no propone la electricidad por HE 6, y una
+   HS 4 forzada a «no aplica» quita la fontanería.
+8. **ICT (F26) solo en plurifamiliar de obra nueva** (no hay justificación de ICT en la app);
+   **ascensor (F27) solo en obra nueva** con el ascensor marcado en El edificio.
+9. **F41 y F42 solo en edificio existente con vía pública**: el vuelo, si se interviene la
+   fachada; el izado de equipos, si aplica HE 4 o HE 5.
+10. **Fichas que siguen a otras**: IP8 (inflamables) con pinturas o impermeabilización; TP3 con
+    cualquier instalación (F22–F27); TP1 con la cubierta; TP2 con la fachada o sus huecos.
+11. **Grúa móvil → camión grúa (M6)**, que es grúa móvil autopropulsada; grúa torre → M7. Las dos
+    proponen el izado de cargas (F36). **Derribo previo** en obra nueva → F2, MA10, M1 y M2.
+12. **Quitar una añadida que la app no propone no la apunta como quitada**: si más adelante la
+    propone, vuelve a salir. Marcar una ficha la saca siempre de las quitadas.
+13. **En las ediciones**, un riesgo añadido que ya está en la ficha no se repite, ni una medida
+    añadida con el texto de otra; una edición vacía se borra; los ids que el catálogo ya no tiene
+    se ignoran.
+
 ### Paso 5 · El documento
 
 `src/lib/obra/estudioBasico.ts`: `estudioBasico(p)` (modelo) y `bloquesEstudioBasico(e)` (bloques),
