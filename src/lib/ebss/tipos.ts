@@ -305,3 +305,81 @@ export interface EstudioSeguridadSalud {
   /** Los planos del estudio, como los numera el proyectista («SS01–SS02»; decisión 10). */
   planos?: string;
 }
+
+// ── El catálogo de fichas (paso 3) ───────────────────────────────────────────
+
+/** Los cinco grupos del catálogo (analisis §4.1), con los ids del análisis. */
+export type GrupoFicha = "IP" | "F" | "MA" | "M" | "TP";
+
+export const GRUPOS_FICHA: readonly GrupoFicha[] = ["IP", "F", "MA", "M", "TP"];
+
+export const NOMBRE_GRUPO: Record<GrupoFicha, string> = {
+  IP: "Instalaciones provisionales",
+  F: "Fases de obra",
+  MA: "Medios auxiliares y protecciones colectivas",
+  M: "Maquinaria",
+  TP: "Trabajos posteriores",
+};
+
+/** Frecuencia de uso de una medida o un EPI, solo en el bloque «toda la obra» (decisión 6). */
+export type Frecuencia = "permanente" | "frecuente" | "ocasional";
+
+export const NOMBRE_FRECUENCIA: Record<Frecuencia, string> = {
+  permanente: "Permanente",
+  frecuente: "Frecuente",
+  ocasional: "Ocasional",
+};
+
+/** Un riesgo de la ficha: la clave de K-SYS.15 y, si se sabe, la causa. */
+export interface RiesgoFicha {
+  clave: ClaveRiesgo;
+  causa?: string;
+}
+
+/**
+ * Una medida, protección colectiva o EPI. Casi siempre un texto; en el bloque
+ * «toda la obra» lleva la frecuencia, y las medidas que evitan un riesgo con
+ * una decisión de esta obra (apartado 7) van marcadas `evitable`.
+ */
+export type ItemFicha = string | { texto: string; frecuencia?: Frecuencia; evitable?: true };
+
+/** Los diez apartados del anexo II del RD 1627/1997 (K-SYS.4). */
+export type ApartadoAnexoII = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+
+/** Un apartado del anexo II que la ficha puede activar; la asignación es INTERPRETACIÓN (K-SYS.4). */
+export interface AnexoIIFicha {
+  apartado: ApartadoAnexoII;
+  /** Cuándo se da: «si hay una línea de alta tensión próxima». Sin texto, siempre que la ficha esté. */
+  cuando?: string;
+}
+
+/** Una entrada del catálogo (analisis §4.1): una unidad de obra, un medio o una máquina. */
+export interface FichaCatalogo {
+  /** «IP1», «F14», «MA1», «M6», «TP1». */
+  id: string;
+  grupo: GrupoFicha;
+  titulo: string;
+  /** Una línea para el apartado 4 del estudio (descripción de la obra). */
+  descripcion: string;
+  /** Marca «(vivienda)» del análisis: frecuente en una obra de vivienda. */
+  vivienda: boolean;
+  riesgos: RiesgoFicha[];
+  /** En las protecciones colectivas (barandillas, redes…): los riesgos que evita, aparte de los propios. */
+  evita?: RiesgoFicha[];
+  medidas: ItemFicha[];
+  protecciones: ItemFicha[];
+  epi: ItemFicha[];
+  anexoII?: AnexoIIFicha[];
+  /** Una frase (art. 6.2, decisión 6): qué medidas eliminan la exposición y cuáles solo la reducen. */
+  eficacia: string;
+  /** Avisos que se imprimen con la ficha (plomo en demoliciones, zanjas y el art. 4.1 d…). */
+  notas?: string[];
+  /** Solo trabajos posteriores (K-SYS.14): los elementos de seguridad que el proyecto prevé. */
+  previsiones?: string[];
+  /** Solo trabajos posteriores: los datos de la obra que importan para mantenerla. */
+  informaciones?: string[];
+  /** Estudios de los que sale («ss01»…): solo para trazar, no se imprimen. */
+  fuentes: string[];
+  /** Hueco del análisis §4.8 redactado por la app (decisión 11): el proyectista la revisa. */
+  redactadaPorApp?: true;
+}

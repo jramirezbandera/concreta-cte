@@ -273,6 +273,58 @@ del CTE:
 Tests: cada riesgo tiene una clave válida; cada entrada tiene al menos un riesgo y una medida; la
 lista de prohibidos no aparece; ninguna cifra ⚠ tiene número.
 
+**Hecho (2026-10-18).** [src/lib/ebss/catalogo.ts](src/lib/ebss/catalogo.ts) (módulo público) con los
+datos en `src/lib/ebss/catalogo/` por grupos (instalaciones, fases1, fases2, medios, maquinaria,
+posteriores), más [cifras.ts](src/lib/ebss/cifras.ts) y [prohibidos.ts](src/lib/ebss/prohibidos.ts);
+tipos nuevos en `tipos.ts` (`FichaCatalogo`, `ItemFicha`, `AnexoIIFicha`, `GrupoFicha`,
+`Frecuencia`). 38 tests en `catalogo.test.ts` y `cifras.test.ts`:
+- **93 fichas**: las 89 del análisis (8 IP, 40 F, 16 MA, 22 M, 3 TP; 57 con marca vivienda) y los
+  4 huecos redactados por la app (`redactadaPorApp`), con nota para que el proyectista los revise:
+  IP9 edificio habitado, F40 apertura de huecos y recalces, F41 vuelo sobre la vía pública, F42
+  izado de equipos a cubierta.
+- `NOMBRES_RIESGO` (28, K-SYS.15) y `ANEXO_II` (resumen de los 10 apartados) como tablas versionadas
+  con `tablaCTE`; `CATALOGO_EBSS` con su procedencia; ayudas puras `fichaPorId`, `fichasDeGrupo`,
+  `textoFicha`, `textoCatalogo`, `riesgosDeFicha`.
+- `cifras.ts`: tabla 1 del RD 614/2001 con `distanciasLineas(kV)` (interpolación lineal, hacia
+  arriba al cm), `TIERRA_PROVISIONAL` con `resistenciaTierraMax(mA)` (800 Ω a 30 mA), ruido, vibraciones,
+  barandilla, escalera, plan de montaje del andamio y viento de la grúa torre.
+- `prohibidos.ts`: 26 patrones con su motivo y `buscarProhibidos(texto)`, para el catálogo ahora y
+  para el documento en el paso 5. El test ya cazó un «aviso previo» en IP9.
+- Tests: recuento, ids con prefijo, claves válidas sin repetir por lista, textos únicos, anexo II
+  en 1–10 (una obra de vivienda activa 1, 2, 4, 6 y 10), solo TP con previsiones, amianto solo en
+  F1, F0 con frecuencia en todo, prohibidos ausentes, cifras ⚠ sin número (lux, Ω, 300 mA,
+  entibación, acopios y vehículos al borde, rodapié, borriquetas, compresor, andamio, bajante,
+  viento salvo M7), cifras verificadas presentes, y toda remisión «(ver XX)» apunta a una ficha.
+
+**Decisiones del paso 3, a validar:**
+1. **Una medida = una cadena.** Los bloques en negrita del análisis (Acometida, Puesta a tierra…)
+   se funden en frases sueltas: es la clave de las ediciones por texto (decisión 5 del paso 1).
+   Solo F0 lleva `frecuencia` en todo y marca `evitable` la medida del clima (apartado 7).
+2. **`eficacia` y `descripcion` ya en el catálogo** (una frase cada una por ficha), no en el paso 5:
+   la frase de eficacia (decisión 6) es contenido de la ficha, y la descripción sirve al apartado 4.
+3. **Edificio habitado va en IP** (IP9, organización de la obra), no en fases; los otros tres huecos
+   siguen la numeración de F (F40–F42). Los 4 cuentan aparte de los 89.
+4. **Más cifras quitadas** además de las ⚠: las de vehículos y máquinas junto al borde (M1, M4, M5,
+   M6: «la distancia que fije el técnico competente», K-SYS.16 filas 5 y 6), las de una sola
+   fuente que no aportan (rampa de 4,5 m / 12 % / 8 %, prueba de carga del ascensor, inspección
+   cada quince días, vertido desde dos plantas, vuelo de 2,5 m de la marquesina) y el radio de las
+   compactadoras (5 m en F7 frente a 6 m en F39). Quedan las de buena práctica sin conflicto
+   (pilas de 1,50 m, plataformas de 60 cm, 24 V, tendido a 2 y 5 m, red a 6 m, hormigonera y
+   sierra a 3 m, compresor y grupo a 2 m, 100 kg/m² en demolición).
+5. **«300 mA» no aparece.** IP4 dice 30 mA en toda base y RA × Ia ≤ 24 V, con IP45 y 450/750 V;
+   el prohibido es la frase «300 mA en fuerza». Las mangueras de 1.000 V de M14 y M19 se quedan
+   como práctica (más exigente que la ITC).
+6. **Anexo II en resumen**, no literal: el estudio lo cita por número. F42 activa el 1 y, si hay
+   línea próxima, el 4.
+7. **UNE**: solo la UNE-EN 13374 «como referencia» (K-SYS.16). Las 12810/12811, 1263 y 353-2 de
+   los ejemplos no se citan por no estar cotejadas; en su lugar, «según el fabricante».
+8. **Vibraciones**: M14, M15 y M20 citan los valores de acción y límite del RD 1311/2005 como
+   referencia de la evaluación de la empresa, sin fijar relevos por norma.
+9. **Prohibidos**: la detección de ratios atribuidas al RD 1627 se limita a una misma frase (hasta
+   120 caracteres sin punto); «fibrocemento» solo se prohíbe como «tubo de fibrocemento», porque
+   el apartado de amianto sí tiene que poder nombrarlo.
+10. **Interpolación del RD 614/2001** redondeada hacia arriba al centímetro, por prudencia.
+
 ### Paso 4 · Qué fichas propone la app
 
 `fichasPropuestas(p)`, puro, con la tabla de correspondencias del análisis (§3, «Cómo se eligen
