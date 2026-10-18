@@ -341,8 +341,10 @@ export interface RiesgoFicha {
  * «toda la obra» lleva la frecuencia, y las medidas que evitan un riesgo con
  * una decisión de esta obra van marcadas `evitable` con la clave del riesgo
  * que evitan: salen en el apartado 7 del estudio, no en la ficha (decisión 1).
+ * Las marcadas `enTexto` ya las dice el texto fijo del apartado donde va la
+ * ficha (la dotación y los primeros auxilios del 6.2): no se repiten en su tabla.
  */
-export type ItemFicha = string | { texto: string; frecuencia?: Frecuencia; evitable?: ClaveRiesgo };
+export type ItemFicha = string | { texto: string; frecuencia?: Frecuencia; evitable?: ClaveRiesgo; enTexto?: true };
 
 /** Los diez apartados del anexo II del RD 1627/1997 (K-SYS.4). */
 export type ApartadoAnexoII = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;

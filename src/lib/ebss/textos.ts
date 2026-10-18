@@ -147,16 +147,16 @@ export const AMIANTO_MEDIDAS: readonly string[] = [
   "Las excepciones del art. 3.2 (exposiciones esporádicas y de baja intensidad) solo se aplican cuando la evaluación del art. 5 lo acredite.",
 ];
 
-// ── Obligaciones durante la obra (apartado 13; K-SYS.6 y K-SYS.20) ───────────
+// ── Obligaciones durante la obra (apartado 13; K-SYS.6, K-SYS.20 y K-SYS.21) ─
 
 /** El texto fijo, corregido: sin aviso previo ni copia de toda anotación a la Inspección. */
 export const OBLIGACIONES_EBSS: readonly string[] = [
   "Cada contratista elabora su plan de seguridad y salud en el trabajo a partir de este estudio básico (art. 7.1). El plan se aprueba antes del inicio de la obra por el coordinador en materia de seguridad y salud durante la ejecución o, cuando no sea necesario designarlo, por la dirección facultativa (art. 7.2), y está en la obra a disposición permanente de la Inspección de Trabajo y Seguridad Social y de los técnicos de las administraciones públicas competentes (art. 19.2).",
   "Cada contratista presentará ante la autoridad laboral la comunicación de apertura del centro de trabajo antes del comienzo de los trabajos, acompañada del plan de seguridad y salud en el trabajo y de su aprobación (art. 7 del RD 1627/1997). La comunicación se expondrá en la obra en lugar visible y se actualizará en el plazo de 10 días cuando se produzcan cambios no identificados inicialmente. El promotor facilitará a los contratistas los datos necesarios (Orden TIN/1071/2010, arts. 2.2 y 3.5).",
-  "En la obra hay un libro de incidencias para el control y seguimiento del plan, facilitado por el colegio profesional del técnico que aprueba el plan (art. 13). Las anotaciones se notifican al contratista y a los representantes de los trabajadores; solo cuando una anotación se refiere a un incumplimiento de advertencias u observaciones anteriores, o a una paralización (art. 14), se remite además a la Inspección de Trabajo y Seguridad Social en el plazo de veinticuatro horas (art. 13.4).",
+  "En la obra hay un libro de incidencias, con hojas por duplicado, para el control y seguimiento del plan. Lo facilita el colegio profesional del técnico que aprueba el plan o, en obras de las Administraciones públicas, la oficina de supervisión de proyectos u órgano equivalente (art. 13.2), y está siempre en la obra, en poder del coordinador durante la ejecución o, si no es necesario designarlo, de la dirección facultativa (art. 13.3). Quien lo tiene notifica cada anotación al contratista afectado y a los representantes de sus trabajadores; solo cuando una anotación se refiere a un incumplimiento de advertencias u observaciones anteriores, o a una paralización (art. 14), se remite además una copia de la anotación a la Inspección de Trabajo y Seguridad Social en el plazo de veinticuatro horas (art. 13.4).",
   "Cada contratista tiene en la obra su libro de subcontratación (Ley 32/2006, art. 8).",
   "Las empresas que concurren en la obra coordinan sus actividades según el RD 171/2004; la presencia de los recursos preventivos de cada contratista se rige por la disposición adicional única del RD 1627/1997, y el plan fija su forma.",
-  "Ante un riesgo grave e inminente, el coordinador o cualquier persona de la dirección facultativa puede paralizar los tajos o la obra entera (art. 14).",
+  "Si el coordinador durante la ejecución o cualquier persona de la dirección facultativa observa que no se cumplen las medidas de seguridad y salud, lo advierte al contratista y lo anota en el libro de incidencias; ante un riesgo grave e inminente, puede paralizar los tajos o la obra entera, y da cuenta a la Inspección de Trabajo y Seguridad Social, a los contratistas y subcontratistas afectados y a los representantes de sus trabajadores (art. 14).",
 ];
 
 /** RD 1627/1997 art. 2.3 (VERIFICADO); Guía folio 22; Orden TIN/1071/2010 art. 2.2 (K-SYS.11 y K-SYS.20). */

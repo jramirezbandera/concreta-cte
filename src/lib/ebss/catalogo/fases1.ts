@@ -94,7 +94,7 @@ export const FASES_1: readonly FichaCatalogo[] = [
       "Estudio previo del edificio por la dirección facultativa, con testigos en las medianeras y en los elementos dudosos",
       "Identificación previa de los materiales con amianto, en el apartado propio del estudio (RD 396/2006, art. 10.2)",
       {
-        texto: "Acometidas anuladas con las compañías (electricidad, agua, gas, telecomunicaciones), saneamiento taponado y depósitos vaciados",
+        texto: "Acometidas de la zona de obra anuladas o desviadas con las compañías (electricidad, agua, gas, telecomunicaciones), saneamiento taponado y depósitos vaciados; si el edificio sigue en uso, se mantienen o se reponen las del resto",
         evitable: "electrico",
       },
       "Retirada previa de vidrios y aparatos sanitarios, sin trocearlos",

@@ -113,16 +113,29 @@ describe("el documento en los casos de partida", () => {
     expect(estudioBasico(deCaso("unifamiliar", COMPLETO_DE_DATOS), FIRMA).pendientes).toEqual([]);
   });
 
-  it("la reforma: amianto, demolición y apertura de huecos; sin cimentación ni cubierta", () => {
+  it("la reforma: amianto, demolición y picado; sin cimentación, cubierta ni apertura de huecos", () => {
     const e = estudioBasico(CASOS[3][1](), FIRMA);
     const t4 = textoDe(e, 4);
     expect(t4).toMatch(/Demolición manual/);
-    expect(t4).toMatch(/Apertura de huecos en muros de carga/);
-    expect(t4).not.toMatch(/Cimentación|Cubierta inclinada|Cubierta plana o azotea/);
+    expect(t4).toMatch(/Picado de revestimientos/);
+    expect(t4).not.toMatch(/Cimentación|Cubierta inclinada|Cubierta plana o azotea|Apertura de huecos en muros de carga/);
     expect(textoDe(e, 11)).toMatch(/Puede haber materiales con amianto: bajantes del patio, de tipo no friable/);
     expect(textoDe(e, 11)).toMatch(/RERA/);
-    // F40 es una ficha redactada por la app: sin revisar, va a pendientes.
+  });
+
+  it("con la estructura intervenida, la apertura de huecos, redactada por la app, va a pendientes sin revisar", () => {
+    const p = CASOS[3][1]();
+    p.datosGenerales = { ...p.datosGenerales, alcance: { ...p.datosGenerales.alcance, estructura: true } };
+    const e = estudioBasico(p, FIRMA);
+    expect(textoDe(e, 4)).toMatch(/Apertura de huecos en muros de carga/);
     expect(e.pendientes.some((x) => /Apertura de huecos/.test(x))).toBe(true);
+  });
+
+  it("6.2: la ficha de servicios higiénicos no repite la dotación ni los primeros auxilios del texto", () => {
+    const t = textoDe(estudioBasico(CASOS[1][1](), FIRMA), 6);
+    expect(t.match(/botiquín portátil/g)).toHaveLength(1);
+    expect(t).not.toMatch(/Retretes, lavabos y duchas según el VII Convenio/);
+    expect(t).toMatch(/Separación por sexos/);
   });
 
   it("el Word se arma con los bloques del estudio", async () => {

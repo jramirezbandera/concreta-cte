@@ -1,10 +1,11 @@
 # Memoria como la del estudio — plan por fases
 
-> Estado: **fases 0 a 6 hechas** · 2026-10-16 (fase 1 en [feature-28.md](feature-28.md), fase 2
+> Estado: **fases 0 a 6 y 8 hechas** · 2026-10-18 (fase 1 en [feature-28.md](feature-28.md), fase 2
 > en [feature-29.md](feature-29.md), fase 3 en [feature-30.md](feature-30.md), fase 4 en
 > [feature-31.md](feature-31.md), fase 5 en [feature-32.md](feature-32.md)). La fase 6 se parte en
 > 6a, el documento del anejo con HS 4 y HS 5 (hecha, [feature-33.md](feature-33.md)), y 6b, REBT
-> aguas abajo (hecha, [feature-34.md](feature-34.md)).
+> aguas abajo (hecha, [feature-34.md](feature-34.md)). La fase 8, el estudio básico de seguridad y
+> salud, hecha el 2026-10-18 ([feature-35.md](feature-35.md)). Queda la 7.
 > Fase 8 (estudio de gestión de residuos y estudio básico de seguridad y salud) añadida el
 > 2026-10-15; su verificación previa, hecha el 2026-10-16, está en §4.2 y §4.3, y el plan, en
 > [feature-35.md](feature-35.md).
@@ -84,7 +85,7 @@ HR y HE 0/HE 1 van pegados como imagen.
 | **5 · Habitabilidad (municipal y autonómica)** ✅ | Iluminación y ventilación por estancia, densidad de viviendas, con la norma declarada por el proyectista (§5.5). | El caso de reforma justifica huecos y densidad con la norma que el usuario declara, citada en cada fila. |
 | **6 · Anejo de cálculo de instalaciones** | Anejo 5.3: HS 4 por tramos, HS 5 por aparato y arquetas, REBT con circuitos, derivación individual y tierra; la memoria remite a él y a los planos (§5.6). | El anejo sustituye al de CYPE en la unifamiliar del ejemplo, sin contradecir la memoria. |
 | **7 · Otros reglamentos y coherencia** | HE 2/RITE, HE 3, ficha ICT del arquitecto, accesibilidad autonómica; comprobaciones cruzadas en «Antes de entregar» (§5.7). | Las contradicciones de los ejemplos (ACS, grupo de presión, garaje) no se pueden dar sin un aviso. |
-| **8 · Seguridad y salud (y remisión a residuos)** | En [feature-35.md](feature-35.md). Anejo nuevo: estudio básico de seguridad y salud (RD 1627/1997), con los datos de obra que hoy no existen: PEM y PEC, plazo, trabajadores, amianto (§5.8). El estudio de gestión de residuos se hace en **concreta-mediciones**, que tiene las partidas; aquí solo se remite a él. | El estudio básico sale en los dos casos con sus riesgos por fase de obra, al nivel de los ejemplos del estudio y sin lo derogado. |
+| **8 · Seguridad y salud (y remisión a residuos)** ✅ | En [feature-35.md](feature-35.md). Anejo nuevo: estudio básico de seguridad y salud (RD 1627/1997), con los datos de obra que hoy no existen: PEM y PEC, plazo, trabajadores, amianto (§5.8). El estudio de gestión de residuos se hace en **concreta-mediciones**, que tiene las partidas; aquí solo se remite a él. | El estudio básico sale en los dos casos con sus riesgos por fase de obra, al nivel de los ejemplos del estudio y sin lo derogado. |
 
 **Orden.**
 - La 1 va primero: son errores de feature-27, recién cerrada.
@@ -506,6 +507,11 @@ que salir (RD 105/2008, art. 4.1.a, con la Ley 7/2022; §4.3):
 **Coherencia.** El PEM y las superficies son los mismos en el estudio básico, en la memoria y en
 el presupuesto de concreta-mediciones; la fase 7 los añade a las comprobaciones de «Antes de
 entregar».
+
+**Fase 8 hecha (2026-10-18, [feature-35.md](feature-35.md)):** el estudio básico de seguridad y salud
+como cuarto entregable (Word y PDF), con el art. 4 en vivo, 93 fichas de catálogo propuestas por la obra,
+amianto, anexo II, servicios higiénicos del convenio, trabajos posteriores y sin nada derogado. Comparado
+con ss02 a ss04 en el paso 7; lo que quedó para más adelante está al final de feature-35.md.
 
 ## 6. Decisiones a validar con el usuario
 

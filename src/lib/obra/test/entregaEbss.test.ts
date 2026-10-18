@@ -31,6 +31,8 @@ const COMPLETO: EstudioSeguridadSalud = {
 function reforma(ss?: EstudioSeguridadSalud): Proyecto {
   const p: Proyecto = { ...crearProyectoDemo(AHORA), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
   p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso("reforma_local_vivienda") ?? {}), documento: { promotor: "Promotora Ejemplo" } };
+  // Abre un hueco en un muro de carga: así propone la apertura de huecos, una ficha redactada por la app.
+  p.datosGenerales.alcance = { ...p.datosGenerales.alcance, estructura: true };
   if (ss) p.seguridadSalud = ss;
   return p;
 }

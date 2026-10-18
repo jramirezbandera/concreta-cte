@@ -82,6 +82,27 @@ const cubiertaPlana = (c: ContextoPropuesta): boolean => c.resumen.tipoCubierta 
 /** Equipos de ACS, climatización o generación eléctrica que acaban en cubierta. */
 const equiposCubierta = (c: ContextoPropuesta): boolean => c.aplica("he4") || c.aplica("he5");
 
+/**
+ * Hay revestimientos que picar o fábricas que demoler: la estructura, una
+ * reforma integral o algo de la envolvente o del interior que no sean solo
+ * huecos, vidrios, alumbrado o protección contra incendios. Sin el alcance
+ * contestado, sí: lo prudente es proponerlo.
+ */
+const PICADO_ENVOLVENTE: readonly NonNullable<Alcance["envolvente"]>[number][] = ["fachadas", "medianerias", "cubiertas", "terreno", "particiones"];
+const PICADO_INTERIOR: readonly NonNullable<Alcance["interior"]>[number][] = [
+  "distribucion", "evacuacion", "compartimentacion", "revestimientos", "suelos_escaleras", "aseos", "accesibilidad",
+];
+const hayPicado = (c: ContextoPropuesta): boolean => {
+  const a = c.alcance;
+  if (a.estructura === undefined && a.envolvente === undefined && a.interior === undefined) return true;
+  return (
+    a.estructura === true ||
+    a.integral === true ||
+    PICADO_ENVOLVENTE.some((e) => enEnvolvente(c, e)) ||
+    PICADO_INTERIOR.some((e) => enInterior(c, e))
+  );
+};
+
 const INSTALACIONES_FICHA = ["F22", "F23", "F24", "F25", "F26", "F27"];
 
 // ── La tabla de correspondencias ─────────────────────────────────────────────
@@ -150,7 +171,12 @@ export const REGLAS_PROPUESTA: readonly ReglaPropuesta[] = [
   {
     motivo: "obra en edificio existente",
     cuando: (c) => !c.nueva,
-    fichas: ["F1", "F3", "MA6", "MA10", "M2", "M12", "M14"],
+    fichas: ["F1", "MA6", "MA10", "M2", "M12"],
+  },
+  {
+    motivo: "se pican revestimientos o se demuelen fábricas",
+    cuando: (c) => !c.nueva && hayPicado(c),
+    fichas: ["F3", "M14"],
   },
   {
     motivo: "ampliación",
@@ -165,7 +191,7 @@ export const REGLAS_PROPUESTA: readonly ReglaPropuesta[] = [
   {
     motivo: "se modifican los huecos de fachada",
     cuando: (c) => enEnvolvente(c, "huecos"),
-    fichas: ["F19", "F20", "F40"],
+    fichas: ["F19", "F20"],
   },
   {
     motivo: "se intervienen las fachadas",
@@ -252,6 +278,11 @@ export const REGLAS_PROPUESTA: readonly ReglaPropuesta[] = [
     motivo: "edificio con ascensor",
     cuando: (c) => c.nueva && c.ascensor,
     fichas: ["F27"],
+  },
+  {
+    motivo: "se interviene la accesibilidad en un edificio con ascensor",
+    cuando: (c) => !c.nueva && c.ascensor && enInterior(c, "accesibilidad"),
+    fichas: ["F27", "MA7"],
   },
   // Medios que declara el estudio.
   { motivo: "hay grúa torre", cuando: (c) => c.ss.medios?.gruaTorre === true, fichas: ["M7", "F36"] },

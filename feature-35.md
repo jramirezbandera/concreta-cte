@@ -565,6 +565,68 @@ navegador (sin errores de consola; en móvil, sin desplazamiento lateral):
 - Abrir el Word en Word.
 - Comprobar en el navegador: datos, selección de fichas, Leer, Word y PDF, sin errores de consola.
 
+**Hecho (2026-10-18).** 1920 tests (6 nuevos y 5 ajustados), tipos y lint sin errores:
+- **Casos**: los tests de `estudioBasico` ya cubrían el Demo, la unifamiliar, la plurifamiliar y la
+  reforma (paso 5). Se suman la apertura de huecos con la estructura intervenida (pendiente sin
+  revisar), el 6.2 sin repeticiones y las tres reglas nuevas de la propuesta.
+- **Foto del expediente**: cada proyecto lleva la huella del estudio básico, compuesto con unos datos
+  fijos (`SEGURIDAD_SALUD` en `fotoExpediente.ts`) para que salga entero. Al añadirla, el resto de la
+  foto no cambió.
+- **Cotejo** (K-SYS.21 en la verificación): los arts. 13.2, 13.4 y 14 estaban bien parafraseados. Se
+  completan con las hojas por duplicado, la oficina de supervisión en obra pública, quién tiene el
+  libro, y la advertencia, la anotación y a quién se da cuenta de la paralización. El RD 396/2006
+  sigue sin modificar y el nuevo real decreto de amianto, en proyecto: nada cambia.
+- **Comparación con ss02 a ss04**: un agente comparó los tres estudios con lo que sale de la app para
+  obras parecidas (refuerzo de cimentación, mirador en fachada protegida, ascensor y fachada en un
+  edificio habitado). Lo nuestro trae lo que los ejemplos no (art. 4 con jornadas, coordinadores,
+  servicios afectados, dotación del convenio, eficacia, otras actividades, anexo II, amianto,
+  trabajos posteriores, normas limpias, solo las fichas de la obra). Arreglado ahora:
+  - **F40 (apertura de huecos) solo con la estructura intervenida**: cambiar huecos de fachada no es
+    abrirlos en un muro de carga; salía en un mirador con el batache en el anexo II.
+  - **Picado (F3) y martillo (M14) solo si hay algo que picar** (estructura, reforma integral, envolvente
+    distinta de los huecos o interior distinto de vidrios, alumbrado y PCI); sin el alcance contestado,
+    sí.
+  - **Ascensor (F27) en edificio existente** con la accesibilidad intervenida y ascensor en El edificio.
+  - **El 6.2 no repite** la dotación ni los primeros auxilios: las medidas de IP6 que ya dice el texto
+    fijo van marcadas `enTexto` y no salen en su tabla.
+  - **F1, acometidas**: «las de la zona de obra, anuladas o desviadas; si el edificio sigue en uso, se
+    mantienen o se reponen las del resto».
+  - **Recurso preventivo** citado por la Ley 31/1995 (art. 32 bis y DA 14.ª), con la Guía para el
+    anexo II; «Apartado 1» en singular en los datos generales.
+- **Word en Word**: la unifamiliar y la reforma, abiertas con Word 16 por automatización sin avisos ni
+  reparación (37 y 27 páginas); el PDF que exporta Word, revisado a ojo: tablas a cuatro columnas
+  partidas entre hojas, cabecera y pie de la memoria.
+- **Navegador** (`/p/demo/seguridad-salud`): datos del art. 4 con la tabla en vivo, quitar una ficha,
+  Leer, Word y PDF descargados, sin errores de consola.
+
+**Decisiones del paso 7, a validar:**
+1. **La apertura de huecos sale solo con la estructura intervenida** (cambia la decisión 5 del paso 4).
+   En «Reforma: local a vivienda», que no marca la estructura, ya no se propone; si se abre un hueco en un
+   muro de carga, el alcance debe decir que se actúa en la estructura (art. 2.4 de la Parte I).
+2. **Picado y martillo según el alcance**, con la lista de arriba. Demolición manual (F1), puntales,
+   bajante, camión y radial siguen en toda obra en edificio existente.
+3. **Ascensor en edificio existente por la accesibilidad**: no hay pregunta «se instala ascensor» en el
+   alcance; la señal es accesibilidad + ascensor en El edificio. Con eso salen F27 y MA7 (y TP3).
+4. **`enTexto`** en las medidas: el texto fijo del apartado manda y la ficha no lo repite en el documento.
+   En la pantalla esas medidas siguen a la vista y se pueden quitar, pero quitarlas no cambia el 6.2.
+5. **La foto del expediente compone el estudio con datos fijos**, iguales en los 40 proyectos, para
+   que su huella vigile el documento entero y no solo los pendientes.
+
+**Para más adelante** (de la comparación; no entran en esta feature):
+- **Fichas nuevas**: micropilotes o cimentación profunda con la perforadora; tratamientos de la madera,
+  decapado y limpieza de fachada (biocidas, plomo, agua a presión); desmontaje de carpinterías y
+  cubriciones de plomo; trabajos posteriores de estructura y cimentación.
+- **Datos del emplazamiento** en `Entorno` (accesos, topografía, colindantes, servidumbres, superficie de
+  actuación): los tres ejemplos los traen; hoy el apartado 3 dice solo el municipio.
+- **Textos de obra nueva en fichas comunes**: IP1 («pasan a la planta baja al terminar la estructura»,
+  piquetas de replanteo), IP3 (calicatas y excavación mecánica en obras sin excavación), F14 (redes en
+  patios, cables entre pilares) y F41 (pensada para cantería). Hace falta condicionar medidas a obra
+  nueva o partir fichas.
+- **Edificio protegido** (`alcance.protegido`): avisar de los anclajes del andamio y proponer la
+  alternativa; **sugerir `cortaDuracion`** con plazo corto y pocos trabajadores; IP9 con una sola
+  escalera (no hay recorrido distinto); el andamio cerrado fuera de horario en edificio habitado.
+- **Amianto «no identificado» con su base** (inspección hecha, año del edificio).
+
 ## Fuera de alcance
 
 - **Estudio de gestión de residuos**: en concreta-mediciones (PLAN-MEMORIA §5.8).

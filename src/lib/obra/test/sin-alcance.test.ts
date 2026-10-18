@@ -24,7 +24,8 @@ import antes from "./foto-antes.json";
 // «revisar» por las longitudes y el terreno supuestos; nada más.
 // En feature-35 (paso 5) cambia la huella de la memoria de los 40 proyectos,
 // por la línea que remite al estudio de seguridad y salud y al de residuos;
-// nada más.
+// nada más. En el paso 7 se añade la huella del estudio básico (con unos datos
+// fijos de seguridad y salud); el resto, igual.
 // =============================================================================
 
 describe("sin asistente de alcance, nada cambia", () => {

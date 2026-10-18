@@ -5,12 +5,15 @@ import type { Intervencion, JustificacionKey, Proyecto } from "../../proyecto/ti
 import { evaluarExpediente } from "../evaluar";
 import { memoriaCte, textoPlanoMemoriaCte } from "../memoria";
 import { anejoInstalaciones, textoPlanoAnejoInstalaciones } from "../anejoInstalaciones";
+import { estudioBasico, textoPlanoEstudioBasico } from "../estudioBasico";
+import type { EstudioSeguridadSalud } from "../../ebss/tipos";
 
 // =============================================================================
 // Foto del expediente (feature-27, paso 8): por proyecto, la aplicabilidad, la
 // nota, la cita, el estado y el veredicto de cada justificación, y una huella
 // del texto entero de la memoria y, desde feature-33, la del anejo de
-// instalaciones. Se genera igual con el código de partida
+// instalaciones y, desde feature-35, la del estudio básico de seguridad y salud
+// (con unos datos fijos, para que salga entero). Se genera igual con el código de partida
 // (7e576d8) y con el de ahora: obra nueva y las reformas sin asistente deben
 // dar lo mismo.
 // =============================================================================
@@ -24,6 +27,25 @@ function huella(s: string): string {
   }
   return h.toString(16).padStart(8, "0");
 }
+
+/** Lo que declara el proyectista en la foto: una obra pequeña, básico, sin amianto. */
+const SEGURIDAD_SALUD: EstudioSeguridadSalud = {
+  presupuesto: { pem: 120_000, gg_pct: 13, bi_pct: 6, iva_pct: 10 },
+  manoDeObra: { plazoDias: 80, maxTrabajadores: 6 },
+  subterraneas: false,
+  amianto: { estado: "no_identificado" },
+  coordinacion: { variosProyectistas: false, variasEmpresas: true },
+  entorno: {
+    centroAsistencial: { nombre: "Hospital Regional", direccion: "Av. Carlos Haya s/n", distancia_km: 3.2, tiempo_min: 9 },
+    viaPublica: false,
+    edificioEnUso: false,
+    servicios: { linea_aerea: false, linea_enterrada: false, transformador: false, gas: false, agua: true, saneamiento: true, telecomunicaciones: true },
+  },
+};
+const FIRMA = {
+  firmantes: [{ id: "a", nombre: "Ana Pérez", titulacion: "Arquitecta", colegiacion: "Colegiada nº 1" }],
+  fecha: "2026-10-18T10:00:00.000Z",
+};
 
 const INTERVENCIONES: Intervencion[] = ["obra_nueva", "reforma", "ampliacion", "cambio_uso"];
 
@@ -68,6 +90,9 @@ export function fotoExpedientes(): FotoExpediente {
     }
     fila.memoria = huella(textoPlanoMemoriaCte(memoriaCte(p)));
     fila.anejo = huella(textoPlanoAnejoInstalaciones(anejoInstalaciones(p)));
+    fila.estudioBasico = huella(
+      textoPlanoEstudioBasico(estudioBasico({ ...p, seguridadSalud: SEGURIDAD_SALUD }, FIRMA)),
+    );
     foto[id] = fila;
   }
   return foto;

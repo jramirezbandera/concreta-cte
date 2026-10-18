@@ -23,6 +23,8 @@ const AHORA = "2026-10-18T10:00:00.000Z";
 function reforma(): Proyecto {
   const p: Proyecto = { ...crearProyectoDemo(AHORA), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
   p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso("reforma_local_vivienda") ?? {}), documento: { promotor: "Promotora Ejemplo" } };
+  // Abre un hueco en un muro de carga: así propone la apertura de huecos, una ficha redactada por la app.
+  p.datosGenerales.alcance = { ...p.datosGenerales.alcance, estructura: true };
   return p;
 }
 

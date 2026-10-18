@@ -16,7 +16,7 @@ import type { EstudioSeguridadSalud, SeleccionFichas } from "../tipos";
 import { crearProyectoDemo } from "../../proyecto/demo";
 import { obraDeCaso } from "../../proyecto/alcance";
 import { edificioDeCaso, type CasoEdificio } from "../../edificio/casos";
-import type { Proyecto } from "../../proyecto/tipos";
+import type { Alcance, Proyecto } from "../../proyecto/tipos";
 
 // =============================================================================
 // feature-35, paso 4: qué fichas propone la app y cuáles salen en el estudio.
@@ -33,6 +33,10 @@ function deCaso(caso: CasoEdificio, ss?: EstudioSeguridadSalud): Proyecto {
 
 const ids = (p: Proyecto): string[] => fichasPropuestas(p).map((f) => f.id);
 const motivosDe = (p: Proyecto, id: string): string[] => fichasPropuestas(p).find((f) => f.id === id)?.motivos ?? [];
+const conAlcance = (p: Proyecto, a: Alcance): Proyecto => ({
+  ...p,
+  datosGenerales: { ...p.datosGenerales, alcance: { ...p.datosGenerales.alcance, ...a } },
+});
 const marcadas = (p: Proyecto): string[] => seleccionDeFichas(p).filter((f) => f.marcada).map((f) => f.ficha.id);
 const conSeleccion = (p: Proyecto, seleccion: SeleccionFichas): Proyecto => ({
   ...p,
@@ -125,9 +129,16 @@ describe("obra en edificio existente: «Reforma: local a vivienda»", () => {
 
   it("demoliciones, apertura de huecos y lo intervenido; el amianto es obligatorio", () => {
     const f = ids(p);
-    for (const id of ["F1", "F3", "F40", "F15", "F19", "F23", "F24", "F22", "MA6", "MA10", "M14"]) expect(f, id).toContain(id);
-    expect(motivosDe(p, "F40")).toEqual(["se modifican los huecos de fachada"]);
+    for (const id of ["F1", "F3", "F15", "F19", "F23", "F24", "F22", "MA6", "MA10", "M14"]) expect(f, id).toContain(id);
+    expect(motivosDe(p, "F3")).toEqual(["se pican revestimientos o se demuelen fábricas"]);
     expect(amiantoObligatorio(p)).toBe(true);
+  });
+
+  // Paso 7 (comparación con ss02 a ss04): cambiar huecos no es abrirlos en un muro de carga.
+  it("la apertura de huecos sale con la estructura, no con los huecos de fachada", () => {
+    expect(ids(p)).not.toContain("F40");
+    const q = conAlcance(p, { estructura: true });
+    expect(motivosDe(q, "F40")).toEqual(["se actúa en la estructura"]);
   });
 
   it("no propone lo que la obra no toca: cimentación, estructura, cubierta, andamio", () => {
@@ -260,7 +271,7 @@ describe("lo que el proyectista edita en una ficha", () => {
 
 describe("fichas redactadas por la app sin revisar", () => {
   it("salen las marcadas que no se han revisado", () => {
-    const p = deCaso("reforma_local_vivienda", { entorno: { edificioEnUso: true } });
+    const p = conAlcance(deCaso("reforma_local_vivienda", { entorno: { edificioEnUso: true } }), { estructura: true });
     expect(fichasSinRevisar(p).map((f) => f.id)).toEqual(["IP9", "F40"]);
     const q = conSeleccion(p, conEdicion(conEdicion(undefined, "IP9", { revisada: true }), "F40", { revisada: true }));
     expect(fichasSinRevisar(q)).toEqual([]);
@@ -270,5 +281,36 @@ describe("fichas redactadas por la app sin revisar", () => {
 
   it("la unifamiliar de obra nueva no propone ninguna", () => {
     expect(fichasSinRevisar(deCaso("unifamiliar"))).toEqual([]);
+  });
+});
+
+describe("paso 7: lo que enseñó la comparación con los estudios del estudio", () => {
+  const sinInterior: Alcance = {
+    tipos: ["reforma"], integral: false, estructura: false, envolvente: ["huecos"], interior: [],
+    aparatos: "no", electrica: "no", generacionTermica: "no", pluviales: false, aparcamiento: false,
+  };
+  const existente = (a: Alcance, ascensor = false): Proyecto => {
+    const p = deCaso("plurifamiliar");
+    return { ...p, edificio: { ...p.edificio, ascensor }, datosGenerales: { ...p.datosGenerales, intervencion: "reforma", alcance: a } };
+  };
+
+  it("solo cambiar carpinterías: ni picado ni martillo; sí la demolición manual", () => {
+    const f = ids(existente(sinInterior));
+    expect(f).toContain("F1");
+    expect(f).toContain("F19");
+    for (const id of ["F3", "M14", "F40"]) expect(f, id).not.toContain(id);
+  });
+
+  it("sin el alcance contestado, el picado se propone por prudencia", () => {
+    expect(ids(existente({ tipos: ["reforma"] }))).toContain("F3");
+  });
+
+  it("ascensor en un edificio existente: con la accesibilidad intervenida", () => {
+    expect(ids(existente(sinInterior, true))).not.toContain("F27");
+    const p = existente({ ...sinInterior, interior: ["accesibilidad"] }, true);
+    expect(motivosDe(p, "F27")).toEqual(["se interviene la accesibilidad en un edificio con ascensor"]);
+    expect(ids(p)).toContain("TP3");
+    // Sin ascensor en El edificio, no.
+    expect(ids(existente({ ...sinInterior, interior: ["accesibilidad"] }))).not.toContain("F27");
   });
 });

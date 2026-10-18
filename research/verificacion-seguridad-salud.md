@@ -764,3 +764,20 @@ Se mantiene lo del análisis: viento, iluminación deficiente, inundación, derr
 - **Apartado 13 (obligaciones), texto fijo verificado:** «Cada contratista presentará ante la autoridad laboral la comunicación de apertura del centro de trabajo antes del comienzo de los trabajos, acompañada del plan de seguridad y salud en el trabajo y de su aprobación (art. 7 del RD 1627/1997). La comunicación se expondrá en la obra en lugar visible y se actualizará en el plazo de 10 días cuando se produzcan cambios no identificados inicialmente. El promotor facilitará a los contratistas los datos necesarios (Orden TIN/1071/2010, arts. 2.2 y 3.5).» Con la pregunta del cabeza de familia en «sí» (K-SYS.11), se añade que, en las partes sin plan, la comunicación va con la evaluación de riesgos.
 - **Apartado 0 (datos generales):** el estudio básico ya reúne los datos que el promotor debe facilitar (c, d, f, h, j, k, l, m, n). Conviene que el apartado 0 los presente en ese orden; la app no genera el modelo oficial.
 - **Apartado 10 (anexo II):** el dato j) de la comunicación sale de este apartado; refuerza que no quede nunca vacío.
+
+---
+
+## K-SYS.21 — Libro de incidencias y paralización (arts. 13 y 14) y amianto, a 2026-10-18
+
+Paso 7 de feature-35: lo que el paso 5 dejó parafraseado sin cotejar (decisión 14) y la segunda mirada al amianto que pedía K-SYS.18.
+
+**Arts. 13 y 14 del RD 1627/1997**, en el consolidado del BOE (BOE-A-1997-22614) pasado a texto → **VERIFICADO (texto)**:
+- **13.1**: en cada centro de trabajo, con fines de control y seguimiento del plan, un libro de incidencias «que constará de hojas por duplicado, habilitado al efecto».
+- **13.2**: lo facilita «a) El Colegio profesional al que pertenezca el técnico que haya aprobado el plan de seguridad y salud» o «b) La Oficina de Supervisión de Proyectos u órgano equivalente cuando se trate de obras de las Administraciones públicas».
+- **13.3**: siempre en la obra, en poder del coordinador durante la ejecución o, si no es necesario designarlo, de la dirección facultativa; pueden anotar la dirección facultativa, contratistas, subcontratistas, autónomos, los responsables de prevención de las empresas, los representantes de los trabajadores y los técnicos de las administraciones.
+- **13.4**: quien lo tiene notifica cada anotación «al contratista afectado y a los representantes de los trabajadores de éste»; con un incumplimiento de advertencias u observaciones anteriores, o en el supuesto del art. 14, «deberá remitirse una copia a la Inspección de Trabajo y Seguridad Social en el plazo de veinticuatro horas».
+- **14.1**: el coordinador durante la ejecución o cualquier otra persona de la dirección facultativa que observe incumplimientos lo advierte al contratista, deja constancia en el libro y, «en circunstancias de riesgo grave e inminente», puede disponer la paralización de los tajos o de la obra entera. **14.2**: quien la ordena da cuenta a la Inspección, a los contratistas y subcontratistas afectados y a los representantes de sus trabajadores.
+
+**Veredicto.** Los parafraseos del paso 5 eran correctos. Se completan en `OBLIGACIONES_EBSS` con lo que faltaba: hojas por duplicado, la oficina de supervisión en obra pública (13.2), quién tiene el libro (13.3), la advertencia y la anotación previas a la paralización y a quién se da cuenta (14). La frase del 13.4 dice «una copia de la anotación a la Inspección», que no choca con el prohibido «copia a la Inspección» (que caza la copia de toda anotación).
+
+**Amianto, segunda mirada (2026-10-18).** El consolidado del RD 396/2006 en boe.es sigue con «Última actualización, publicada el 11/04/2006», sin modificaciones ni derogación → **LEÍDO (web)**. La búsqueda solo encuentra el **proyecto** de real decreto que transpone la Directiva (UE) 2023/2668 y lo derogaría; ninguna noticia de aprobación ni referencia del BOE. Algunas fuentes dan el nuevo VLA-ED de 0,01 fibras/cm³ en los LEP 2026 del INSST, que no son norma de este estudio y que el estudio no imprime → **LEÍDO (web)**, fuentes secundarias. **K-SYS.9 y K-SYS.18 se mantienen.**

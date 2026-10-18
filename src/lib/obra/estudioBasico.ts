@@ -218,7 +218,8 @@ function celdaItem(i: ItemFicha): string {
 }
 
 /** Los evitables van al apartado 7, no a la ficha (decisión 1). */
-const noEvitable = (i: ItemFicha): boolean => typeof i === "string" || i.evitable === undefined;
+/** En la tabla de la ficha: ni lo que va al apartado 7 ni lo que ya dice el texto fijo de su apartado. */
+const enTabla = (i: ItemFicha): boolean => typeof i === "string" || (i.evitable === undefined && !i.enTexto);
 
 /**
  * La ficha a cuatro columnas (decisión 1). Las columnas son listas
@@ -228,9 +229,9 @@ const noEvitable = (i: ItemFicha): boolean => typeof i === "string" || i.evitabl
 function tablaFicha(f: FichaCatalogo, rotulo: string = f.titulo): BloqueMemoria {
   const cols = [
     riesgosDeFicha(f).map(textoRiesgo),
-    f.medidas.filter(noEvitable).map(celdaItem),
-    f.protecciones.filter(noEvitable).map(celdaItem),
-    f.epi.filter(noEvitable).map(celdaItem),
+    f.medidas.filter(enTabla).map(celdaItem),
+    f.protecciones.filter(enTabla).map(celdaItem),
+    f.epi.filter(enTabla).map(celdaItem),
   ];
   const n = Math.max(1, ...cols.map((x) => x.length));
   return {
@@ -301,7 +302,7 @@ function datosGenerales(c: Contexto, anexoII: CasoAnexoII[]): ApartadoEstudio {
     ["Máximo de trabajadores a la vez", m?.maxTrabajadores !== undefined ? entero(m.maxTrabajadores) : "Sin declarar"],
     [
       "Trabajos del anexo II",
-      anexoII.length > 0 ? `Apartados ${listaY(anexoII.map((x) => String(x.apartado)))} (ver apartado 10)` : "No se prevén (ver apartado 10)",
+      anexoII.length > 0 ? `${anexoII.length === 1 ? "Apartado" : "Apartados"} ${listaY(anexoII.map((x) => String(x.apartado)))} (ver apartado 10)` : "No se prevén (ver apartado 10)",
     ],
     ["Promotor", doc?.promotor?.trim() || "Sin declarar"],
     ["Autor del proyecto", autores.length > 0 ? listaY(autores) : "Sin declarar"],
@@ -732,7 +733,7 @@ function anexoII(casos: CasoAnexoII[]): ApartadoEstudio {
         columnas: [TEXTO, TEXTO, TEXTO],
       },
       parrafo(
-        "En estos trabajos es preceptiva la presencia de un recurso preventivo (Guía técnica del INSST); el plan de seguridad y salud fija la forma de esa presencia (RD 1627/1997, disposición adicional única).",
+        "En estos trabajos es preceptiva la presencia de un recurso preventivo de cada contratista (Ley 31/1995, art. 32 bis y disposición adicional decimocuarta; la Guía técnica del INSST lo pide para los trabajos del anexo II); el plan de seguridad y salud fija la forma de esa presencia (RD 1627/1997, disposición adicional única).",
       ),
     );
   } else {
