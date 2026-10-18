@@ -505,6 +505,54 @@ fijos en [src/lib/ebss/textos.ts](src/lib/ebss/textos.ts) y 48 tests en `src/lib
   `PendienteEntrega.key` es hoy una `JustificacionKey`: se amplía para admitir el documento.
 - **Navegación**: entrada en la barra lateral de la obra, junto a Lo que se entrega.
 
+**Hecho (2026-10-18).** 16 tests nuevos (7 en `src/lib/obra/test/entregaEbss.test.ts` y 9 de interfaz en
+`src/pages/test/seguridadSalud.test.tsx`) y comprobado en el
+navegador (sin errores de consola; en móvil, sin desplazamiento lateral):
+- [SeguridadSaludPage.tsx](src/pages/SeguridadSaludPage.tsx) en `/p/:id/seguridad-salud`: a la izquierda,
+  el art. 4 (presupuesto con el PEC desglosado, plazo, trabajadores con la ayuda para estimarlos,
+  jornadas con la tabla de periodos si la cota pasa de 500, túneles), la tabla de supuestos en vivo y el
+  resultado; amianto, coordinación (con el motivo de cada coordinador), entorno (centro asistencial con
+  el mapa, vía pública, edificio en uso, servicios afectados, tensión) y medios, servicios higiénicos y
+  planos. A la derecha, [FichasEbss.tsx](src/components/ebss/FichasEbss.tsx): las fichas por grupo, con su
+  motivo, para marcar o quitar, y su edición (riesgos, medidas, protecciones y EPI; «la doy por buena»
+  en las redactadas por la app). Controles en [src/components/ebss/controles.tsx](src/components/ebss/controles.tsx).
+- [EstudioBasicoPage.tsx](src/pages/EstudioBasicoPage.tsx) en `/p/:id/estudio-basico`: el documento como
+  sale en el Word, con lo que falta arriba.
+- `useExportarEstudioBasico` en el hook común (los bloques reciben ya el estudio, para los firmantes).
+- `entrega.ts`: `PendienteEntrega.key` admite `"seguridadSalud"`; `antesDeEntregar` suma los del estudio
+  básico; `entregables().seguridadSalud` con `resultado` y `empezado`. `estudioBasico.ts` da
+  `pendientesEstudioBasico(p)`, los pendientes con su id, sin componer el documento.
+- Lo que se entrega: la fila del estudio básico, la última, con Datos, Leer, Word y PDF. Barra lateral:
+  «Seguridad y salud» tras Memoria CTE.
+
+**Decisiones del paso 6, a validar:**
+1. **Sin empezar no hay avisos.** Mientras el proyecto no tiene `seguridadSalud`, «Antes de entregar» no
+   añade nada (el estudio puede hacerse fuera); La obra pone «sin empezar» y desactiva Word y PDF; la
+   barra lateral, sin glifo. Cualquier dato que se declare lo empieza.
+2. **«Antes de entregar», sin inundar**: en rojo, el supuesto superado (y solo eso); en ámbar, el PEC
+   cerca del umbral (decisión 4), el PEM, el plazo, los trabajadores, el centro, el amianto y cada ficha
+   redactada por la app sin revisar, uno a uno; lo demás, en una línea («Quedan 7 cosas más…») con los
+   textos en el detalle. Los firmantes no: ya tienen el aviso de «Tu estudio».
+3. **El código del aviso es «Seguridad y salud»** y lleva a la pantalla.
+4. **Recuento**: los apartados sin «Pendiente», de 15, sin contar el de quién firma (es del estudio, no
+   del proyecto). Con el estudio completo, «hace falta el estudio completo» en rojo y 0 de 1.
+5. **Sin fecha**: el documento dice «en la fecha de la firma». Firman los de «Tu estudio» que elige el
+   proyecto, como en la memoria.
+6. **Glifo de la barra lateral**: ✕ completo, ! con apartados pendientes, ✓ listo.
+7. **Dos columnas**: datos a la izquierda, fichas a la derecha. Por defecto «Las de esta obra» (las
+   propuestas y las marcadas); «Todo el catálogo» para añadir las que la app no propone.
+8. **La estimación de trabajadores solo informa** (jornadas y media), sin botón para tomarla: el dato del
+   art. 4 lo teclea el proyectista.
+9. **El mapa del centro asistencial** busca en Google Maps «urgencias cerca de <municipio>». Dirección,
+   distancia y tiempo se activan con el nombre (sin nombre, el dato no se guarda).
+10. **Números**: vacío es «sin declarar», nunca 0; coma decimal y puntos de millar («450.759»). Lo que se
+    guarda pasa por `parseSeguridadSalud`, igual que al importar.
+11. **La tabla de supuestos usa un nombre corto** («Volumen de mano de obra»); el texto del art. 4.1 va en
+    la ayuda de la celda y en el documento.
+12. **No se editan** las previsiones e informaciones útiles de los trabajos posteriores, ni la
+    descripción ni la eficacia de las fichas: solo riesgos, medidas, protecciones y EPI. «Deshacer lo
+    editado» conserva la marca de revisada.
+
 ### Paso 7 · Casos y cierre
 
 - Tests puros de `estudioBasico` sobre el Demo, la unifamiliar y «Reforma: local a vivienda»:

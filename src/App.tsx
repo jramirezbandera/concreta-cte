@@ -11,6 +11,8 @@ import { InicioPage } from "./pages/InicioPage";
 import { ObraPage } from "./pages/ObraPage";
 import { MemoriaPage } from "./pages/MemoriaPage";
 import { AnejoInstalacionesPage } from "./pages/AnejoInstalacionesPage";
+import { EstudioBasicoPage } from "./pages/EstudioBasicoPage";
+import { SeguridadSaludPage } from "./pages/SeguridadSaludPage";
 import { FormDatosGeneralesPage } from "./pages/FormDatosGeneralesPage";
 import { EdificioPage } from "./pages/EdificioPage";
 import { ProyectoLayout } from "./pages/ProyectoLayout";
@@ -74,6 +76,8 @@ const router = createHashRouter([
           { path: "edificio", element: <EdificioPage /> },
           { path: "memoria", element: <MemoriaPage /> },
           { path: "anejo-instalaciones", element: <AnejoInstalacionesPage /> },
+          { path: "seguridad-salud", element: <SeguridadSaludPage /> },
+          { path: "estudio-basico", element: <EstudioBasicoPage /> },
           {
             path: "hs/humedad",
             lazy: lazyComponent(() => import("./modules/hs1/ui"), "Hs1Module"),

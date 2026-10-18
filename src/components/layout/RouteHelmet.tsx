@@ -37,6 +37,9 @@ function resolver(pathname: string): { title: string; description: string } {
       }
       if (resto === "edificio") return { title: `El edificio · ${SUFIJO}`, description: DESC_GENERICA };
       if (resto === "memoria") return { title: `Memoria CTE · ${SUFIJO}`, description: DESC_GENERICA };
+      if (resto === "anejo-instalaciones") return { title: `Anejo de instalaciones · ${SUFIJO}`, description: DESC_GENERICA };
+      if (resto === "seguridad-salud") return { title: `Seguridad y salud · ${SUFIJO}`, description: DESC_GENERICA };
+      if (resto === "estudio-basico") return { title: `Estudio básico de seguridad y salud · ${SUFIJO}`, description: DESC_GENERICA };
       subruta = resto;
     }
   }

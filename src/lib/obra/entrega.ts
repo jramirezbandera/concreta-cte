@@ -12,11 +12,23 @@ import type { JustificacionKey, Proyecto } from "../proyecto/tipos";
 import { evaluarExpediente, type EvaluacionJustificacion } from "./evaluar";
 import { anejoInstalaciones } from "./anejoInstalaciones";
 import { INSTALACIONES_ANEJO } from "./remision";
+import { estudioBasico, pendientesEstudioBasico, SIN_FIRMANTES } from "./estudioBasico";
+import { UMBRAL_PEC, type ResultadoArt4 } from "../ebss/art4";
+
+/**
+ * El estudio básico de seguridad y salud en «Antes de entregar» (feature-35,
+ * paso 6): no es una justificación del CTE, pero sus pendientes van a la misma
+ * lista, hacia su pantalla.
+ */
+export const CLAVE_SEGURIDAD_SALUD = "seguridadSalud";
+export const RUTA_SEGURIDAD_SALUD = "seguridad-salud";
+export const RUTA_ESTUDIO_BASICO = "estudio-basico";
 
 export interface PendienteEntrega {
   /** Estable: `<clave>:<id>`. */
   id: string;
-  key: JustificacionKey;
+  /** La justificación, o el estudio básico de seguridad y salud. */
+  key: JustificacionKey | typeof CLAVE_SEGURIDAD_SALUD;
   codigo: string;
   /** Subruta del módulo, para ir a verlo. */
   ruta?: string;
@@ -45,7 +57,73 @@ export function antesDeEntregar(p: Proyecto): PendienteEntrega[] {
       (a): PendienteEntrega => ({ id: `${ev.key}:${a.id}`, ...base(ev), tipo: "revisar", titulo: a.titulo, detalle: a.detalle, ...(a.elementoId ? { elementoId: a.elementoId } : {}) }),
     ),
   );
-  return [...fallos, ...avisos, ...sinPlanos(p, evs)];
+  return [...fallos, ...avisos, ...sinPlanos(p, evs), ...pendientesSeguridadSaludEntrega(p)];
+}
+
+const euros = (v: number): string => `${v.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+
+/** Los datos que «Antes de entregar» nombra uno a uno; el resto se cuenta en una línea. */
+const DATOS_NOMBRADOS = new Set(["pem", "plazo", "trabajadores", "amianto", "centro"]);
+
+/**
+ * El estudio básico (feature-35, paso 6), solo si se ha empezado: sin
+ * `seguridadSalud`, el proyecto no lo hace aquí y no se llena la lista. En
+ * rojo, si se supera un supuesto del art. 4.1; en ámbar, el PEC cerca del
+ * umbral, el PEM, el plazo, los trabajadores, el amianto, el centro
+ * asistencial y las fichas redactadas por la app sin revisar, uno a uno, y lo
+ * demás en una línea. Los firmantes no: son del estudio y ya tienen su aviso.
+ */
+function pendientesSeguridadSaludEntrega(p: Proyecto): PendienteEntrega[] {
+  if (!p.seguridadSalud) return [];
+  const base = { key: CLAVE_SEGURIDAD_SALUD, codigo: "Seguridad y salud", ruta: RUTA_SEGURIDAD_SALUD } as const;
+  const e = estudioBasico(p);
+  if (e.art4.resultado === "completo") {
+    return [
+      {
+        id: `${CLAVE_SEGURIDAD_SALUD}:completo`,
+        ...base,
+        tipo: "no_cumple",
+        titulo: "Hace falta el estudio de seguridad y salud completo.",
+        detalle: e.pendientes[0] ?? "",
+      },
+    ];
+  }
+  const out: PendienteEntrega[] = [];
+  const aviso = e.art4.avisoPec;
+  if (aviso) {
+    out.push({
+      id: `${CLAVE_SEGURIDAD_SALUD}:pec-cerca`,
+      ...base,
+      tipo: "revisar",
+      titulo: "El presupuesto de ejecución por contrata está cerca del umbral del art. 4.1 a).",
+      detalle: `Le faltan ${euros(aviso.diferencia)} (un ${aviso.pct.toLocaleString("es-ES")} %) para ${euros(UMBRAL_PEC)}: si el presupuesto sube, hace falta el estudio completo.`,
+    });
+  }
+  const pendientes = pendientesEstudioBasico(p).filter((d) => d.id !== "firmantes");
+  for (const d of pendientes) {
+    if (DATOS_NOMBRADOS.has(d.id)) {
+      out.push({ id: `${CLAVE_SEGURIDAD_SALUD}:${d.id}`, ...base, tipo: "revisar", titulo: d.texto, detalle: "Se declara en la pantalla de seguridad y salud." });
+    } else if (d.id.startsWith("ficha:")) {
+      out.push({
+        id: `${CLAVE_SEGURIDAD_SALUD}:${d.id}`,
+        ...base,
+        tipo: "revisar",
+        titulo: d.texto,
+        detalle: "La redacta la app para un hueco de los ejemplos: léela, ajústala y márcala como revisada.",
+      });
+    }
+  }
+  const resto = pendientes.filter((d) => !DATOS_NOMBRADOS.has(d.id) && !d.id.startsWith("ficha:"));
+  if (resto.length > 0) {
+    out.push({
+      id: `${CLAVE_SEGURIDAD_SALUD}:resto`,
+      ...base,
+      tipo: "revisar",
+      titulo: resto.length === 1 ? "Queda 1 cosa más por completar en el estudio básico." : `Quedan ${resto.length} cosas más por completar en el estudio básico.`,
+      detalle: resto.map((d) => d.texto).join(" "),
+    });
+  }
+  return out;
 }
 
 /**
@@ -92,6 +170,11 @@ export interface Entregables {
    * no se desarrolla no cuenta.
    */
   instalaciones: RecuentoEntregable;
+  /**
+   * Estudio básico de seguridad y salud (feature-35): sus apartados, listos si
+   * no les falta nada. Con `completo`, el básico no vale.
+   */
+  seguridadSalud: RecuentoEntregable & { resultado: ResultadoArt4; empezado: boolean };
 }
 
 /** Los módulos con esquema para el plano, en el orden en que se entregan. */
@@ -117,6 +200,18 @@ function recuentoInstalaciones(p: Proyecto, evs: readonly EvaluacionJustificacio
   };
 }
 
+function recuentoSeguridadSalud(p: Proyecto): Entregables["seguridadSalud"] {
+  const e = estudioBasico(p);
+  const sinPendientes = e.apartados.filter((a) => a.bloques.every((b) => b.tipo !== "pendiente" || b.texto === `Pendiente: ${SIN_FIRMANTES}`));
+  return {
+    listos: e.art4.resultado === "completo" ? 0 : sinPendientes.length,
+    total: e.apartados.length,
+    noCumplen: [],
+    resultado: e.art4.resultado,
+    empezado: p.seguridadSalud !== undefined,
+  };
+}
+
 export function entregables(p: Proyecto): Entregables {
   const evs = evaluarExpediente(p).justificaciones;
   const calculadas = evs.filter((ev) => CALCULADA.has(ev.estado));
@@ -126,5 +221,6 @@ export function entregables(p: Proyecto): Entregables {
     fichas: recuento(calculadas),
     esquemas: { ...recuento(esquemas), claves: esquemas.filter((ev) => LISTA.has(ev.estado)).map((ev) => ev.key) },
     instalaciones: recuentoInstalaciones(p, evs),
+    seguridadSalud: recuentoSeguridadSalud(p),
   };
 }

@@ -24,7 +24,7 @@ import { cuantos, listaY, mayuscula } from "../cte/redaccion";
 import { textoTabla } from "../cte/memoria";
 import type { TipoColumna } from "../cte/presentacion";
 import { art4, coordinadores, dotacionHigienica, type Art4, type Coordinador, type LetraSupuesto } from "../ebss/art4";
-import { amiantoObligatorio, pendientesSeguridadSalud, preguntaCabezaFamilia } from "../ebss/datos";
+import { amiantoObligatorio, pendientesSeguridadSalud, preguntaCabezaFamilia, type PendienteDato } from "../ebss/datos";
 import { fichasDelEstudio, fichasSinRevisar } from "../ebss/propuesta";
 import { ANEXO_II, nombreRiesgo, riesgosDeFicha } from "../ebss/catalogo";
 import { distanciasLineas } from "../ebss/cifras";
@@ -64,6 +64,12 @@ export const META_ESTUDIO_BASICO: MetaDocumento = {
   asunto: TITULO_ESTUDIO_BASICO,
   descripcion: "Estudio básico de seguridad y salud (RD 1627/1997) redactado con Concreta Memorias",
 };
+
+/**
+ * El «Pendiente» de la firma sin firmantes. Los firmantes son del estudio (del
+ * navegador), no del proyecto: el recuento de Lo que se entrega no lo cuenta.
+ */
+export const SIN_FIRMANTES = "falta quién firma (los datos del estudio).";
 
 /** Un apartado del documento, ya con su contenido. */
 export interface ApartadoEstudio {
@@ -805,7 +811,7 @@ function firma(c: Contexto): ApartadoEstudio {
   const lugar = c.p.datosGenerales.municipio || "—";
   const fecha = fechaLarga(c.fecha);
   const b: BloqueMemoria[] = [parrafo(fecha ? `En ${lugar}, a ${fecha}.` : `En ${lugar}, en la fecha de la firma.`)];
-  if (c.firmantes.length === 0) b.push(pendiente("falta quién firma (los datos del estudio)."));
+  if (c.firmantes.length === 0) b.push(pendiente(SIN_FIRMANTES));
   for (const f of c.firmantes) {
     b.push(parrafo(nombreFirmante(f)));
     if (f.colegiacion) b.push({ tipo: "nota", texto: f.colegiacion });
@@ -821,33 +827,63 @@ function firma(c: Contexto): ApartadoEstudio {
  * El estudio básico del expediente, apartado a apartado. Con `completo` en el
  * art. 4, solo la justificación: el estudio básico no se redacta.
  */
-export function estudioBasico(p: Proyecto, op: OpcionesEstudioBasico = {}): EstudioBasico {
+function contextoDe(p: Proyecto, op: OpcionesEstudioBasico): Contexto {
   const ss = p.seguridadSalud ?? {};
-  const a4 = art4(ss);
   const editadas = fichasDelEstudio(p);
   const titulos = new Map(editadas.map((f) => [f.id, f.titulo]));
   const fichas = editadas.map((f) => fichaConTitulos(f, titulos));
-  const datos = pendientesSeguridadSalud(p);
-  const c: Contexto = {
+  return {
     p,
     ss,
-    a4,
+    a4: art4(ss),
     resumen: resumenEdificio(p.edificio),
     nueva: p.datosGenerales.intervencion === "obra_nueva",
     fichas,
     marcadas: new Set(fichas.map((f) => f.id)),
-    faltan: new Map(datos.map((d) => [d.id, d.texto])),
+    faltan: new Map(pendientesSeguridadSalud(p).map((d) => [d.id, d.texto])),
     firmantes: op.firmantes ?? [],
     ...(op.fecha ? { fecha: op.fecha } : {}),
   };
+}
+
+/** Con `completo`, lo único pendiente: el estudio básico no vale. */
+function pendienteCompleto(a4: Art4): PendienteDato {
+  return {
+    id: "completo",
+    texto: `Se da el supuesto ${listaY(a4.superados.map((l) => `${l})`))} del art. 4.1 del RD 1627/1997: hace falta el estudio de seguridad y salud, que la app no redacta.`,
+  };
+}
+
+function pendientesDeContexto(c: Contexto): PendienteDato[] {
+  if (c.a4.resultado === "completo") return [pendienteCompleto(c.a4)];
+  const out: PendienteDato[] = [...pendientesSeguridadSalud(c.p)];
+  for (const f of fichasSinRevisar(c.p)) out.push({ id: `ficha:${f.id}`, texto: `La ficha «${f.titulo}», redactada por la app, está sin revisar.` });
+  if (!c.p.datosGenerales.documento?.promotor?.trim()) out.push({ id: "promotor", texto: "Falta el promotor (datos del documento)." });
+  if (c.firmantes.length === 0) out.push({ id: "firmantes", texto: "Falta quién firma (los datos del estudio)." });
+  if (fasesEnOrden(c).unidades.length === 0) out.push({ id: "unidades", texto: "No hay ninguna unidad de obra marcada en la selección de fichas." });
+  if (deGrupo(c, "TP").length === 0) out.push({ id: "posteriores", texto: "No hay ninguna ficha de trabajos posteriores marcada (art. 6.3)." });
+  return out;
+}
+
+/**
+ * Lo que falta para entregar el estudio, con su id (para «Antes de entregar»,
+ * paso 6), en el orden del documento. Es la lista `pendientes` de
+ * `estudioBasico`, sin componer el documento.
+ */
+export function pendientesEstudioBasico(p: Proyecto, op: OpcionesEstudioBasico = {}): PendienteDato[] {
+  return pendientesDeContexto(contextoDe(p, op));
+}
+
+/**
+ * El estudio básico del expediente, apartado a apartado. Con `completo` en el
+ * art. 4, solo la justificación: el estudio básico no se redacta.
+ */
+export function estudioBasico(p: Proyecto, op: OpcionesEstudioBasico = {}): EstudioBasico {
+  const c = contextoDe(p, op);
+  const a4 = c.a4;
   const base = { titulo: TITULO_ESTUDIO_BASICO, proyecto: p.nombre, art4: a4 };
-  if (a4.resultado === "completo") {
-    return {
-      ...base,
-      apartados: [justificacion(c)],
-      pendientes: [`Se da el supuesto ${listaY(a4.superados.map((l) => `${l})`))} del art. 4.1 del RD 1627/1997: hace falta el estudio de seguridad y salud, que la app no redacta.`],
-    };
-  }
+  const pendientes = pendientesDeContexto(c).map((d) => d.texto);
+  if (a4.resultado === "completo") return { ...base, apartados: [justificacion(c)], pendientes };
   const casos = casosAnexoII(c);
   const apartados: ApartadoEstudio[] = [
     datosGenerales(c, casos),
@@ -865,14 +901,6 @@ export function estudioBasico(p: Proyecto, op: OpcionesEstudioBasico = {}): Estu
     posteriores(c),
     obligaciones(c),
     firma(c),
-  ];
-  const pendientes = [
-    ...datos.map((d) => d.texto),
-    ...fichasSinRevisar(p).map((f) => `La ficha «${f.titulo}», redactada por la app, está sin revisar.`),
-    ...(p.datosGenerales.documento?.promotor?.trim() ? [] : ["Falta el promotor (datos del documento)."]),
-    ...(c.firmantes.length > 0 ? [] : ["Falta quién firma (los datos del estudio)."]),
-    ...(fasesEnOrden(c).unidades.length > 0 ? [] : ["No hay ninguna unidad de obra marcada en la selección de fichas."]),
-    ...(deGrupo(c, "TP").length > 0 ? [] : ["No hay ninguna ficha de trabajos posteriores marcada (art. 6.3)."]),
   ];
   return { ...base, apartados, pendientes };
 }

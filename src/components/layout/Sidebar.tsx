@@ -1,6 +1,6 @@
 import { useContext, type JSX } from "react";
 import { Link, NavLink } from "react-router";
-import { Building2, HardHat, ScrollText, X } from "lucide-react";
+import { Building2, HardHat, ScrollText, ShieldCheck, X } from "lucide-react";
 import { ObraMenu } from "./ObraMenu";
 import { justificacionesPorGrupo, type JustificacionEntry } from "../../data/justificacionRegistry";
 import { ProyectoContext } from "../../lib/proyecto/ProyectoContext";
@@ -14,8 +14,9 @@ import { ENGINE_VERSION } from "../../lib/version";
 //
 //   - Arriba, el menú de obra (ObraMenu): nueva, datos, duplicar, guardar,
 //     exportar/importar .json y recientes.
-//   - «Proyecto»: La obra, El edificio y la Memoria CTE con sus apartados
-//     listos (feature-16).
+//   - «Proyecto»: La obra, El edificio, la Memoria CTE con sus apartados
+//     listos (feature-16) y Seguridad y salud (feature-35), con el glifo del
+//     estudio básico: ✕ hace falta el completo · ! queda algo · ✓ listo.
 //   - Todas las justificaciones del registry agrupadas por DB, con su código y
 //     un glifo de estado a la derecha: ✓ cumple · ! por revisar · ✕ no cumple ·
 //     «pronto» si aún no existe · ↗ si se justifica fuera. Las no publicadas
@@ -160,7 +161,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   // Tolerante a null: la Sidebar también se monta en /_smoke, sin provider.
   const ctx = useContext(ProyectoContext);
   const proyecto = ctx?.proyecto ?? null;
-  const memoria = proyecto !== null ? entregables(proyecto).memoria : null;
+  const e = proyecto !== null ? entregables(proyecto) : null;
+  const memoria = e?.memoria ?? null;
+  const ss = e?.seguridadSalud ?? null;
+  const glifoSs: Glifo | null =
+    ss === null || !ss.empezado
+      ? null
+      : ss.resultado === "completo"
+        ? { texto: "Hace falta el estudio completo", simbolo: "✕", clase: "text-state-fail font-bold" }
+        : ss.listos < ss.total
+          ? { texto: `${ss.listos} de ${ss.total} apartados listos`, simbolo: "!", clase: "text-state-warn font-bold" }
+          : { texto: "Estudio básico listo", simbolo: "✓", clase: "text-state-ok" };
 
   const grupos = justificacionesPorGrupo()
     .map((g) => ({
@@ -225,6 +236,19 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   >
                     {memoria!.listos}/{memoria!.total}
                   </span>
+                </>
+              )}
+            </NavLink>
+            <NavLink to={`/p/${proyecto.id}/seguridad-salud`} onClick={onClose} className={navClass}>
+              {({ isActive }) => (
+                <>
+                  <Icono icon={ShieldCheck} activo={isActive} />
+                  <span className="min-w-0 flex-1 truncate">Seguridad y salud</span>
+                  {glifoSs !== null && (
+                    <span className={`ml-auto font-mono text-[11px] ${glifoSs.clase}`} role="img" aria-label={`Estado: ${glifoSs.texto}`} title={glifoSs.texto}>
+                      {glifoSs.simbolo}
+                    </span>
+                  )}
                 </>
               )}
             </NavLink>

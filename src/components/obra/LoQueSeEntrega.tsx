@@ -7,19 +7,20 @@ import { descargarBlob } from "../../lib/export/descargar";
 import { GeneradorAnejo } from "../proyecto/GeneradorAnejo";
 import { showToast } from "../ui/Toast";
 import { RotuloSeccion } from "./LoQueSeJustifica";
-import { useExportarAnejoInstalaciones, useExportarMemoria } from "./useExportarMemoria";
+import { useExportarAnejoInstalaciones, useExportarEstudioBasico, useExportarMemoria } from "./useExportarMemoria";
 
 // =============================================================================
 // «Lo que se entrega» (feature-16 §D, maqueta v4 de La obra): la memoria CTE
 // (Word y PDF), las fichas justificativas (el anejo en PDF) y los esquemas para
-// el plano (DXF), cada uno con lo que tiene listo. Lo que no cumple no cuenta
+// el plano (DXF) y el estudio básico de seguridad y salud (feature-35), cada uno
+// con lo que tiene listo. Lo que no cumple no cuenta
 // como listo y se nombra.
 // =============================================================================
 
 const ACCION =
   "text-accent hover:text-accent-hover focus-visible:outline-accent inline-flex items-center gap-1 text-[12.5px] font-medium hover:underline focus-visible:outline-2 disabled:cursor-wait disabled:opacity-60 disabled:no-underline";
 
-type TipoEntregable = "memoria" | "anejo" | "fichas" | "esquemas";
+type TipoEntregable = "memoria" | "anejo" | "fichas" | "esquemas" | "seguridad";
 
 function Miniatura({ tipo }: { tipo: TipoEntregable }): JSX.Element {
   const trazo = "var(--color-text-disabled)";
@@ -42,6 +43,13 @@ function Miniatura({ tipo }: { tipo: TipoEntregable }): JSX.Element {
         </>
       )}
       {tipo === "esquemas" && <path d="M34 12v46M14 22h20M14 34h20M14 46h20M34 58H14" stroke={trazo} strokeWidth="1.6" />}
+      {tipo === "seguridad" && (
+        <>
+          <path d="M28 12l9 15H19z" fill="none" stroke={trazo} strokeWidth="1.4" strokeLinejoin="round" />
+          <path d="M28 18v4M28 24.5v.5" stroke={trazo} strokeWidth="1.4" />
+          <path d="M12 34h32M12 40h32M12 46h32M12 52h20" stroke={trazo} strokeWidth="1.6" />
+        </>
+      )}
     </svg>
   );
 }
@@ -97,6 +105,7 @@ export function LoQueSeEntrega(): JSX.Element {
   const e = entregables(proyecto);
   const memoria = useExportarMemoria();
   const anejo = useExportarAnejoInstalaciones();
+  const estudioBasico = useExportarEstudioBasico();
   const [dxf, setDxf] = useState(false);
 
   const descargarDxf = async () => {
@@ -212,9 +221,54 @@ export function LoQueSeEntrega(): JSX.Element {
             </button>
           }
         />
+        <Entregable
+          tipo="seguridad"
+          titulo="Estudio básico de seguridad y salud"
+          descripcion="La justificación del art. 4 y las fichas de riesgos de lo que tiene esta obra, con el amianto, el anexo II y los trabajos posteriores."
+          estado={
+            e.seguridadSalud.resultado === "completo" ? (
+              <span className="text-state-fail font-mono text-[11px] whitespace-nowrap">hace falta el estudio completo</span>
+            ) : e.seguridadSalud.empezado ? (
+              <Recuento r={e.seguridadSalud} unidad={["apartado", "apartados"]} />
+            ) : (
+              <span className="text-text-disabled font-mono text-[11px] whitespace-nowrap">sin empezar</span>
+            )
+          }
+          acciones={
+            <>
+              <Link to="seguridad-salud" aria-label="Datos y fichas del estudio básico" className={ACCION}>
+                Datos
+              </Link>
+              <Link to="estudio-basico" aria-label="Leer el estudio básico" className={ACCION}>
+                Leer
+              </Link>
+              <button
+                type="button"
+                onClick={estudioBasico.word}
+                disabled={estudioBasico.ocupado !== null || !e.seguridadSalud.empezado}
+                aria-label="Estudio básico en Word"
+                className={ACCION}
+              >
+                {estudioBasico.ocupado === "word" && girando}
+                Word
+              </button>
+              <button
+                type="button"
+                onClick={estudioBasico.pdf}
+                disabled={estudioBasico.ocupado !== null || !e.seguridadSalud.empezado}
+                aria-label="Estudio básico en PDF"
+                className={ACCION}
+              >
+                {estudioBasico.ocupado === "pdf" && girando}
+                PDF
+              </button>
+            </>
+          }
+        />
       </ul>
       {memoria.modal}
       {anejo.modal}
+      {estudioBasico.modal}
     </section>
   );
 }

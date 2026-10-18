@@ -107,6 +107,8 @@ describe("entregables", () => {
       esquemas: { listos: 2, total: 2, noCumplen: [], claves: ["hs5", "hs4"] },
       // HS 4 y HS 5 desarrollan su anejo desde feature-33; el REBT, desde feature-34.
       instalaciones: { listos: 3, total: 3, noCumplen: [] },
+      // feature-35: sin empezar, el estudio básico sale con sus pendientes.
+      seguridadSalud: { listos: 10, total: 15, noCumplen: [], resultado: "pendiente", empezado: false },
     });
   });
 
@@ -116,6 +118,7 @@ describe("entregables", () => {
       fichas: { listos: 24, total: 25, noCumplen: ["HS4"] },
       esquemas: { listos: 1, total: 2, noCumplen: ["HS4"], claves: ["hs5"] },
       instalaciones: { listos: 2, total: 3, noCumplen: ["HS4"] },
+      seguridadSalud: { listos: 10, total: 15, noCumplen: [], resultado: "pendiente", empezado: false },
     });
   });
 });
