@@ -80,6 +80,12 @@ export interface AlcanceEdificio {
   pasaARecintoActividad: boolean;
   /** Se interviene en viviendas, trasteros o garaje: locales del ámbito de HS 3. */
   intervieneLocalesHs3: boolean;
+  /**
+   * Se construye, reforma o cambia de uso alguna zona común (portal, escalera,
+   * pasillos): lo que decide el Decreto 293/2009 andaluz en un edificio existente
+   * (art. 2.1 j, feature-36). Sin marcas, todo cuenta como reformado.
+   */
+  intervieneComunes: boolean;
   /** Demanda de ACS de referencia antes y después de la ampliación [l/d] (HE 4 c). */
   demandaAcs: { inicial_l_d: number; final_l_d: number };
 }
@@ -121,6 +127,7 @@ export function alcanceDeEdificio(
     viviendaEnEdificioDeViviendas: pasaAVivienda && viviendasPrevias,
     pasaARecintoActividad: conViviendas && cambiosUso.some((c) => ACTIVIDAD.has(c.uso)),
     intervieneLocalesHs3: todas.some((z) => obra(z) !== "existente" && LOCALES_HS3.has(z.uso)),
+    intervieneComunes: todas.some((z) => obra(z) !== "existente" && (z.uso === "zona_comun" || z.uso === "vestibulo")),
     demandaAcs: {
       inicial_l_d: demandaReferencia(sinNuevas, estadoHe4),
       final_l_d: demandaReferencia(edificio, estadoHe4),

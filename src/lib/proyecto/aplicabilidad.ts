@@ -15,7 +15,8 @@ import { recargaDeHe6 } from "../../modules/he6/justificacion";
 import { edificioSi } from "../../modules/si/edificio";
 import { edificioSua } from "../../modules/sua/edificio";
 import { alcanceDeEdificio, tiposDeObra } from "./alcance";
-import { promocionDe } from "./promocion";
+import { comunidadDeObra, promocionDe } from "./promocion";
+import type { ComunidadAutonoma } from "../../data/comunidades";
 import {
   CITA_MANTENIMIENTO,
   HE1_SIN_K,
@@ -58,6 +59,12 @@ export interface AtributosProyecto {
    * proyectista en La obra; sin contestar, `undefined` y el módulo lo pide.
    */
   propiedadHorizontal?: boolean;
+  /**
+   * Accesibilidad autonómica (feature-36): la comunidad del municipio y la
+   * autopromoción individual para uso propio que declara el proyectista.
+   */
+  comunidad?: ComunidadAutonoma;
+  autopromocion?: boolean;
   /**
    * Demanda de ACS de referencia del edificio [l/d] (DB-HE Anejo F, feature-22),
    * con las decisiones guardadas de HE 4. Sin ella, la regla de HE 4 no se evalúa.
@@ -108,6 +115,8 @@ export function atributosDe(
     tieneTrasteros: r.tieneTrasteros,
     iluminacionHe3: edificioSua(edificio).zonas.some((z) => z.clase !== "vivienda" && z.clase !== "garaje_vivienda"),
     propiedadHorizontal: promocionDe(dg).propiedadHorizontal,
+    comunidad: comunidadDeObra(dg),
+    autopromocion: promocionDe(dg).autopromocion,
     demandaAcs_l_d: demandaReferencia(edificio, estadoHe4),
     superficieConstruida_m2,
     plazasAparcamiento: he6.plazas,
@@ -119,6 +128,7 @@ export function atributosDe(
         alcance,
         edificio: alcanceDeEdificio(dg, edificio, estadoHe4),
         superficieConstruida_m2,
+        comunidad: comunidadDeObra(dg),
       },
     },
   };
@@ -342,6 +352,23 @@ export const REGLAS_ATRIBUTOS: readonly ReglaAtributo[] = [
       "edificio no está acogido, ni debe acogerse, al régimen de propiedad horizontal, " +
       "ni se arrienda por plazo superior a un año (RD-ley 1/1998, art. 2).",
     cita: "RD-ley 1/1998, art. 2",
+  },
+  // ── Accesibilidad autonómica (feature-36) ─────────────────────────────────
+  {
+    // Decreto 293/2009 (K-MEM.14 y 22, VERIFICADO): la unifamiliar no tiene
+    // elementos de uso comunitario (art. 2.1 j), su interior de vivienda libre no
+    // tiene exigencias y la autopromoción para uso propio queda fuera del art. 106
+    // (106.5). Solo Andalucía: en otra comunidad la decide su norma.
+    key: "acc",
+    cuando: (a) => a.comunidad === "andalucia" && a.esUnifamiliar && a.autopromocion === true,
+    resultado: "no_aplica",
+    nota:
+      "Accesibilidad: el Decreto 293/2009 de Andalucía no tiene exigencias para esta " +
+      "vivienda — es unifamiliar, sin elementos de uso comunitario (art. 2.1 j); su " +
+      "interior, de vivienda libre no reservada, no tiene exigencias, y como " +
+      "autopromoción individual para uso propio queda excluida de las de " +
+      "comunicación vertical (art. 106.5).",
+    cita: "Decreto 293/2009, arts. 2.1 j y 106.5",
   },
   // ── Habitabilidad (feature-32) ────────────────────────────────────────────
   {

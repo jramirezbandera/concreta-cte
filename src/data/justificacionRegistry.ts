@@ -2,7 +2,7 @@ import type { ComponentType } from "react";
 import {
   Wind, Droplets, Waves, Thermometer, FlaskConical, Radiation, CloudRain, BrickWallFire, Truck, Columns3, FireExtinguisher, Flame, DoorOpen,
   Footprints, ShieldAlert, LockKeyhole, Lightbulb, Users, Car, CloudLightning, Accessibility, Trash2,
-  ShowerHead, SolarPanel, Zap, EvCharger, Ear, Gauge, Weight, LifeBuoy, SunMedium, LampCeiling, RadioTower, AirVent,
+  ShowerHead, SolarPanel, Zap, EvCharger, Ear, Gauge, Weight, LifeBuoy, SunMedium, LampCeiling, RadioTower, AirVent, PersonStanding,
 } from "lucide-react";
 import type { JustificacionKey } from "../lib/proyecto/tipos";
 
@@ -472,6 +472,20 @@ export const justificacionRegistry: JustificacionEntry[] = [
     shipped: true,
     route: "ict",
     icon: RadioTower,
+    schemaVersion: "1",
+  },
+  // ── Accesibilidad autonómica (feature-36): plantilla de Andalucía; el resto, declarada ─
+  {
+    key: "acc",
+    codigo: "ACC",
+    label: "Accesibilidad autonómica",
+    grupo: "Accesibilidad (autonómica)",
+    db: "Accesibilidad",
+    edicionDB: "Decreto 293/2009 de Andalucía, o la norma declarada",
+    formato: "checker",
+    shipped: true,
+    route: "accesibilidad",
+    icon: PersonStanding,
     schemaVersion: "1",
   },
   // ── Externas (se resuelven fuera de la app; La obra referencia el documento) ─

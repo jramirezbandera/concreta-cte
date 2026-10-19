@@ -102,8 +102,8 @@ describe("antesDeEntregar", () => {
 describe("entregables", () => {
   it("el Demo: todo listo", () => {
     expect(entregables(demo())).toEqual({
-      memoria: { listos: 30, total: 30, noCumplen: [] },
-      fichas: { listos: 28, total: 28, noCumplen: [] },
+      memoria: { listos: 31, total: 31, noCumplen: [] },
+      fichas: { listos: 29, total: 29, noCumplen: [] },
       esquemas: { listos: 2, total: 2, noCumplen: [], claves: ["hs5", "hs4"] },
       // HS 4 y HS 5 desarrollan su anejo desde feature-33; el REBT, desde feature-34.
       instalaciones: { listos: 3, total: 3, noCumplen: [] },
@@ -114,8 +114,8 @@ describe("entregables", () => {
 
   it("lo que no cumple no cuenta como listo", () => {
     expect(entregables(conHs4Fallando())).toEqual({
-      memoria: { listos: 29, total: 30, noCumplen: ["HS4"] },
-      fichas: { listos: 27, total: 28, noCumplen: ["HS4"] },
+      memoria: { listos: 30, total: 31, noCumplen: ["HS4"] },
+      fichas: { listos: 28, total: 29, noCumplen: ["HS4"] },
       esquemas: { listos: 1, total: 2, noCumplen: ["HS4"], claves: ["hs5"] },
       instalaciones: { listos: 2, total: 3, noCumplen: ["HS4"] },
       seguridadSalud: { listos: 10, total: 15, noCumplen: [], resultado: "pendiente", empezado: false },
@@ -160,6 +160,7 @@ describe("memoriaCte", () => {
       "REBT:redactado",
       "HAB:redactado",
       "ICT:redactado",
+      "ACC:redactado",
     ]);
     const enc = (k: string) => m.apartados.find((a) => a.key === k)!.encabezado;
     expect(enc("hs5")).toBe("3.4.5. HS 5 Evacuación de aguas");
@@ -172,6 +173,7 @@ describe("memoriaCte", () => {
     expect(enc("he4")).toBe("3.6.5. HE 4 Contribución mínima de energía renovable para cubrir la demanda de agua caliente sanitaria");
     expect(enc("rebt")).toBe("4.1.1. ITC-BT-10 Grado de electrificación y previsión de cargas");
     expect(enc("ict")).toBe("4.3. Infraestructuras comunes de telecomunicaciones (ICT)");
+    expect(enc("acc")).toBe("4.4. Accesibilidad");
     // SE y HR son la sección entera: sin título propio.
     expect(m.apartados.find((a) => a.key === "hr")).toMatchObject({ sinTitulo: true, encabezado: "3.5. Protección frente al ruido DB HR" });
     expect(m.apartados.find((a) => a.key === "dbse")).toMatchObject({ sinTitulo: true, encabezado: "3.1. Seguridad estructural DB SE" });
@@ -210,6 +212,7 @@ describe("memoriaCte", () => {
       "4.1. Reglamento electrotécnico para baja tensión (REBT)",
       "4.2. Habitabilidad",
       "4.3. Infraestructuras comunes de telecomunicaciones (ICT)",
+      "4.4. Accesibilidad",
     ]);
     // Ni el proyecto en el cuerpo, ni la jerga de la ficha en las fuentes.
     expect(b.some((x) => x.tipo === "parrafo" && x.texto.startsWith("Demo — "))).toBe(false);

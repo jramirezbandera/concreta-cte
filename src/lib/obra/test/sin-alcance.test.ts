@@ -32,7 +32,9 @@ import antes from "./foto-antes.json";
 // salen los datos de la obra de los 40, pasa a estar en propiedad horizontal).
 // En el paso 4 (HE 2 · RITE) se añade la fila «rite» y cambia la huella de la
 // memoria, por el apartado 3.6.3 y la numeración del 3.6; el REBT, que lee la
-// climatización del RITE, no cambia (lo habitual sigue siendo la aire-aire).
+// climatización del RITE, no cambia (lo habitual sigue siendo la aire-aire). En
+// el paso 5 (accesibilidad autonómica) se añade la fila «acc» y cambia la huella
+// de la memoria, por el apartado 4.4; nada más.
 // =============================================================================
 
 describe("sin asistente de alcance, nada cambia", () => {

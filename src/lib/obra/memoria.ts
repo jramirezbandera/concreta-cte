@@ -61,6 +61,7 @@ export const SECCIONES: readonly SeccionDocumento[] = [
   { capitulo: 4, numero: "4.1", titulo: "Reglamento electrotécnico para baja tensión (REBT)", keys: ["rebt"] },
   { capitulo: 4, numero: "4.2", titulo: "Habitabilidad", keys: ["hab"], sinSubapartados: true },
   { capitulo: 4, numero: "4.3", titulo: "Infraestructuras comunes de telecomunicaciones (ICT)", keys: ["ict"], sinSubapartados: true },
+  { capitulo: 4, numero: "4.4", titulo: "Accesibilidad", keys: ["acc"], sinSubapartados: true },
 ];
 
 /**

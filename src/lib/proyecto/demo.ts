@@ -19,6 +19,7 @@ import { habEstadoDefaults, type EstanciaHab, type HabEstado } from "../../modul
 import { he3EstadoDefaults, type He3Estado } from "../../modules/he3/estado";
 import { ictEstadoDefaults } from "../../modules/ict/estado";
 import { riteEstadoDefaults, type RiteEstado } from "../../modules/rite/estado";
+import type { AccEstado } from "../../modules/acc/estado";
 import { COMPUTAN_HABITUAL, type TipoEstancia } from "../habitabilidad/norma";
 import type { ZonaClimatica } from "../../modules/he1/tablas";
 import {
@@ -130,6 +131,13 @@ const RITE_DEMO: RiteEstado = {
   potenciaAcs_kW: 1.8,
   acumulacion_l: 200,
 };
+
+/**
+ * Accesibilidad autonómica (feature-36): Cáceres está en Extremadura, sin
+ * plantilla en la herramienta. NORMA DE DEMOSTRACIÓN, como la de habitabilidad:
+ * el rótulo lo dice para que no pase a una memoria real.
+ */
+const ACC_DEMO: AccEstado = { normaOtra: "Norma de accesibilidad de demostración (sustituir por la de la comunidad)" };
 
 /** Una estancia del Demo: [id, nombre, tipo, Su, hueco]. */
 type FilaEstancia = [string, string, TipoEstancia, number, number | null];
@@ -262,6 +270,7 @@ export function crearProyectoDemo(nowIso: string): Proyecto {
       he3: justificacionDemo(structuredClone(HE3_DEMO)),
       ict: justificacionDemo(structuredClone(ictEstadoDefaults)),
       rite: justificacionDemo(structuredClone(RITE_DEMO)),
+      acc: justificacionDemo(structuredClone(ACC_DEMO)),
     },
   };
 }

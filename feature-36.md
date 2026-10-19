@@ -364,6 +364,43 @@ Con el Decreto (K-MEM.14 y 15):
 
 Unifamiliar: «sin zonas comunes» como motivo, no «no es vivienda adaptada».
 
+**Hecho (2026-10-19).** 14 tests en `src/modules/acc/test/acc.test.ts`; comprobado en el navegador
+(el Demo en Cáceres con la norma declarada y el mismo Demo en Málaga con la plantilla; memoria 4.4; sin
+errores de consola):
+- [src/modules/acc/](src/modules/acc/) con el patrón de la ICT: `tablas.ts` (art. 106.2, reserva de la
+  Ley 4/2017 y la Ficha IV, tramos del art. 104; `exigenciaVertical`, `viviendasReservadas`),
+  `estado.ts` (la norma de otra comunidad y la declaración de la DA 1.ª), `justificacion.ts`,
+  `textos.ts`, `memoria.ts`, `dibujo.ts`, `definicion.ts` y `ui.tsx`.
+- **Andalucía** (comunidad por el INE del municipio): la norma; itinerarios del art. 104 (sin medidas:
+  la Ficha III no está transcrita); comunicación vertical por el 106.2 frente a lo que exige SUA 9, con
+  aviso si no coinciden y la tabla «DB-SUA 9 | Decreto | Proyecto»; reserva de viviendas frente a las
+  accesibles de SUA 9; en existente, lo modificado y la DA 1.ª; otros usos, «fuera» (Ficha II).
+- **Otra comunidad**: solo la norma declarada; sin ella (o sin municipio), «no cumple».
+- Aplicabilidad: regla de atributos (Andalucía, unifamiliar y autopromoción → `no_aplica` con el
+  motivo); en existente, `acc` en `REGLAS_EXISTENTES` con `AlcanceEdificio.intervieneComunes` (nuevo:
+  alguna zona común nueva, reformada o que cambia de uso) y `ContextoExistente.comunidad`.
+- Registro (ruta `accesibilidad`, grupo «Accesibilidad (autonómica)»), La obra, anejo, memoria (4.4) y
+  Demo con una norma de demostración rotulada (Cáceres no tiene plantilla).
+- Foto del expediente: la fila `acc` y la huella de la memoria; nada más.
+
+**Decisiones del paso 5, a validar:**
+1. **Solo Andalucía con plantilla**; en otra comunidad, la norma con su referencia y una línea de
+   remisión, sin comprobar nada.
+2. **La unifamiliar que no es de autopromoción entra en el art. 106.2** (INTERPRETACIÓN: el 106.5 solo
+   tiene sentido si el 106 la alcanza): PB+1 pide reserva de hueco y PB+2, ascensor. Sin contestar la
+   autopromoción, «no cumple».
+3. **Las viviendas reservadas las cuenta SUA 9** (sus viviendas accesibles para silla de ruedas): si
+   son menos que la reserva, «no cumple» con el texto que dice cuántas indicar en SUA 9.
+4. **Sin ascensor declarado en El edificio, se supone el que exija el Decreto o SUA 9**; con «no»
+   explícito y el Decreto pidiéndolo, «no cumple».
+5. **En existente, la comunicación vertical es un dato**, sin «no cumple»: se aplica a lo modificado y,
+   si no se puede, la DA 1.ª y las ayudas técnicas.
+6. **Promoción protegida de menos de 17 viviendas: cero reservadas con un aviso** (la Ley 4/2017 no fija
+   umbral; sin confirmar).
+7. **Los edificios de otros usos, «fuera»** (Ficha II): la app no la trae.
+8. **No se imprimen las medidas de la Ficha III** (anchos, rampas, escaleras, mecanismos): no están
+   transcritas; la memoria remite a la ficha.
+
 ### Paso 6 · Coherencia en «Antes de entregar»
 
 `coherencia(p)`, puro, en `src/lib/obra/coherencia.ts`, con una comprobación por tema y su

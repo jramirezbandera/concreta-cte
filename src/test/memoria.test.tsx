@@ -29,7 +29,7 @@ describe("«/p/demo/memoria»", () => {
     await renderApp(`#/p/${DEMO_ID}/memoria`);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Cumplimiento del CTE" }, { timeout: 20000 })).toBeInTheDocument();
-    expect(screen.getByText("30 de 30 apartados listos")).toBeInTheDocument();
+    expect(screen.getByText("31 de 31 apartados listos")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "3.4.5. HS 5 Evacuación de aguas" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "3.3.6. SUA 6 Seguridad frente al riesgo de ahogamiento" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "3.4.1. HS 1 Protección frente a la humedad" })).toBeInTheDocument();
@@ -45,7 +45,7 @@ describe("«/p/demo/memoria»", () => {
     expect(screen.getByRole("heading", { name: "4.2. Habitabilidad" })).toBeInTheDocument();
     // Desde feature-25 (HR) no queda nada por redactar.
     expect(screen.queryByText(/Aún sin redactar/)).toBeNull();
-    expect(screen.getByRole("link", { name: /Memoria CTE/ })).toHaveTextContent("30/30");
+    expect(screen.getByRole("link", { name: /Memoria CTE/ })).toHaveTextContent("31/31");
 
     // user-event pone su propio portapapeles: se espía después de crearlo.
     const user = userEvent.setup();

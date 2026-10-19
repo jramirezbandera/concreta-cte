@@ -7,6 +7,7 @@ import type {
   TipoObraExistente,
 } from "./tipos";
 import type { AlcanceEdificio } from "./alcance";
+import type { ComunidadAutonoma } from "../../data/comunidades";
 
 // Reglas de aplicabilidad en edificios existentes (feature-27, paso 2).
 // Lib PURA. Para cada justificación y cada tipo de obra, la propuesta del bloque D
@@ -24,6 +25,8 @@ export interface ContextoExistente {
   edificio: AlcanceEdificio;
   /** Superficie construida del edificio [m²] (HE 5). */
   superficieConstruida_m2?: number;
+  /** La comunidad autónoma de la obra (accesibilidad autonómica, feature-36). */
+  comunidad?: ComunidadAutonoma;
 }
 
 /** Propuesta de una regla. */
@@ -622,6 +625,30 @@ function rite(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
   return noAplica(`${RITE}: no es de aplicación — la intervención no reforma ni amplía las instalaciones térmicas (RITE art. 2).`, CITA_RITE);
 }
 
+const ACC = "Accesibilidad";
+const CITA_ACC = "Decreto 293/2009, arts. 2.1 j y 2.2";
+
+/**
+ * Accesibilidad autonómica en un edificio existente (K-MEM.14 y 22): en
+ * Andalucía, el Decreto alcanza a los elementos de uso comunitario que se
+ * construyen, reforman o cambian de uso, y en la reforma solo a lo modificado
+ * (art. 2.1 j y 2.2); el interior de la vivienda libre, nada. Fuera de Andalucía
+ * decide la norma declarada: se propone que aplique.
+ */
+function accExistente(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
+  if (c.comunidad !== "andalucia") return reformado(`${ACC}: se aplica la norma autonómica de accesibilidad a lo que la obra construye, reforma o cambia de uso.`, "Norma autonómica de accesibilidad");
+  if (caso === "cambio_uso_caracteristico") {
+    return aplica(`${ACC}: el edificio cambia su uso característico; el Decreto 293/2009 se aplica a sus elementos de uso comunitario (art. 2.1 j).`, CITA_ACC);
+  }
+  if (c.edificio.intervieneComunes) {
+    return reformado(`${ACC}: se aplica el Decreto 293/2009 a los elementos de uso comunitario que se reforman o cambian de uso, y solo a ellos (art. 2.1 j, segunda frase, y 2.2).`, CITA_ACC);
+  }
+  return noAplica(
+    `${ACC}: el Decreto 293/2009 no tiene exigencias para esta obra — no construye, reforma ni cambia de uso elementos de uso comunitario (art. 2.1 j), y el interior de la vivienda libre no reservada no tiene exigencias.`,
+    CITA_ACC,
+  );
+}
+
 const ICT = "Infraestructuras comunes de telecomunicaciones";
 const CITA_ICT = "RD-ley 1/1998, art. 3.1";
 
@@ -768,6 +795,7 @@ export const REGLAS_EXISTENTES: Partial<Record<JustificacionKey, Regla>> = {
   hab,
   ict,
   rite,
+  acc: accExistente,
   dbse,
 };
 
