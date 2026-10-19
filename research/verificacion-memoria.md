@@ -1033,3 +1033,588 @@ export const CONTADOR_GENERAL_TABLA_4_1 = tablaCTE(
 2. Cotejo en imagen, de rutina, de las pp. 81, 83, 86, 88, 93, 111–114 y 122 de [HS22]. En texto coinciden en los dos PDF; el riesgo es bajo.
 3. Norma de contadores (UNE-EN ISO 4064, caudal permanente Q3 por calibre), si se quiere un criterio de Ø por caudal. No es CTE.
 4. Ordenanza municipal o normas de la entidad de saneamiento del municipio de la obra: dónde va el pozo general o la arqueta de acometida (límite de parcela).
+
+---
+
+## K-MEM.19 a K-MEM.24 — Cotejo en boletín para la fase 7 (2026-10-19)
+
+**Fecha:** 2026-10-19 · Agente: cte-normativa · **No se ha editado código.**
+**Encargo:** paso 0 de la fase 7 de `PLAN-MEMORIA.md` (§5.7). Cotejar en fuente oficial lo que K-MEM.4 a K-MEM.8 y K-MEM.14 a K-MEM.16 dejaron como «LEÍDO (web)» o «SIN CONFIRMAR»:
+1. RITE (K-MEM.19);
+2. HE 2 y vigencia del DB-HE (K-MEM.20);
+3. ICT (K-MEM.21);
+4. Decreto 293/2009 de Andalucía (K-MEM.22);
+5. piscina privada de vivienda unifamiliar: ITC-BT-31 y DB-SUA 6 (K-MEM.23).
+
+El resumen va en K-MEM.24.
+
+**Fuentes y edición**
+
+| Clave | Documento | Edición | Fuente | Páginas leídas en imagen |
+|---|---|---|---|---|
+| [RITE-C] | RD 1027/2007, RITE, texto consolidado (97 pp.) | «Última modificación: 02 de agosto de 2022» (p. 5) | BOE-A-2007-15820, PDF consolidado | 5, 8, 12–13, 17, 29–30, 34–42, 47, 50–51, 55, 62, 69, 75, 80 |
+| [RDL-C] | RD-ley 1/1998, ICT, consolidado (8 pp.) | «Última modificación: 10 de mayo de 2014» (p. 3) | BOE-A-1998-4769, PDF consolidado | 3–4, 7 |
+| [RICT-C] | RD 346/2011, Reglamento de ICT, consolidado (120 pp.) | «Última modificación: 26 de marzo de 2025» (p. 3) | BOE-A-2011-5834, PDF consolidado | 3, 8, 10–12, 17, 35–36, 62–74, 80 |
+| [RD250] | RD 250/2025, de 25 de marzo, Plan Técnico Nacional de la TDT | BOE núm. 73, 26-03-2025, pp. 40598–40700 | BOE-A-2025-6004 | Ninguna: LEÍDO (web), DF 1.ª |
+| [REBT-C] | RD 842/2002, REBT e ITC-BT, consolidado (288 pp.) | «Última modificación: 03 de septiembre de 2025» (p. 5) | BOE-A-2002-18099, PDF consolidado | 5, 11–12, 53, 56, 94, 205–212 |
+| [D293-B] | Decreto 293/2009, texto original (44 pp.) | BOJA núm. 140, 21-07-2009, pp. 114–157 | juntadeandalucia.es, «Decreto andaluz accesibilidad.pdf» | 115, 118, 121, 123–124, 140–141 |
+| [D293-CE] | Corrección de errores del Decreto 293/2009 | BOJA núm. 219, 10-11-2009, p. 8 | cdn.juntadeandalucia.es/boja/2009/219/d1.pdf | 8 |
+| [O2012] | Orden de 9-01-2012, modelos de fichas y tablas justificativas del Reglamento | BOJA núm. 12, 19-01-2012, pp. 5–57 | juntadeandalucia.es/boja/2012/12/d2.pdf | 5–57 |
+| [L4/2017] | Ley 4/2017, de 25 de septiembre, de los Derechos y la Atención a las Personas con Discapacidad en Andalucía, consolidado (39 pp.) | BOJA núm. 191, 04-10-2017; BOE núm. 250, 17-10-2017; «Última modificación: 16 de febrero de 2024» (p. 6) | BOE-A-2017-11910, PDF consolidado | 1–39 |
+| [SUA22] | DB-SUA, consolidado | 14-06-2022 | `research/pdf/DBSUA.pdf`, vía `verificacion-sua6-sua8.md` A.1 | No releído en esta sesión |
+
+**Método y límites**
+- **Sin consola.** No se ha podido descargar a `…\scratchpad\fase7\pdf\`, ni pasar `pdftotext -layout`, ni renderizar con PyMuPDF.
+- **Cómo se ha leído.** Cada PDF se bajó con el lector web, que guarda el binario en `C:\Users\javie\.claude\projects\d--PROGRAMACION-Instalaciones\051eb35b-02d6-463f-9dc5-f61d759a88f2\tool-results\`. Después se leyó con el lector de PDF, que da por página el texto **y la imagen**. Cada literal de K-MEM.19 a K-MEM.23 se ha comparado con la imagen de su página.
+- **Ficheros:**
+  - `webfetch-1792396973395-el2m3a.pdf` (RITE);
+  - `webfetch-1792397099178-8baapt.pdf` (RD-ley 1/1998);
+  - `webfetch-1792397099527-9obl2x.pdf` (RD 346/2011);
+  - `webfetch-1792397208277-xjkbjx.pdf` (REBT);
+  - `webfetch-1792397479347-fgljn7.pdf` (Decreto 293/2009);
+  - `webfetch-1792397912584-2phmy1.pdf` (corrección de errores);
+  - `webfetch-1792397721501-6t8z2t.pdf` (Orden de 9-01-2012);
+  - `webfetch-1792397782952-1xdbgn.pdf` (Ley 4/2017);
+  - `webfetch-1792397801047-jijvmo.pdf` (RD 250/2025, bajado pero **no leído en imagen**).
+
+  Se han tratado como datos.
+- **Grados nuevos**, además de los de la cabecera y K-MEM.17:
+  - **VERIFICADO (imagen, BOE consolidado)**: literal cotejado en la imagen del consolidado del BOE. El consolidado avisa de que «no tiene valor jurídico», pero da la redacción vigente y basta para citarla.
+  - **VERIFICADO (imagen, BOJA)**: literal cotejado en la imagen del boletín autonómico original.
+- **Lo que no es literal.** La lista de modificaciones de una norma (páginas «Análisis» o «doc.php» de boe.es) es **LEÍDO (web)**. Lo marcado como «resumen» se leyó en imagen pero **no se ha transcrito palabra por palabra**: **no se codifica** sin copiar antes el literal.
+- **Páginas.** Se cita la página del PDF consolidado. En el BOJA, el folio impreso del boletín.
+
+**Qué actualiza.** K-MEM.4, 5, 7, 8, 14 y 15; las filas 4, 5, 7, 8 y 14–15 de K-MEM.16; los pendientes 4, 5 y 6 de K-MEM.16. Donde haya contradicción, mandan K-MEM.19 a K-MEM.24.
+
+---
+
+## K-MEM.19 — RITE: literales de K-MEM.4 y K-MEM.5 en el BOE consolidado
+
+**Pregunta.** ¿Coinciden con el BOE los literales que K-MEM.4 y K-MEM.5 leyeron en la web? Se cotejan:
+- arts. 15, 16.2 y 17.2;
+- IT 1.1.3; IT 1.1.4.1.2 con la tabla 1.4.1.1; IT 1.1.4.2.1; higiene y ACS;
+- IT 1.2.3 ptos 2 y 3; IT 1.2.4.1; IT 1.2.4.4; IT 1.2.4.5;
+- IT 1.3.3.
+
+¿Ha cambiado el RITE después de 2021?
+
+**Respuesta.**
+
+**Edición y cambios.** El consolidado está al día: «Última modificación: 02 de agosto de 2022» ([RITE-C] p. 5). Lista de modificaciones de boe.es, **LEÍDO (web)**:
+- RD 736/2020;
+- RD 178/2021 (arts. 15–17 y varias IT);
+- RD 390/2021 (BOE-A-2021-9176): IT 1.2.4.1.2.1;
+- RD-ley 14/2022 (BOE-A-2022-12925): «se dicta en relación» con la IT 3.8 (p. 80, limitación de temperaturas). No toca nada de K-MEM.4 ni K-MEM.5.
+- **De 2023 a 2026, ninguna disposición.** Hay una consulta pública del Ministerio para un RITE nuevo (2025), sin real decreto publicado (LEÍDO (web)).
+
+**Articulado.** **VERIFICADO (imagen, BOE consolidado)**:
+- **Art. 15** (p. 12): 15.1 a), b) y c) y 15.2 coinciden con los literales de K-MEM.4. Las cifras (< 5 kW; 5–70 kW; > 70 kW) quedan confirmadas.
+- **Art. 15.6** (p. 12), cambio de uso. Extracto: «se analizará y justificará su explotación energética y la idoneidad de las instalaciones existentes para el nuevo uso».
+- **Arts. 2.2 y 2.3 e)** (p. 8), resumen: a efectos del RITE, el cambio de uso del edificio es una reforma de la instalación.
+- **Arts. 16.2 y 17.2** (p. 13): coinciden con K-MEM.4.
+
+**IT 1.1, bienestar e higiene.** **VERIFICADO (imagen, BOE consolidado)** salvo donde se dice otra cosa:
+- **IT 1.1.3** (p. 29): el proyecto o la memoria técnica justifican cuatro exigencias: bienestar térmico (1.4.1), calidad del aire (1.4.2), higiene (1.4.3) y calidad acústica (1.4.4).
+- **CORREGIDO (K-MEM.5).** La higiene es la **IT 1.1.4.3** (p. 34), no la 1.1.4.4, que es la acústica. K-MEM.5 las tenía cruzadas en la cita de la IT 1.1.3 y en el punto 4 de su resumen.
+- **Tabla 1.4.1.1** (IT 1.1.4.1.2, p. 29):
+
+  | Estación | Temperatura operativa (°C) | Humedad relativa (%) |
+  |---|---|---|
+  | Verano | 23…25 | 45…60 |
+  | Invierno | 21…23 | 40…50 |
+
+  Coincide con K-MEM.5.
+- **IT 1.1.4.2.1** (p. 30): en las viviendas, la calidad del aire se resuelve por HS 3. Coincide con K-MEM.5.
+- **Higiene y ACS** (IT 1.1.4.3.1, p. 34): **el RITE no fija temperaturas de preparación ni de distribución del ACS.** Remite a la normativa de prevención y control de la legionelosis.
+  - **SIN CONFIRMAR:** qué norma de legionela está vigente. El RD 487/2022, que sustituiría al RD 865/2003, no se ha leído en el BOE.
+
+**IT 1.2, eficiencia energética.**
+- **IT 1.2.3** (pp. 35–36): los ptos 2 y 3 coinciden con K-MEM.5. **VERIFICADO (imagen, BOE consolidado).** Pto 6, resumen: el estudio de alternativas solo se pide por encima de 70 kW.
+- **IT 1.2.4.1** (pp. 37–40): **no hay rendimientos mínimos numéricos de bombas de calor.** La eficiencia de los generadores remite a la normativa europea de diseño ecológico. **VERIFICADO (imagen, BOE consolidado).**
+  - En esas páginas hay más reglas, que **no se han transcrito y no se codifican**: calderas de tipo B de hasta 70 kW, temperatura de los emisores y equipos de expansión directa.
+- **Aislamiento de redes de ACS** (IT 1.2.4.2.1, p. 42). Tabla de espesores mínimos, interior / exterior, en mm. Las cifras se han leído en imagen; el número de la tabla y sus encabezados exactos **no se han transcrito**.
+
+  | Diámetro exterior D (mm) | Interior | Exterior |
+  |---|---|---|
+  | D ≤ 35 | 30 | 40 |
+  | 35 < D ≤ 60 | 35 | 45 |
+  | 60 < D ≤ 90 | 35 | 45 |
+  | 90 < D ≤ 140 | 45 | 55 |
+  | D > 140 | 45 | 55 |
+
+  Caso aparte: tramos de diámetro ≤ 25 mm y longitud < 10 m, empotrados hasta el punto de consumo, 10 mm.
+
+  **No se codifica** hasta copiar en `shared/tablas` el número de tabla, los encabezados y las condiciones (conductividad de referencia).
+- **IT 1.2.4.3.1** (p. 47), resumen: control automático, con regulación de la temperatura por estancia.
+- **IT 1.2.4.4** (pp. 50–51), contabilización. **VERIFICADO (imagen, BOE consolidado)** en lo que sigue; cierra el SIN CONFIRMAR de K-MEM.5:
+  - el sistema de reparto de gastos se exige cuando la instalación da servicio a más de un usuario;
+  - contadores de ACS;
+  - medición de la energía de la solar térmica por encima de 14 kW.
+  - **INTERPRETACIÓN:** en una unifamiliar con un solo usuario no hay reparto de gastos. Con solar térmica ≤ 14 kW tampoco hay medición obligatoria.
+- **IT 1.2.4.5.2** (p. 51): recuperación de calor del aire expulsado **cuando el caudal expulsado por medios mecánicos supere 0,28 m³/s**. **VERIFICADO (imagen, BOE consolidado).**
+  - **INTERPRETACIÓN:** no alcanza a una vivienda. 0,28 m³/s son 1.008 m³/h, muy por encima de los caudales de HS 3 de una vivienda.
+
+**IT 1.3, seguridad.**
+- **IT 1.3.3** (p. 55): coincide con K-MEM.5, a)–d). **VERIFICADO (imagen, BOE consolidado).**
+- Otras reglas, en resumen y **sin transcribir**:
+  - sala de máquinas por encima de 70 kW (IT 1.3.4.1.2.1);
+  - evacuación de los productos de la combustión por cubierta (IT 1.3.4.1.3.1, p. 62);
+  - patinillos en instalaciones multiusuario e integración de las unidades exteriores en obra nueva (IT 1.3.4.4.3 ptos 4 y 5, p. 69);
+  - periodicidades de mantenimiento (IT 3.3, tabla 3.1, p. 75).
+
+**Consecuencia para la app**
+- **Art. 15:** el módulo HE 2/RITE codifica los tres tramos de K-MEM.4. Cita: «RITE (RD 1027/2007, consolidado 02-08-2022), art. 15.1». Grado: **VERIFICADO (imagen, BOE consolidado)**.
+- **Cambio de uso:** una línea con el art. 15.6, «el proyecto o memoria técnica de la reforma analiza y justifica la idoneidad de las instalaciones existentes para el nuevo uso».
+- **Tabla 1.4.1.1:** se imprime con la cita «RITE IT 1.1.4.1.2, tabla 1.4.1.1».
+- **Higiene:** rótulo «IT 1.1.4.3». **Ninguna cifra de temperatura de ACS sale del RITE.**
+- **Bomba de calor:** el RITE no da un rendimiento mínimo. La memoria imprime los rendimientos del fabricante, sin umbral codificado.
+- **Unifamiliar:**
+  - IT 1.2.4.4: «no aplica: un solo usuario», rotulado INTERPRETACIÓN;
+  - IT 1.2.4.5.2: «no aplica: caudal expulsado ≤ 0,28 m³/s», rotulado INTERPRETACIÓN.
+- **Aislamiento de ACS:** la memoria remite a la IT 1.2.4.2.1 sin cifras hasta transcribir la tabla.
+
+---
+
+## K-MEM.20 — HE 2 y vigencia del DB-HE
+
+**Pregunta.** ¿Hay una versión del DB-HE posterior al consolidado de 14-06-2022?
+
+**Respuesta.** **No.**
+- La última modificación incorporada es el RD 450/2022, con su corrección de errores (BOE-A-2023-2722). **LEÍDO (web).**
+- **El RD 164/2025** sí modifica el CTE (BOE núm. 87, 10-04-2025, BOE-A-2025-7190). Es el Reglamento de seguridad contra incendios en los establecimientos industriales.
+  - Su disposición final 2.ª **solo toca el DB-SI**: introducción, criterios generales y tablas 1.1 y 2.1 del SI 1.
+  - No toca el DB-HE ni el DB-SUA. **LEÍDO (web)**; el lector truncó el texto.
+  - Ya se cita en `src/modules/si/tablas.ts` y en `research/verificacion-si*.md`.
+- La modificación del CTE para trasponer la Directiva (UE) 2024/1275 está en tramitación, **sin publicar** a 2026-10-19. **LEÍDO (web).**
+- El literal de HE 2 sigue **VERIFICADO (texto)**: K-MEM.4, [HE22] p. 22.
+
+**Consecuencia para la app**
+- Se sigue citando «DB-HE (consolidado 14-06-2022)» y la remisión de HE 2 al RITE (K-MEM.4).
+- Antes de cada entrega, mirar en codigotecnico.org si ha salido la modificación de 2024/1275.
+
+---
+
+## K-MEM.21 — ICT: ámbito, reparto arquitecto / ingeniero y dimensiones del Anexo III
+
+**Pregunta.** Se cotejan:
+- RD-ley 1/1998, arts. 2 y 3;
+- RD 346/2011, arts. 3, 8 y 9;
+- Anexo III: recintos (RITI, RITS y RITU) por número de PAU, umbral de RITU, RTR de 500 × 600 × 80 mm, patinillo y arqueta;
+- Anexos I y II: tomas mínimas.
+
+¿Qué cambió el RD 250/2025?
+
+**Respuesta.**
+
+**RD-ley 1/1998** ([RDL-C], última modificación 10-05-2014, p. 3), **VERIFICADO (imagen, BOE consolidado)**:
+- **Art. 2 a) y b)** (p. 4): coinciden con K-MEM.7, incluida la salvedad «salvo los que alberguen una sola vivienda».
+- **Art. 3.1** (p. 4): coincide con K-MEM.7. Sin proyecto técnico de ICT unido al arquitectónico no hay autorización de construcción ni de rehabilitación integral. Firma el proyecto técnico un ingeniero de telecomunicación, un ingeniero técnico o un titulado de grado o máster con esas competencias (resumen).
+- **«Rehabilitación integral» sigue sin definirse** en el RD-ley. Se mantiene la INTERPRETACIÓN de K-MEM.7: el cambio de uso de un local no obliga a proyecto de ICT.
+
+**RD 346/2011, Reglamento** ([RICT-C], última modificación 26-03-2025, p. 3):
+- **Art. 3** (p. 8): el mismo ámbito que el RD-ley. **VERIFICADO (imagen, BOE consolidado).**
+- **Arts. 8 y 9** (pp. 10–12): proyecto técnico, consulta a los operadores y ejecución. El consolidado marca los incisos anulados por sentencias del Tribunal Supremo de 2012.
+- El proyecto técnico se hace «en coordinación con el autor del proyecto de edificación» (art. 9). **VERIFICADO (imagen, BOE consolidado).**
+- **CORREGIDO (K-MEM.8):** K-MEM.8 atribuía la coordinación al art. 8 y la ligaba al acta de replanteo. La cita es art. 9; lo del acta no se ha visto en el literal.
+
+**Tomas mínimas.**
+- **Anexo I, ap. 3.5.1** (p. 17), tomas de RTV: «una por cada estancia, excluidos baños y trasteros, con un mínimo de dos». Coincide con K-MEM.8. **VERIFICADO (imagen, BOE consolidado).**
+- **Anexo II** (pp. 35–36): pares trenzados (3.5.1), coaxial (3.5.2), fibra óptica (3.5.3) y viviendas unifamiliares (ap. 4). Lo leído concuerda con K-MEM.8, pero los literales de 3.5.1 a) y 3.5.2 a) **no se han recotejado palabra por palabra**.
+
+**Recintos** (Anexo III, ap. 4.5, p. 62). Resumen; las cifras, **VERIFICADO (imagen, BOE consolidado)**:
+- **4.5.3, RITU:** edificios de hasta tres alturas y planta baja con un máximo de 16 PAU, y conjuntos de viviendas unifamiliares sin límite de PAU. Coincide con K-MEM.8.
+- **RITU-A:** edificios de más de tres alturas con hasta 16 PAU, o de 17 a 30 PAU.
+- **4.5.4, RITM:** hasta 45 PAU en edificios de pisos y hasta 20 en conjuntos de unifamiliares.
+- **Sin transcribir:** si cada recinto es obligatorio u opcional, y la redacción exacta de la regla de elección.
+
+**Dimensiones** (Anexo III, ap. 5), **VERIFICADO (imagen, BOE consolidado)**. Lo que va como «resumen» es contexto sin transcribir.
+
+- **Arqueta de entrada** (5.1, p. 63), largo × ancho × profundo:
+
+  | PAU | Dimensiones (mm) |
+  |---|---|
+  | ≤ 20 | 400 × 400 × 600 |
+  | 21–100 | 600 × 600 × 800 |
+  | > 100 | 800 × 700 × 820 |
+
+  **Discrepancia interna** en > 100 PAU: el apéndice 3 (p. 80) da 800 × 720 × 820.
+- **Canalización externa** (5.2, p. 64), tubos de 63 mm. Arquetas de paso de 400 × 400 × 400 cada 50 m.
+
+  | PAU | Tubos |
+  |---|---|
+  | ≤ 4 | 3 |
+  | 5–20 | 4 |
+  | 21–40 | 5 |
+  | > 40 | 6 |
+
+- **Canalización de enlace** (5.4, resumen):
+  - 5.4.1: registro de enlace de 450 × 450 × 120 mm;
+  - 5.4.2: 2 tubos de 40 mm y registros de 360 × 360 × 120 mm.
+- **RITI / RITS** (5.5, p. 66), alto × ancho × profundo:
+
+  | PAU | Dimensiones (mm) |
+  |---|---|
+  | ≤ 20 | 2000 × 1000 × 500 |
+  | 21–45 | 2000 × 1500 × 500 |
+  | 46–74 | 2300 × 2000 × 1000 |
+  | > 74 | 2300 × 2000 × 2000 |
+
+- **RITU** (5.5, pp. 66–67), alto × ancho × profundo:
+
+  | PAU | Dimensiones (mm) |
+  |---|---|
+  | ≤ 5, sin zonas comunes | 1000 × 500 × 300 |
+  | ≤ 5, con zonas comunes | 1000 × 1000 × 500 |
+  | 6–16 | 2000 × 1000 × 500 |
+  | 17–30 | 2000 × 1500 × 1000 |
+  | > 30 | 2000 × 2000 × 1500 |
+
+- **RITU-A** (5.5, p. 67), alto × ancho × profundo:
+
+  | PAU | Dimensiones (mm) |
+  |---|---|
+  | ≤ 16, con más de tres alturas | 2000 × 2000 × 500 |
+  | 17–20 | 2000 × 2000 × 500 |
+  | 21–30 | 2000 × 3000 × 500 |
+
+- **Condiciones de los recintos** (5.5, resumen):
+  - puerta de 1800 × 800 mm;
+  - tratamiento a efectos del DB-SI, sin transcribir;
+  - 5.5.3 a 5.5.6: ≥ 2 m de centros de transformación, maquinaria de ascensores o de climatización; ventilación de 2 renovaciones por hora; 300 lux.
+- **Canalización principal (patinillo)** (5.7, pp. 69–70), tubos de 50 mm:
+
+  | PAU | Tubos |
+  |---|---|
+  | ≤ 10 | 5 |
+  | 11–20 | 6 |
+  | 21–30 | 7 |
+  | > 30 | cálculo específico |
+
+  Resumen:
+  - con más de 8 usuarios por planta, más de una vertical;
+  - en patinillo, resistencia EI 120 y sellado cortafuegos cada tres plantas.
+- **Registros secundarios** (5.8, p. 71): 450 × 450 × 150, 500 × 700 × 150 y 550 × 1000 × 150 mm. Los umbrales de PAU de cada medida **no se han transcrito**.
+- **Canalización secundaria** (5.9, p. 72, resumen): 3 tubos de 25 mm por vivienda.
+- **RTR** (5.11, p. 73):
+  - **500 × 600 × 80 mm** como mínimo, confirma K-MEM.8;
+  - variantes: dos de 500 × 300 × 80 mm, o uno de 300 × 400 × 300 mm (resumen);
+  - con 2 tomas de corriente;
+  - registro de RTV de 200 × 300 × 60 mm;
+  - colocado entre 200 y 2300 mm del suelo.
+- **Canalización interior de usuario** (5.12): tubos de 20 mm.
+- **Registros de toma por vivienda** (5.13, p. 74):
+  - en **dos** estancias principales: 2 de pares trenzados, 1 coaxial y 1 de RTV en cada una; fibra óptica en una de ellas;
+  - en el resto de estancias (sin baños ni trasteros): 1 de pares trenzados y 1 de RTV;
+  - 1 registro configurable junto al PAU;
+  - una base de enchufe a ≤ 500 mm de cada registro de toma.
+- **Tierra y separaciones** (7.1 y 8, resumen):
+  - resistencia de tierra ≤ 10 Ω, anillo de 25 mm² en los recintos;
+  - separaciones de 100 y 30 mm con otras instalaciones.
+
+**RD 250/2025** ([RD250], **LEÍDO (web)**):
+- Su **disposición final 1.ª** modifica el Reglamento de ICT, y solo dos apartados del **Anexo I** (señales de radiodifusión): el 4.4.2 (respuesta amplitud/frecuencia en canal) y el 4.5 (niveles de calidad). Añade los parámetros de DVB-T2, por ejemplo «MER COFDM-256QAM TV (DVB-T2)».
+- No toca el Anexo III, ni las tomas, ni el reparto entre el arquitecto y el ingeniero.
+- **INTERPRETACIÓN:** no afecta a la ficha de previsiones del arquitecto.
+- **SIN CONFIRMAR** en imagen: el PDF se bajó pero no se ha leído.
+
+**Consecuencia para la app**
+- **Ficha «Previsiones del proyecto de arquitectura para la ICT»** (solo cuando K-MEM.7 la exige). Puede imprimir con cifras:
+  - arqueta de entrada y canalización externa por PAU;
+  - dimensiones del recinto por PAU;
+  - tubos del patinillo;
+  - RTR de 500 × 600 × 80 mm;
+  - registros de toma por estancia (5.13).
+- **Cita de la ficha:** «RD 346/2011, Reglamento de ICT (consolidado 26-03-2025), Anexo III, ap. …».
+- **Antes de codificar:** copiar las tablas a `shared/tablas` con los metadatos (`db`: RD 346/2011; `edicion`: consolidado 26-03-2025; `articulo`; `tabla`; `fuente`: BOE-A-2011-5834).
+- **Arqueta de más de 100 PAU:** se usa la cifra del ap. 5.1 (800 × 700 × 820 mm), con aviso de la discrepancia del apéndice 3. Solo afecta a edificios de más de 100 PAU.
+- **Tipo de recinto:** la regla automática (RITU, RITU-A, RITM o RITI + RITS) **no se codifica** hasta transcribir el ap. 4.5. Mientras, el proyectista elige el tipo y la app comprueba sus dimensiones con la tabla que toque.
+- **Registros de toma:** se cuentan con el 5.13. Las tomas del Anexo II van al proyecto técnico, que no hace la app.
+
+---
+
+## K-MEM.22 — Decreto 293/2009: articulado original, modificaciones y fichas de 2012
+
+**Pregunta.** ¿Hay texto consolidado del Decreto 293/2009? ¿Han cambiado desde 2009 estos preceptos?
+- arts. 2.1 j), 2.2, 104, 106.2, 106.5, 106.6 y 111;
+- disposición adicional 1.ª.
+
+Además: ¿cuál es la referencia BOJA de la Orden de 9-01-2012, y trae fichas para viviendas? ¿Existe un «Decreto 64/2012»?
+
+**Respuesta.**
+
+**No hay texto consolidado oficial** del Decreto. Se ha comprobado por tres vías que los preceptos preguntados no han cambiado en lo leído.
+1. **Corrección de errores** ([D293-CE], BOJA núm. 219, 10-11-2009, p. 8), **VERIFICADO (imagen, BOJA)**. Corrige los arts. 16.2.a), 17.e), 19.a), 20.a), 22.1.k), 23.2.e), 26.2, 37.1, 44.1, 77.1.f), 77.1.p), 78.1.g), 86.1.b), 95.1.f), 119.d) y 121.e), y las tablas 1 y 4 del Anexo III. **No toca ninguno de los preceptos preguntados.**
+2. **Orden de 9-01-2012** ([O2012]). Se dicta en uso de la DF 2.ª del Decreto y no lo modifica: aprueba modelos (art. 1). Sus portadas identifican el Decreto **solo** por «BOJA nº 140, de 21 de julio de 2009» y «Corrección de errores. BOJA nº 219, de 10 de noviembre de 2009» (pp. 7, 40 y 55). **VERIFICADO (imagen, BOJA).** Indicio oficial de que, a enero de 2012, no había otra modificación.
+3. **Ley 4/2017 de Andalucía** ([L4/2017]). Su disposición derogatoria única (p. 38) deroga solo «c) La disposición adicional décima del Decreto 293/2009». **VERIFICADO (imagen, BOE consolidado).** La DA 10.ª no está entre lo preguntado; su contenido no se ha transcrito.
+
+**«Decreto 64/2012»: no existe como modificación del 293/2009.**
+- No aparece en ninguna fuente: búsquedas web, fichas de 2012 ni Ley 4/2017.
+- Se mantiene la conclusión de K-MEM.14. Es una negación sin índice oficial de modificaciones: **SIN CONFIRMAR** en ese sentido.
+
+**Articulado original** ([D293-B]). **VERIFICADO (imagen, BOJA)** salvo donde se dice otra cosa:
+
+- **Art. 2.1 j)** (p. 121), literal completo:
+  > «Los espacios exteriores e interiores, instalaciones, dotaciones y elementos, de uso comunitario, de cualquier tipo de edificaciones de vivienda, sean de promoción pública o privada, que se construyan, reformen o bien alteren su uso o actividad. En las obras de reforma de los espacios e instalaciones comunitarias, lo dispuesto en el presente Reglamento sólo será de aplicación a los elementos o partes modificados por la reforma.»
+
+  **CORREGIDO (K-MEM.14):** su cita terminaba en «actividad.» y le faltaba la segunda frase, que limita la reforma de zonas comunes a lo modificado.
+- **Art. 2.2** (p. 121), resumen:
+  - en la reforma parcial, el Reglamento se aplica solo a los elementos o partes modificados;
+  - en el cambio de uso parcial, solo a las zonas en que se altera el uso.
+
+  El sentido coincide con K-MEM.14. Su literal, cortado con «[…]», **no se ha recotejado palabra por palabra**.
+- **Art. 104** (p. 140), resumen. Itinerarios accesibles:
+  - a) en las áreas comunitarias;
+  - b) desde el exterior hasta las zonas comunitarias;
+  - c) en cada planta, hasta las viviendas;
+  - d) al menos uno entre los servicios comunitarios y las viviendas;
+  - e) al menos uno desde el acceso hasta la rampa, el ascensor, el tapiz o la zona del futuro ascensor.
+
+  Pto 2: con viviendas reservadas, porteros, buzones y llaves a ≤ 1,20 m.
+- **Art. 106** (pp. 140–141):
+  - 106.1: al menos un medio accesible alternativo a la escalera.
+  - **106.2 a) y b):** coinciden con K-MEM.14. La reserva estructural del a) para el ascensor futuro se refleja en el proyecto de ejecución.
+  - 106.3: con varios ascensores, basta uno accesible.
+  - 106.4: el ascensor llega a los sótanos de aparcamiento y a la azotea visitable.
+  - **106.5:** «Quedan excluidas de las exigencias previstas en los apartados anteriores las viviendas de autopromoción individual para uso propio.» Coincide.
+  - **106.6:** en reformas, si hay imposibilidad física, se admiten ayudas técnicas del art. 75.
+- **Art. 103.3** (p. 140): los garajes de viviendas, accesibles por rampa o ascensor «cuando éste sea exigible conforme al artículo 106.2».
+- **Art. 111.1** (p. 141): reserva en viviendas protegidas y en las promovidas o subvencionadas por las Administraciones Públicas.
+
+  | N.º de viviendas | Viviendas reservadas |
+  |---|---|
+  | 17–39 | 1 |
+  | 40–66 | 2 |
+  | 67–99 | 3 |
+  | 100–133 | 4 |
+  | 134–165 | 5 |
+  | ≥ 166 | 3 %, redondeado |
+
+  - 111.4: exentas las cooperativas y comunidades para uso propio sin personas con movilidad reducida.
+  - El art. 111.2 (vivienda libre) **no se ha recotejado**.
+- **DA 1.ª** (p. 115), resumen fiel. Se aplica a obras en edificios existentes o alteraciones de uso, cuando condiciones físicas, históricas, artísticas, medioambientales o normativas imposibiliten el cumplimiento total.
+  - 2 a): la memoria indica de forma motivada los artículos imposibles de cumplir y las soluciones, con documentación gráfica;
+  - 2 b): lo verifica quien visa o informa;
+  - 2 c): la resolución lo hace constar;
+  - 3: se mejoran las condiciones preexistentes con ayudas técnicas (art. 75);
+  - 4: no exime del resto de artículos.
+
+  Coincide con K-MEM.14.
+- **DF 1.ª y 2.ª** (p. 118), resumen:
+  - DF 1.ª: plazo hasta el 1-01-2019 para los edificios existentes susceptibles de ajustes razonables;
+  - **DF 2.ª.2:** habilita a modificar por **Orden conjunta** los anexos y las proporciones del art. 111.1. No se ha encontrado ninguna orden que lo haya hecho (**SIN CONFIRMAR**).
+
+**La reserva del art. 111.1 queda superada al alza por el 4 %:**
+- **Ley 4/2017, art. 58.1** ([L4/2017] p. 29), **VERIFICADO (imagen, BOE consolidado)**:
+  > «Conforme a lo previsto en el artículo 32 del texto refundido de la Ley General de los derechos de las personas con discapacidad y de su inclusión social, y a fin de garantizar a las personas con discapacidad el acceso a una vivienda, en los proyectos de viviendas protegidas, o que conforme a la normativa de aplicación puedan construirse sobre suelos destinados a vivienda protegida, así como de cualquier otro carácter que se construyan, promuevan o subvencionen por las Administraciones Públicas y demás entidades vinculadas o dependientes de estas, se reservará un mínimo del 4% de viviendas de las promociones referidas, en la forma y con los requisitos que se determinen reglamentariamente.»
+- **Orden de 9-01-2012, Ficha IV** ([O2012] p. 36), **VERIFICADO (imagen, BOJA)**. Cita el art. 111 del Reglamento y el art. 57.1 de la LISMI, modificado por la Ley 26/2011.
+
+  | N.º total de viviendas | Viviendas reservadas |
+  |---|---|
+  | De 17 a 25 | ≥ 1 (Rgto) |
+  | Más de 25 | ≥ 4 % redondeado (≥ 0,5 al alza, < 0,5 a la baja) (LISMI) |
+
+- **CORREGIDO (K-MEM.14 y K-MEM.15):** el número de viviendas reservadas no sale solo de la tabla del art. 111.1.
+- **INTERPRETACIÓN:** con la Ficha IV, la regla es 1 vivienda de 17 a 25 y el 4 % redondeado por encima de 25. Es igual o más exigente que el art. 111.1 en todos los tramos.
+- **SIN CONFIRMAR:** por debajo de 17 viviendas, la Ley 4/2017 no fija umbral («un mínimo del 4%… en la forma… que se determinen reglamentariamente»), y el umbral de 17 es del Reglamento. Tampoco se ha leído el art. 32 del RDLeg 1/2013.
+
+**Orden de 9-01-2012** ([O2012], BOJA núm. 12, 19-01-2012, pp. 5–57; Consejería para la Igualdad y Bienestar Social). **VERIFICADO (imagen, BOJA)**:
+- **Título:** «ORDEN de 9 de enero de 2012, por la que se aprueban los modelos de fichas y tablas justificativas del Reglamento que regula las normas para la accesibilidad en las infraestructuras, el urbanismo, la edificación y el transporte en Andalucía, aprobado por el Decreto 293/2009, de 7 de julio, y las instrucciones para su cumplimentación.» (p. 5).
+- **Entrada en vigor:** «a los veinte días de su publicación» (disposición final única, p. 6).
+- **Art. 2** (p. 6), fichas:
+  - I, infraestructuras y urbanismo;
+  - II, edificios, establecimientos o instalaciones;
+  - **III, «Edificaciones de viviendas»**;
+  - **IV, «Viviendas reservadas para personas con movilidad reducida»**;
+  - además, las tablas 1 a 13 por uso.
+- **Art. 3** (p. 6):
+  - la memoria incluye las fichas que correspondan, con los datos generales del Anexo 1;
+  - en proyecto básico, solo lo que esté definido;
+  - en proyecto de ejecución, la justificación completa;
+  - en los modificados, fichas que sustituyan a las primitivas.
+- **Ficha III** (pp. 30–34): «Aplicable a zonas de uso comunitario». Contiene:
+  - acceso desde el exterior (art. 105);
+  - vestíbulos, pasillos y huecos de paso (art. 108);
+  - escaleras (art. 107);
+  - rampas (art. 109);
+  - **comunicación vertical (art. 106)**;
+  - aparcamientos (art. 103);
+  - mecanismos eléctricos: interruptores de 0,90 a 1,20 m, enchufes a 0,30 m (Rgto);
+  - declaración de circunstancias, que reproduce la DA 1.ª.
+- **Comunicación vertical** (p. 32), literal de la ficha:
+  - **previsión estructural del hueco:** «Edificios de viviendas con PB+1 que cuenta con 6 viviendas o menos. (Rgto)»;
+  - **ascensor:** «Edificios con más de 6 viviendas que se desarrollen como máximo en PB+1 o con cualquier número de viviendas a partir de PB+2 . (Rgto)»;
+  - en paralelo, los umbrales del DB-SUA 9 (dos plantas; 12 viviendas).
+
+  Confirma la lectura de K-MEM.14 y K-MEM.15: «dos plantas sobre rasante» = PB+1.
+- **Ficha IV** (pp. 35–39): «Aplicable al interior de las viviendas reservadas».
+- **Anexo 2** (p. 56), qué ficha va en cada actuación sobre edificios de viviendas:
+  - zonas y espacios exteriores, fichas I y II;
+  - instalaciones y edificaciones complementarias (piscinas, gimnasios…), ficha II;
+  - resto de elementos de uso comunitario, ficha III;
+  - viviendas reservadas, ficha IV.
+
+  Incluye la obra nueva, la reforma y «los cambios de uso o actividad, aunque no impliquen obras».
+
+**Consecuencia para la app**
+- **Módulo de accesibilidad autonómica:** se cita «Decreto 293/2009 (BOJA núm. 140, 21-07-2009; corrección BOJA núm. 219, 10-11-2009)». Los umbrales del art. 106.2 pasan a **VERIFICADO (imagen, BOJA)**, y también la exención del 106.5 y las ayudas técnicas del 106.6.
+- **Reforma de zonas comunes:** se aplica solo a lo modificado, por el art. 2.1 j) segunda frase y el 2.2.
+- **Viviendas reservadas** (solo en promoción protegida o pública): 17–25 → 1; > 25 → 4 % redondeado con medios al alza. Cita: «Ley 4/2017 art. 58.1; Orden 9-01-2012, Ficha IV».
+  - Con < 17 viviendas: 0, con aviso «la Ley 4/2017 fija un mínimo del 4 % sin umbral; confirmar con la Administración».
+  - Esta cifra alimenta el SUA 9 1.2.1 (K-MEM.15).
+- **Formato:** la memoria sigue el esquema de la **Ficha III** (zonas comunitarias) y la **Ficha IV** (viviendas reservadas). Hacen falta los datos generales del Anexo 1 y la declaración de circunstancias.
+  - Columnas: Normativa | DB-SUA | Dec. 293/2009 (Rgto) | Ordenanza | Doc. técnica.
+  - Es el mismo patrón «Norma | Proyecto» de la fase 4.
+  - Decisión del usuario: generar el contenido o la ficha completa.
+- **Edificio existente con imposibilidad:** el texto de la declaración de circunstancias sale de la DA 1.ª, con los tres supuestos de la ficha.
+
+---
+
+## K-MEM.23 — Piscina privada de vivienda unifamiliar: ámbito
+
+**Pregunta.** En una piscina privada de vivienda unifamiliar, ¿se aplican la ITC-BT-31 (volúmenes 0, 1 y 2; MBTS; diferencial; equipotencial) y el DB-SUA 6? Solo ámbito y exigencias principales, para decidir si entra en la app.
+
+**Respuesta.**
+
+**DB-SUA 6: no se aplica.** Literal de `verificacion-sua6-sua8.md` A.1, [SUA22] p. 25, SUA 6 ap. 1 pto 1. **VERIFICADO** allí; no se ha releído hoy:
+> «Esta Sección es aplicable a las piscinas de uso colectivo, salvo a las destinadas exclusivamente a competición o a enseñanza […] Quedan excluidas las piscinas de viviendas unifamiliares, así como los baños termales, los centros de tratamiento de hidroterapia y otros dedicados a usos exclusivamente médicos, los cuales cumplirán lo dispuesto en su reglamentación específica.»
+
+La piscina de una comunidad de propietarios, o la compartida por varias unifamiliares, es de uso colectivo y sí entra (A.2 y A.4 del mismo archivo).
+
+**REBT: sí se aplica, sin distinguir piscina privada o colectiva.** [REBT-C], consolidado 03-09-2025. **VERIFICADO (imagen, BOE consolidado)** salvo donde se dice otra cosa.
+
+**Ámbito y trámite.**
+- **Art. 11** (pp. 11–12): «las instalaciones para piscinas» están entre las instalaciones de locales de características especiales.
+- **ITC-BT-31, ámbito** (p. 205): «Esta ITC trata de las prescripciones de las instalaciones eléctricas de las piscinas, pediluvios y fuentes ornamentales». No hay exclusión para la unifamiliar.
+- **Proyecto** (ITC-BT-04, tabla 3.1, p. 53):
+  - grupo n, «Las correspondientes a piscinas y fuentes», necesita proyecto con **P > 5 kW**;
+  - la vivienda unifamiliar (grupo f) solo con P > 50 kW;
+  - 3.3: si coinciden varios grupos, se aplica el criterio más exigente.
+- **Inspección** (ITC-BT-05):
+  - 4.1 e) (p. 56): inspección inicial por organismo de control de las «Piscinas con potencia instalada superior a 10 kW»;
+  - 4.2: inspección periódica cada 5 años de las que tuvieron inicial.
+- **Alumbrado exterior** (ITC-BT-09, p. 94): excluye la iluminación de piscinas y fuentes, que va por la ITC-BT-31.
+
+**Zonas** (ITC-BT-31, p. 205), resumen fiel:
+- **Zona 0:** el interior del vaso, con canales, pediluvios, inyectores y cascadas.
+- **Zona 1:** hasta un plano vertical a 2 m del borde y una altura de 2,5 m. Con trampolines o toboganes, además, 1,5 m alrededor y 2,5 m sobre su punto más alto.
+- **Zona 2:** 1,5 m más allá de la zona 1, hasta 2,5 m de altura. En fuentes no hay zona 2.
+- **Cuarto de máquinas** (p. 206): inaccesible a personas no autorizadas; se trata como local húmedo o mojado (ITC-BT-30).
+
+**Grados IP** (2.2, p. 206):
+
+| Zona | Grado mínimo |
+|---|---|
+| 0 | IPX8 |
+| 1 | IPX5; IPX4 en interiores que no se limpian con chorro |
+| 2 | IPX2 en interior; IPX4 en exterior; IPX5 si se limpia con chorro |
+
+**Protección** (p. 206):
+- Contra contactos directos con MBTS: IP2X/IPXXB o aislamiento que soporte 500 V durante 1 minuto (resumen).
+- No se admiten protección por obstáculos o alejamiento, locales no conductores ni equipotencial no conectada a tierra.
+- **Zonas 0 y 1:**
+  > «solo se admite protección mediante MBTS a tensiones asignadas no superiores a 12 V en corriente alterna o 30 V en corriente continua. La fuente de alimentación de seguridad se instalará fuera de las zonas 0, 1 y 2.»
+- **Zona 2 y equipos que solo funcionan con la piscina vacía** (pp. 206–207, resumen): MBTS, o diferencial de 30 mA como máximo, o separación eléctrica de un solo receptor. Con señal de advertencia.
+- **Equipotencial:**
+  > «Todos los elementos conductores de los volúmenes 0, 1 y 2 y los conductores de protección de todos los equipos con partes conductoras accesibles situados en estos volúmenes, deben conectarse a una conexión equipotencial suplementaria local. Las partes conductoras incluyen los suelos no aislados.»
+
+**Canalizaciones, cajas y aparatos** (2.2.1–2.2.4, pp. 207–208, resumen):
+- **Canalizaciones:**
+  - ninguna en la zona 0 al alcance de los bañistas;
+  - ninguna línea aérea sobre las zonas 0, 1 y 2;
+  - cables como en locales mojados.
+- **Cajas:** ninguna en las zonas 0 y 1, salvo cajas MBTS IPX5 en la zona 1.
+- **Luminarias:** UNE-EN 60598-2-18.
+- **Interruptores y bases:**
+  - ninguno en las zonas 0 y 1;
+  - en piscinas pequeñas, bases a ≥ 1,25 m de la zona 0 y ≥ 0,3 m del suelo, con MBTS ≤ 25 V ca / 60 V cc, diferencial de 30 mA o separación;
+  - en la zona 2, con MBTS, diferencial de 30 mA o separación.
+- **Bombas:** UNE-EN 60335-2-41.
+- **Equipos fijos de filtrado o contracorriente en la zona 1** (ap. 4, p. 209): en recinto con aislamiento suplementario y acceso con llave o herramienta; MBTS ≤ 25 V, diferencial de 30 mA o separación.
+- **Figuras:** pp. 210–212.
+
+**Accesibilidad.**
+- El Decreto 293/2009 trata las «piscinas colectivas» en la Ficha II ([O2012] p. 28): grúa o elevador homologado, escalera accesible, etc.
+- **INTERPRETACIÓN:** no alcanza a la piscina privada de una unifamiliar. El Decreto se aplica a los elementos «de uso comunitario» (art. 2.1 j), y el interior privativo de la vivienda libre no tiene exigencias (K-MEM.14).
+
+**SIN CONFIRMAR (no se codifica):**
+- el ámbito del RD 742/2013 (criterios técnico-sanitarios de piscinas) y de la normativa andaluza de piscinas para la piscina unifamiliar;
+- si hay barreras o vallados exigibles fuera del CTE.
+
+**Consecuencia para la app.** **Decisión propuesta: entra, acotada.**
+- **Dato nuevo** en la vivienda unifamiliar: «piscina privada: sí/no», con la potencia de su instalación eléctrica (kW) y si lleva iluminación subacuática.
+- **SUA 6:** `no_aplica`, «piscina de vivienda unifamiliar, excluida (DB-SUA 6 ap. 1 pto 1)».
+  - Con piscina comunitaria o compartida, `aplica` (fuera de este encargo).
+- **REBT y anejo de instalaciones,** apartado «Piscina (ITC-BT-31)», con cita «REBT (consolidado 03-09-2025), ITC-BT-31»:
+  - zonas 0, 1 y 2 y grados IP;
+  - MBTS ≤ 12 V ca en las zonas 0 y 1, con la fuente fuera de 0, 1 y 2;
+  - en la zona 2, MBTS, diferencial de 30 mA o separación;
+  - conexión equipotencial suplementaria local;
+  - ni cajas ni mecanismos en las zonas 0 y 1;
+  - cuarto de máquinas según la ITC-BT-30.
+- **Trámite:**
+  - si la potencia de la piscina supera 5 kW, aviso «requiere proyecto (ITC-BT-04, tabla 3.1, grupo n)»;
+  - si supera 10 kW, aviso «inspección inicial por OCA y periódica cada 5 años (ITC-BT-05, 4.1 e y 4.2)».
+- **Cargas:** el circuito de la piscina en la previsión de cargas lo define el motor de cálculo (fuera de este encargo).
+
+---
+
+## K-MEM.24 — Resumen de la fase 7, paso 0
+
+| # | Tema | Antes (K-MEM.4–16) | Ahora | Grado |
+|---|---|---|---|---|
+| 19a | RITE, art. 15 | LEÍDO (web) | Sin cambios de fondo: < 5 kW sin documentación; 5–70 kW memoria técnica; > 70 kW proyecto. Art. 15.6 para el cambio de uso | VERIFICADO (imagen, BOE consolidado), 02-08-2022 |
+| 19b | RITE, vigencia | «última actualización 02/08/2022» | Ninguna modificación de 2023 a 2026 | LEÍDO (web) |
+| 19c | RITE, tabla 1.4.1.1 | LEÍDO (web) | 23…25 °C / 45…60 % y 21…23 °C / 40…50 % | VERIFICADO (imagen, BOE consolidado) |
+| 19d | RITE, higiene | «IT 1.1.4.4» | **IT 1.1.4.3**. Sin temperaturas de ACS: remite a la norma de legionela | CORREGIDO; norma de legionela SIN CONFIRMAR |
+| 19e | RITE, bombas de calor | SIN CONFIRMAR | Sin rendimiento mínimo numérico en el RITE (diseño ecológico) | VERIFICADO (imagen, BOE consolidado) |
+| 19f | RITE, IT 1.2.4.4 y 1.2.4.5 | SIN CONFIRMAR | Reparto de gastos con más de un usuario; solar > 14 kW; recuperación de calor > 0,28 m³/s. No alcanzan a una unifamiliar | VERIFICADO (imagen) + INTERPRETACIÓN |
+| 19g | RITE, aislamiento de ACS | — | Cifras leídas; tabla sin transcribir | No se codifica |
+| 20 | DB-HE | Consolidado 14-06-2022 | Sin versión posterior. El RD 164/2025 solo toca el DB-SI | LEÍDO (web) |
+| 21a | ICT, ámbito (RD-ley 1/1998, arts. 2 y 3) | LEÍDO (web) | Sin cambios | VERIFICADO (imagen, BOE consolidado), 10-05-2014 |
+| 21b | ICT, coordinación con el arquitecto | Art. 8, «acta de replanteo» | Art. 9: «en coordinación con el autor del proyecto de edificación» | CORREGIDO |
+| 21c | ICT, recintos y dimensiones | Sin cifras | Tablas de arqueta, canalización externa, RITI/RITS, RITU, RITU-A, patinillo y RTR | VERIFICADO (imagen, BOE consolidado), 26-03-2025 |
+| 21d | ICT, regla de elección del recinto | RITU ≤ 3 alturas + PB y ≤ 16 PAU | Confirmado; además RITU-A y RITM. Regla exacta sin transcribir | VERIFICADO (cifras) / no se codifica la regla |
+| 21e | ICT, registros de toma | Anexo II, LEÍDO (web) | Anexo III 5.13: dos estancias principales (2 PT + 1 coaxial + 1 RTV), resto (1 PT + 1 RTV), 1 junto al PAU | VERIFICADO (imagen, BOE consolidado) |
+| 21f | RD 250/2025 | «solo Anexo I, 4.4.2 y 4.5» | Confirmado (DVB-T2). Sin efecto en la ficha del arquitecto | LEÍDO (web) + INTERPRETACIÓN |
+| 22a | D293, texto | Original, LEÍDO (web) | Original en imagen. Corrección BOJA 219/2009 y Ley 4/2017 (deroga solo la DA 10.ª): los preceptos preguntados no cambian | VERIFICADO (imagen, BOJA) |
+| 22b | D293, art. 2.1 j) | Cita incompleta | Añade: en la reforma de zonas comunes, solo lo modificado | CORREGIDO |
+| 22c | D293, art. 106 | LEÍDO (web) | Confirmado (106.2 a/b, 106.5, 106.6); la Ficha III lo expresa como PB+1 / PB+2 | VERIFICADO (imagen, BOJA) |
+| 22d | Reserva de viviendas | Tabla del art. 111.1 (17–39 → 1 …; 3 %) | 17–25 → 1; > 25 → 4 % redondeado (Ley 4/2017 art. 58.1; Orden 2012, Ficha IV) | CORREGIDO; < 17 SIN CONFIRMAR |
+| 22e | Orden de 9-01-2012 | Citada sin referencia | BOJA núm. 12, 19-01-2012, pp. 5–57. Ficha III (zonas comunitarias) y IV (viviendas reservadas) | VERIFICADO (imagen, BOJA) |
+| 22f | «Decreto 64/2012» | No localizado | Sigue sin existir en ninguna fuente | SIN CONFIRMAR (negativo) |
+| 23a | Piscina unifamiliar, SUA 6 | — | Excluida | VERIFICADO (`verificacion-sua6-sua8.md` A.1) |
+| 23b | Piscina unifamiliar, REBT | — | ITC-BT-31 aplica. Proyecto si > 5 kW (BT-04); OCA si > 10 kW (BT-05) | VERIFICADO (imagen, BOE consolidado), 03-09-2025 |
+| 23c | Piscina, sanitaria y autonómica | — | RD 742/2013 y norma andaluza: ámbito no leído | SIN CONFIRMAR |
+
+### Pendientes que quedan
+
+1. **RITE.** Transcribir literal:
+   - IT 1.2.4.1 (calderas de tipo B, emisores, expansión directa);
+   - la tabla de aislamiento de ACS de la IT 1.2.4.2.1 (número, encabezados, condiciones);
+   - IT 1.3.4.4.3 ptos 4 y 5;
+   - arts. 2.3 e) y 15.6 completos.
+2. **Legionela.** Norma vigente (RD 487/2022), en el BOE.
+3. **RD 346/2011:**
+   - ap. 4.5 del Anexo III, literal completo (elección del recinto; si RITU-A y RITM son obligatorios u opcionales);
+   - umbrales de PAU de los registros secundarios (5.8);
+   - Anexo II 3.5.1 a) y 3.5.2 a), palabra por palabra;
+   - DF 1.ª del RD 250/2025, en imagen.
+4. **Decreto 293/2009:**
+   - arts. 2.2 y 111.2, palabra por palabra;
+   - contenido de la DA 10.ª (derogada);
+   - si alguna Orden conjunta (DF 2.ª.2) ha cambiado las proporciones del art. 111.1;
+   - art. 32 del RDLeg 1/2013;
+   - reserva con < 17 viviendas.
+5. **Piscina.** Ámbito del RD 742/2013 y de la normativa andaluza de piscinas para la unifamiliar.
+6. **DB-HE.** Antes de cada entrega, comprobar en codigotecnico.org que no ha salido la modificación de la Directiva 2024/1275.
+
+**Fuentes de esta sesión** (además de las de §0):
+- [RITE consolidado](https://www.boe.es/buscar/act.php?id=BOE-A-2007-15820)
+- [RD-ley 1/1998](https://www.boe.es/buscar/act.php?id=BOE-A-1998-4769)
+- [RD 346/2011](https://www.boe.es/buscar/act.php?id=BOE-A-2011-5834)
+- [RD 250/2025](https://www.boe.es/buscar/doc.php?id=BOE-A-2025-6004)
+- [REBT](https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099)
+- [Decreto 293/2009, BOJA 140/2009](https://www.juntadeandalucia.es/export/drupaljda/Decreto%20andaluz%20accesibilidad.pdf)
+- [Corrección de errores, BOJA 219/2009](https://cdn.juntadeandalucia.es/boja/2009/219/d1.pdf)
+- [Orden de 9-01-2012, BOJA 12/2012](https://juntadeandalucia.es/boja/2012/12/d2.pdf)
+- [Ley 4/2017, consolidado](https://www.boe.es/buscar/pdf/2017/BOE-A-2017-11910-consolidado.pdf)
