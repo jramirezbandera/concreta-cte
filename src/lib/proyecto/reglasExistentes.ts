@@ -576,6 +576,28 @@ function rebt(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
   );
 }
 
+const HE3 = "DB-HE 3 Condiciones de las instalaciones de iluminación";
+const CITA_HE3 = "DB-HE 3, ámbito de aplicación (ap. 1 pto 3)";
+
+/**
+ * HE 3 en un edificio existente (K-MEM.6, VERIFICADO): todo el edificio con un
+ * cambio de uso característico; la parte renovada o ampliada en el resto (pto 3 b
+ * y c). La regla de más de 1.000 m² y del 25 % de la superficie iluminada (pto 3
+ * a) se nombra: la app no sabe qué parte de la iluminación se renueva.
+ */
+function he3(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
+  if (caso === "cambio_uso_caracteristico") {
+    return aplica(`${HE3}: se aplica a las instalaciones de iluminación de todo el edificio, que cambia su uso característico (HE 3 ap. 1 pto 3 a).`, CITA_HE3);
+  }
+  if (caso === "ampliacion" || c.alcance.integral === true || tocaInterior(c.alcance, ["alumbrado"])) {
+    return reformado(
+      `${HE3}: se adecua la parte de la instalación de iluminación que se renueva o amplía, para cumplir el valor de eficiencia energética límite, con los sistemas de control que exija la zona (HE 3 ap. 1 pto 3 b y c). Si la superficie útil final supera 1.000 m² y se renueva más del 25 % de la superficie iluminada, la Sección se aplica a todo el edificio (pto 3 a).`,
+      CITA_HE3,
+    );
+  }
+  return noAplica(`${HE3}: no es de aplicación — la intervención no renueva ni amplía la instalación de iluminación de las zonas comunes (HE 3 ap. 1 pto 3).`, CITA_HE3);
+}
+
 const HAB = "Habitabilidad";
 const CITA_HAB = "Norma de habitabilidad del municipio";
 
@@ -630,6 +652,7 @@ export const REGLAS_EXISTENTES: Partial<Record<JustificacionKey, Regla>> = {
   hs4: hs45("DB-HS 4 Suministro de agua", "DB-HS 4", false),
   hs5: hs45("DB-HS 5 Evacuación de aguas", "DB-HS 5", true),
   hs6,
+  he3,
   si1: si(
     "SI 1 Propagación interior",
     (a) => tocaInterior(a, ["compartimentacion", "revestimientos"]),

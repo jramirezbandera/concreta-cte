@@ -13,6 +13,7 @@ import { demandaReferencia } from "../../modules/he4/justificacion";
 import { superficiesHe5 } from "../../modules/he5/justificacion";
 import { recargaDeHe6 } from "../../modules/he6/justificacion";
 import { edificioSi } from "../../modules/si/edificio";
+import { edificioSua } from "../../modules/sua/edificio";
 import { alcanceDeEdificio, tiposDeObra } from "./alcance";
 import {
   CITA_MANTENIMIENTO,
@@ -45,6 +46,12 @@ export interface AtributosProyecto {
   tieneViviendas: boolean;
   tieneGaraje: boolean;
   tieneTrasteros: boolean;
+  /**
+   * HE 3 (feature-36): hay iluminación que justificar fuera de las viviendas
+   * (zonas comunes, trasteros, cuartos de instalaciones, aparcamiento que no es de
+   * la unifamiliar, oficinas o locales). Sin ella, todo es interior de vivienda.
+   */
+  iluminacionHe3?: boolean;
   /**
    * Demanda de ACS de referencia del edificio [l/d] (DB-HE Anejo F, feature-22),
    * con las decisiones guardadas de HE 4. Sin ella, la regla de HE 4 no se evalúa.
@@ -93,6 +100,7 @@ export function atributosDe(
     tieneViviendas: r.tieneViviendas,
     tieneGaraje: r.tieneGaraje,
     tieneTrasteros: r.tieneTrasteros,
+    iluminacionHe3: edificioSua(edificio).zonas.some((z) => z.clase !== "vivienda" && z.clase !== "garaje_vivienda"),
     demandaAcs_l_d: demandaReferencia(edificio, estadoHe4),
     superficieConstruida_m2,
     plazasAparcamiento: he6.plazas,
@@ -288,6 +296,21 @@ export const REGLAS_ATRIBUTOS: readonly ReglaAtributo[] = [
       "eléctricos: no es de aplicación — edificio de uso distinto del residencial " +
       "privado con una zona de aparcamiento de 10 plazas o menos (HE 6 ap. 1 pto 2 a).",
     cita: "DB-HE 6, ámbito de aplicación",
+  },
+  // ── DB-HE 3 · Iluminación (feature-36) ────────────────────────────────────
+  {
+    // Ámbito (K-MEM.6, VERIFICADO): se excluyen las instalaciones interiores de
+    // las viviendas (ap. 1 pto 2 a). Con solo viviendas no queda nada; vale para
+    // obra nueva y existente.
+    key: "he3",
+    cuando: (a) => a.iluminacionHe3 === false,
+    resultado: "no_aplica",
+    nota:
+      "DB-HE 3 Condiciones de las instalaciones de iluminación: no es de aplicación — " +
+      "las instalaciones interiores de las viviendas están excluidas del ámbito de la " +
+      "Sección (HE 3 ap. 1 pto 2 a) y el edificio no tiene zonas comunes, aparcamiento " +
+      "ni otros usos.",
+    cita: "DB-HE 3, ámbito de aplicación",
   },
   // ── Habitabilidad (feature-32) ────────────────────────────────────────────
   {

@@ -63,6 +63,7 @@ import { sua2 } from "../../modules/sua2/definicion";
 import { sua3 } from "../../modules/sua3/definicion";
 import { hs2 } from "../../modules/hs2/definicion";
 import { sua4 } from "../../modules/sua4/definicion";
+import { he3 } from "../../modules/he3/definicion";
 import { sua8 } from "../../modules/sua8/definicion";
 import { he4 } from "../../modules/he4/definicion";
 import { he5 } from "../../modules/he5/definicion";
@@ -314,5 +315,6 @@ export const MODULOS_OBRA: Partial<Record<JustificacionKey, ModuloObra>> = {
   sua2: moduloSi(sua2),
   sua3: moduloSi(sua3),
   sua4: moduloSi(sua4),
+  he3: moduloSi(he3),
   sua8: moduloSi(sua8),
 };

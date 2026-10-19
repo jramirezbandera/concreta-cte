@@ -25,7 +25,9 @@ import antes from "./foto-antes.json";
 // En feature-35 (paso 5) cambia la huella de la memoria de los 40 proyectos,
 // por la línea que remite al estudio de seguridad y salud y al de residuos;
 // nada más. En el paso 7 se añade la huella del estudio básico (con unos datos
-// fijos de seguridad y salud); el resto, igual.
+// fijos de seguridad y salud); el resto, igual. En feature-36 (paso 2, HE 3) se
+// añade la fila «he3» y cambia la huella de la memoria, por el apartado nuevo y la
+// numeración del 3.6; nada más.
 // =============================================================================
 
 describe("sin asistente de alcance, nada cambia", () => {

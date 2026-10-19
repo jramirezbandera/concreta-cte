@@ -57,7 +57,7 @@ export const SECCIONES: readonly SeccionDocumento[] = [
   },
   { capitulo: 3, numero: "3.4", titulo: "Salubridad DB HS", keys: ["hs1", "hs2", "hs3", "hs4", "hs5", "hs6"] },
   { capitulo: 3, numero: "3.5", titulo: "Protección frente al ruido DB HR", keys: ["hr"], sinSubapartados: true },
-  { capitulo: 3, numero: "3.6", titulo: "Ahorro de energía DB HE", keys: ["he0he1_global", "he1", "he4", "he5", "he6"] },
+  { capitulo: 3, numero: "3.6", titulo: "Ahorro de energía DB HE", keys: ["he0he1_global", "he1", "he3", "he4", "he5", "he6"] },
   { capitulo: 4, numero: "4.1", titulo: "Reglamento electrotécnico para baja tensión (REBT)", keys: ["rebt"] },
   { capitulo: 4, numero: "4.2", titulo: "Habitabilidad", keys: ["hab"], sinSubapartados: true },
 ];
@@ -90,6 +90,7 @@ const TITULOS: Partial<Record<JustificacionKey, string>> = {
   hs6: "HS 6 Protección frente a la exposición al radón",
   he0he1_global: "HE 0 y HE 1 Limitación del consumo energético y verificación global de la demanda",
   he1: "HE 1 Condiciones para el control de la demanda energética",
+  he3: "HE 3 Condiciones de las instalaciones de iluminación",
   he4: "HE 4 Contribución mínima de energía renovable para cubrir la demanda de agua caliente sanitaria",
   he5: "HE 5 Generación mínima de energía eléctrica procedente de fuentes renovables",
   he6: "HE 6 Dotaciones mínimas para la infraestructura de recarga de vehículos eléctricos",

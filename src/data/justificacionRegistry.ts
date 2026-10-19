@@ -2,7 +2,7 @@ import type { ComponentType } from "react";
 import {
   Wind, Droplets, Waves, Thermometer, FlaskConical, Radiation, CloudRain, BrickWallFire, Truck, Columns3, FireExtinguisher, Flame, DoorOpen,
   Footprints, ShieldAlert, LockKeyhole, Lightbulb, Users, Car, CloudLightning, Accessibility, Trash2,
-  ShowerHead, SolarPanel, Zap, EvCharger, Ear, Gauge, Weight, LifeBuoy, SunMedium,
+  ShowerHead, SolarPanel, Zap, EvCharger, Ear, Gauge, Weight, LifeBuoy, SunMedium, LampCeiling,
 } from "lucide-react";
 import type { JustificacionKey } from "../lib/proyecto/tipos";
 
@@ -366,6 +366,19 @@ export const justificacionRegistry: JustificacionEntry[] = [
     shipped: false,
     externo: { destino: "HULC o CE3X" },
     icon: Gauge,
+  },
+  {
+    key: "he3",
+    codigo: "HE3",
+    label: "Iluminación",
+    grupo: "Ahorro de energía (DB-HE)",
+    db: "DB-HE3",
+    edicionDB: "DB-HE (consolidado 14-jun-2022)",
+    formato: "checker",
+    shipped: true,
+    route: "he/iluminacion",
+    icon: LampCeiling,
+    schemaVersion: "1",
   },
   {
     key: "he4",

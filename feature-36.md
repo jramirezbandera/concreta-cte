@@ -191,6 +191,38 @@ garaje), con S de El edificio y **P (W) y Em (lux) declarados** por el proyectis
 (manual + horario, o presencia / pulsador temporizado en uso esporádico). Sin P o Em, pendiente.
 Sin exigencia de luz natural (3.4 pto 2).
 
+**Hecho (2026-10-19).** 18 tests en `src/modules/he3/test/he3.test.ts`; comprobado en el navegador
+(pantalla y memoria del Demo, sin errores de consola):
+- [src/modules/he3/](src/modules/he3/) con el patrón de SUA 4: `tablas.ts` (tabla 3.1, tabla 3.2, control
+  del 3.3 y 3.4, `veei`), `estado.ts` (por zona `potencia_W` e `iluminancia_lx`; `control` con lo
+  habitual), `justificacion.ts`, `textos.ts`, `memoria.ts`, `dibujo.ts`, `definicion.ts` y `ui.tsx`.
+- Las zonas: las de uso general del DB-SUA (portal, vestíbulo), trasteros, cuartos de instalaciones y
+  el garaje que no es de la unifamiliar. Por zona, el VEEI frente a 4,0 (6,0 en las zonas comunes de un
+  edificio no residencial); por grupo, PTOT/STOT frente a 10 W/m² (25 con más de 600 lux) y 5 en el
+  aparcamiento, con todas las plantas. Oficinas y locales, previstos con su actividad.
+- Aplicabilidad: atributo `iluminacionHe3` (hay algo fuera de las viviendas) con la regla de la
+  exclusión a); en existente, `he3` en `REGLAS_EXISTENTES` (cambio de uso característico, todo el
+  edificio; ampliación, reforma integral o alumbrado renovado, lo renovado, nombrando la regla de
+  1.000 m² y 25 %; si no, no aplica) y `ALCANCE_MODULO.he3 = "intervenido"`.
+- Registro (`he/iluminacion`, tras HE 1), ruta, La obra, anejo de fichas, memoria (3.6.3, y HE 4 a
+  HE 6 pasan a 3.6.4–3.6.6) y Demo con potencias e iluminancias de demostración.
+- Foto del expediente: la fila `he3` y la huella de la memoria; nada más.
+
+**Decisiones del paso 2, a validar:**
+1. **Sin potencia o sin iluminancia, la zona «no cumple» («sin declarar»)**, como habitabilidad sin
+   norma: el expediente no se da por bueno sin el dato. Un proyecto nuevo de plurifamiliar sale con HE 3
+   en rojo hasta que se declaran.
+2. **Potencia e iluminancia por planta** en las zonas que se repiten (la escalera de P1–P3); PTOT y STOT
+   suman todas las plantas.
+3. **Trasteros y cuartos de instalaciones cuentan como zonas comunes** (límite 4,0); el CTE no los
+   excluye.
+4. **Más de 600 lux en una zona sube el máximo de todas las zonas comunes a 25 W/m²**: la tabla 3.2 va
+   por uso, no por zona, y se toma la mayor iluminancia (INTERPRETACIÓN).
+5. **Control: detección de presencia, lo habitual**; las tres opciones del 3.3 valen en uso esporádico y
+   no hay «no cumple» posible.
+6. **El 25 % de la superficie iluminada renovada no se pregunta**: con alumbrado renovado sale
+   «aplica_reformado» y la nota nombra la regla de todo el edificio.
+
 ### Paso 3 · ICT
 
 Clave **`ict`**, en el capítulo 4 («Otros reglamentos»). Aplicabilidad (K-MEM.7):

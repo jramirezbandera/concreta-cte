@@ -16,6 +16,7 @@ import { hs6EstadoDefaults, type Hs6Estado } from "../../modules/hs6/estado";
 import { hs1EstadoDefaults, type Hs1Estado } from "../../modules/hs1/estado";
 import { he1EstadoDefaults, type He1Estado } from "../../modules/he1/estado";
 import { habEstadoDefaults, type EstanciaHab, type HabEstado } from "../../modules/hab/estado";
+import { he3EstadoDefaults, type He3Estado } from "../../modules/he3/estado";
 import { COMPUTAN_HABITUAL, type TipoEstancia } from "../habitabilidad/norma";
 import type { ZonaClimatica } from "../../modules/he1/tablas";
 import {
@@ -94,6 +95,20 @@ const DATOS_GENERALES_DEMO: DatosGenerales = {
         computan: [...COMPUTAN_HABITUAL],
       },
     ],
+  },
+};
+
+/**
+ * HE 3 (feature-36): potencias e iluminancias de DEMOSTRACIÓN, como las estancias,
+ * por planta: portal, garaje, trasteros y cuarto de instalaciones.
+ */
+const HE3_DEMO: He3Estado = {
+  ...he3EstadoDefaults,
+  zonas: {
+    z3: { potencia_W: 175, iluminancia_lx: 150 },
+    z4: { potencia_W: 840, iluminancia_lx: 75 },
+    z5: { potencia_W: 108, iluminancia_lx: 100 },
+    z6: { potencia_W: 50, iluminancia_lx: 150 },
   },
 };
 
@@ -225,6 +240,7 @@ export function crearProyectoDemo(nowIso: string): Proyecto {
       hs6: justificacionDemo(hs6Inputs),
       he1: justificacionDemo(he1Inputs),
       hab: justificacionDemo(structuredClone({ ...habEstadoDefaults, estancias: ESTANCIAS_DEMO })),
+      he3: justificacionDemo(structuredClone(HE3_DEMO)),
     },
   };
 }
