@@ -124,6 +124,7 @@ const ADAPTADORES: Partial<Record<JustificacionKey, Adaptador>> = {
   sua3: adaptadorSi(async () => (await import("../../modules/sua3/definicion")).sua3),
   sua4: adaptadorSi(async () => (await import("../../modules/sua4/definicion")).sua4),
   he3: adaptadorSi(async () => (await import("../../modules/he3/definicion")).he3),
+  ict: adaptadorSi(async () => (await import("../../modules/ict/definicion")).ict),
   sua8: adaptadorSi(async () => (await import("../../modules/sua8/definicion")).sua8),
   hs2: adaptadorSi(async () => (await import("../../modules/hs2/definicion")).hs2),
   he4: adaptadorSi(async () => (await import("../../modules/he4/definicion")).he4),

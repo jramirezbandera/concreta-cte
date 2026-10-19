@@ -107,6 +107,10 @@ const router = createHashRouter([
             lazy: lazyComponent(() => import("./modules/he1/ui"), "He1Module"),
           },
           {
+            path: "ict",
+            lazy: lazyComponent(() => import("./modules/ict/ui"), "IctModule"),
+          },
+          {
             path: "he/iluminacion",
             lazy: lazyComponent(() => import("./modules/he3/ui"), "He3Module"),
           },

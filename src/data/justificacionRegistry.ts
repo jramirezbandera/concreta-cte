@@ -2,7 +2,7 @@ import type { ComponentType } from "react";
 import {
   Wind, Droplets, Waves, Thermometer, FlaskConical, Radiation, CloudRain, BrickWallFire, Truck, Columns3, FireExtinguisher, Flame, DoorOpen,
   Footprints, ShieldAlert, LockKeyhole, Lightbulb, Users, Car, CloudLightning, Accessibility, Trash2,
-  ShowerHead, SolarPanel, Zap, EvCharger, Ear, Gauge, Weight, LifeBuoy, SunMedium, LampCeiling,
+  ShowerHead, SolarPanel, Zap, EvCharger, Ear, Gauge, Weight, LifeBuoy, SunMedium, LampCeiling, RadioTower,
 } from "lucide-react";
 import type { JustificacionKey } from "../lib/proyecto/tipos";
 
@@ -445,6 +445,20 @@ export const justificacionRegistry: JustificacionEntry[] = [
     shipped: true,
     route: "habitabilidad",
     icon: SunMedium,
+    schemaVersion: "1",
+  },
+  // ── ICT (feature-36): previsiones de la arquitectura; el proyecto técnico, aparte ─
+  {
+    key: "ict",
+    codigo: "ICT",
+    label: "Infraestructuras comunes de telecomunicaciones",
+    grupo: "Telecomunicaciones (ICT)",
+    db: "ICT",
+    edicionDB: "RD 346/2011 (consolidado 26-mar-2025)",
+    formato: "checker",
+    shipped: true,
+    route: "ict",
+    icon: RadioTower,
     schemaVersion: "1",
   },
   // ── Externas (se resuelven fuera de la app; La obra referencia el documento) ─

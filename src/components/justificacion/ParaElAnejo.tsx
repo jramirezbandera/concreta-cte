@@ -35,12 +35,21 @@ function Fila({ id, etiqueta, control, ayuda }: { id: string; etiqueta: string; 
 }
 
 /** Texto libre; vacío es `undefined`. */
-export function CampoPlanos({ id, valor, onChange, ayuda }: { id: string; valor: string | undefined; onChange: (v: string | undefined) => void; ayuda: string }): JSX.Element {
+export function CampoTexto(props: {
+  id: string;
+  etiqueta: string;
+  valor: string | undefined;
+  onChange: (v: string | undefined) => void;
+  ayuda: string;
+  placeholder: string;
+  ancho?: string;
+}): JSX.Element {
+  const { id, etiqueta, valor, onChange, ayuda, placeholder, ancho = "w-[132px]" } = props;
   const original = valor ?? "";
   return (
     <Fila
       id={id}
-      etiqueta="Planos"
+      etiqueta={etiqueta}
       ayuda={ayuda}
       control={
         <input
@@ -48,17 +57,22 @@ export function CampoPlanos({ id, valor, onChange, ayuda }: { id: string; valor:
           id={id}
           type="text"
           defaultValue={original}
-          placeholder="I05–I07"
+          placeholder={placeholder}
           onBlur={(e) => {
             const v = e.currentTarget.value.trim();
             if (v !== original) onChange(v === "" ? undefined : v);
           }}
           onKeyDown={(e) => confirmarConTeclas(e, original)}
-          className={`${INPUT} w-[132px]`}
+          className={`${INPUT} ${ancho}`}
         />
       }
     />
   );
+}
+
+/** Los planos de la instalación: texto libre; vacío es `undefined`. */
+export function CampoPlanos({ id, valor, onChange, ayuda }: { id: string; valor: string | undefined; onChange: (v: string | undefined) => void; ayuda: string }): JSX.Element {
+  return <CampoTexto id={id} etiqueta="Planos" valor={valor} onChange={onChange} ayuda={ayuda} placeholder="I05–I07" />;
 }
 
 function formato(v: number | undefined): string {

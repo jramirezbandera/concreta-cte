@@ -241,6 +241,44 @@ Remisión al proyecto técnico (autor y fecha, declarados; coordinación del art
 de arqueta, recintos y RTR, de las tablas verificadas en K-MEM.21; la fila de más de 100 PAU y la
 elección entre RITU obligatorio u opcional, no.
 
+**Hecho (2026-10-19).** 19 tests en `src/modules/ict/test/ict.test.ts`; comprobado en el navegador
+(pantalla y memoria 4.3 del Demo, sin errores de consola):
+- [src/modules/ict/](src/modules/ict/) con el patrón de habitabilidad: `tablas.ts` (ámbito del RD-ley,
+  RITU, RITU-A, RITI/RITS, arqueta ≤ 100 PAU, canalización externa y principal, RTR y registros de toma
+  del 5.13, con `recintoAdmitido` y `medidasRecinto`), `estado.ts` (recinto con lo habitual, PAU de
+  locales y de estancias comunes, autor y fecha del proyecto técnico), `justificacion.ts`, `textos.ts`,
+  `memoria.ts`, `dibujo.ts`, `definicion.ts` y `ui.tsx`. `CampoTexto` nuevo en `ParaElAnejo.tsx`
+  (`CampoPlanos` pasa a usarlo).
+- Elementos: régimen (sin declarar, «no cumple»), PAU, recinto (fuera de su ámbito, «no cumple»),
+  arqueta, canalización externa, canalización principal (no en la unifamiliar), RTR, registros de toma
+  por vivienda tipo (con las estancias de Habitabilidad o, sin ellas, las deducidas del tipo y un aviso)
+  y el proyecto técnico, «previsto».
+- Aplicabilidad: `AtributosProyecto.propiedadHorizontal`; dos reglas de `no_aplica` con el «no»
+  (una sola vivienda; o fuera del régimen y sin arrendamiento), cita «RD-ley 1/1998, art. 2». En
+  existente, `ict` en `REGLAS_EXISTENTES`: con `Alcance.integral`, aplica; si no, `no_aplica` rotulado
+  interpretación, «se conecta a la infraestructura existente».
+- Registro (grupo «Telecomunicaciones (ICT)», ruta `ict`), La obra, anejo de fichas, memoria (4.3,
+  tras habitabilidad) y Demo en propiedad horizontal.
+- Foto del expediente: la fila `ict` y la huella de la memoria; nada más.
+
+**Decisiones del paso 3, a validar:**
+1. **`aplica`, no `externo`**: el módulo es la ficha de previsiones de la arquitectura y remite al
+   proyecto técnico; `externo` no tiene pantalla. «Sin declarar» el régimen, aplica y el módulo sale
+   «no cumple» hasta contestarlo en La obra (como habitabilidad sin norma).
+2. **PAU**: las viviendas de El edificio, un local u oficina por zona y planta (ajustable) y las
+   estancias comunes que se declaren (por defecto, ninguna).
+3. **Recinto elegido por el proyectista**, con lo habitual RITU en su ámbito (hasta PB + 3 y 16 PAU) y
+   RITI + RITS fuera de él; el RITU y el RITU-A fuera de su ámbito, «no cumple»; RITI + RITS siempre vale.
+   El RITM y los conjuntos de unifamiliares no se distinguen (la regla del 4.5 sigue sin transcribir).
+4. **El RITU de hasta 5 PAU «con zonas comunes»** si El edificio tiene portal o zona común.
+5. **Estancias con registros de toma**: todas menos baños, aseos y pasillos; «otra» cuenta. Las dos
+   principales son las dos primeras; con una sola estancia, una principal.
+6. **Arqueta de más de 100 PAU**: sin cifra («la dimensiona el proyecto técnico»); canalización
+   principal de más de 30 PAU, «cálculo específico».
+7. **En existente solo cuenta `Alcance.integral`** (decisión 6 del plan): la ampliación o el cambio de
+   uso característico sin rehabilitación integral no piden proyecto.
+8. **Autor y fecha del proyecto técnico, opcionales**: sin ellos, la memoria remite sin nombrarlo.
+
 ### Paso 4 · HE 2 / RITE
 
 Clave **`rite`** (rótulo «HE 2 · RITE»), en 3.6. La fuente se reparte por servicio (decisión 3):

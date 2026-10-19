@@ -32,6 +32,7 @@ describe("filasObra — el Demo", () => {
       "Ahorro de energía · DB HE",
       "Electricidad · REBT",
       "Habitabilidad",
+      "Telecomunicaciones · ICT",
       "Externas",
     ]);
   });
@@ -179,8 +180,8 @@ describe("piezasDeQueEntra", () => {
 describe("recuento", () => {
   it("una a una, no por filas", () => {
     const r = recuentoObra(demo());
-    expect(r).toMatchObject({ cumple: 7, revisar: 19, no_cumple: 0, no_aplica: 2, externo: 3, pronto: 0 });
-    expect(textoRecuento(r)).toBe("7 cumple · 19 por revisar · 2 no aplica · 3 externo");
+    expect(r).toMatchObject({ cumple: 8, revisar: 19, no_cumple: 0, no_aplica: 2, externo: 3, pronto: 0 });
+    expect(textoRecuento(r)).toBe("8 cumple · 19 por revisar · 2 no aplica · 3 externo");
   });
 
   it("rotuloGrupo", () => {

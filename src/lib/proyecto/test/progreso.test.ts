@@ -45,7 +45,7 @@ function proyecto(
  */
 const PUBLICADAS: JustificacionKey[] = [
   "hs1", "hs2", "hs3", "hs4", "hs5", "hs6", "si1", "si2", "si3", "si4", "si5", "si6",
-  "sua1", "sua2", "sua3", "sua4", "sua6", "sua7", "sua8", "sua9", "hr", "he3", "he4", "he5", "he6", "rebt", "hab",
+  "sua1", "sua2", "sua3", "sua4", "sua6", "sua7", "sua8", "sua9", "hr", "he3", "he4", "he5", "he6", "rebt", "hab", "ict",
 ];
 
 describe("estadoDe — calculado con el motor del módulo", () => {
@@ -114,11 +114,11 @@ describe("resumenProyecto — recuento del expediente", () => {
   /** Nº de claves reales del expediente (registry sin entradas dev). */
   const TOTAL = justificacionRegistry.filter((e) => !e.dev).length;
 
-  it("el registry sin dev cubre las 31 claves del union", () => {
-    expect(TOTAL).toBe(31);
+  it("el registry sin dev cubre las 32 claves del union", () => {
+    expect(TOTAL).toBe(32);
   });
 
-  it("proyecto sin abrir nada: las veintisiete publicadas calculadas, el resto sin iniciar", () => {
+  it("proyecto sin abrir nada: las veintiocho publicadas calculadas, el resto sin iniciar", () => {
     const r = resumenProyecto(proyecto());
     // he0he1_global y he1 (HULC) y dbse (Concreta estructura) son externas en
     // obra nueva; SUA 5 no aplica nunca a viviendas ni oficinas.

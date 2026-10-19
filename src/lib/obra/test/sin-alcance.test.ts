@@ -27,7 +27,9 @@ import antes from "./foto-antes.json";
 // nada más. En el paso 7 se añade la huella del estudio básico (con unos datos
 // fijos de seguridad y salud); el resto, igual. En feature-36 (paso 2, HE 3) se
 // añade la fila «he3» y cambia la huella de la memoria, por el apartado nuevo y la
-// numeración del 3.6; nada más.
+// numeración del 3.6; nada más. En el paso 3 (ICT) se añade la fila «ict» y
+// cambia la huella de la memoria, por el apartado 4.3; nada más (el Demo, del que
+// salen los datos de la obra de los 40, pasa a estar en propiedad horizontal).
 // =============================================================================
 
 describe("sin asistente de alcance, nada cambia", () => {

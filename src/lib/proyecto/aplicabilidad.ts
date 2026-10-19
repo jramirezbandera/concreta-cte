@@ -15,6 +15,7 @@ import { recargaDeHe6 } from "../../modules/he6/justificacion";
 import { edificioSi } from "../../modules/si/edificio";
 import { edificioSua } from "../../modules/sua/edificio";
 import { alcanceDeEdificio, tiposDeObra } from "./alcance";
+import { promocionDe } from "./promocion";
 import {
   CITA_MANTENIMIENTO,
   HE1_SIN_K,
@@ -52,6 +53,11 @@ export interface AtributosProyecto {
    * la unifamiliar, oficinas o locales). Sin ella, todo es interior de vivienda.
    */
   iluminacionHe3?: boolean;
+  /**
+   * ICT (feature-36): el régimen de propiedad horizontal que declara el
+   * proyectista en La obra; sin contestar, `undefined` y el módulo lo pide.
+   */
+  propiedadHorizontal?: boolean;
   /**
    * Demanda de ACS de referencia del edificio [l/d] (DB-HE Anejo F, feature-22),
    * con las decisiones guardadas de HE 4. Sin ella, la regla de HE 4 no se evalúa.
@@ -101,6 +107,7 @@ export function atributosDe(
     tieneGaraje: r.tieneGaraje,
     tieneTrasteros: r.tieneTrasteros,
     iluminacionHe3: edificioSua(edificio).zonas.some((z) => z.clase !== "vivienda" && z.clase !== "garaje_vivienda"),
+    propiedadHorizontal: promocionDe(dg).propiedadHorizontal,
     demandaAcs_l_d: demandaReferencia(edificio, estadoHe4),
     superficieConstruida_m2,
     plazasAparcamiento: he6.plazas,
@@ -311,6 +318,30 @@ export const REGLAS_ATRIBUTOS: readonly ReglaAtributo[] = [
       "Sección (HE 3 ap. 1 pto 2 a) y el edificio no tiene zonas comunes, aparcamiento " +
       "ni otros usos.",
     cita: "DB-HE 3, ámbito de aplicación",
+  },
+  // ── ICT (feature-36) ──────────────────────────────────────────────────────
+  {
+    // Ámbito (K-MEM.7 y 21, VERIFICADO): propiedad horizontal, o arrendamiento de
+    // más de un año salvo una sola vivienda (RD-ley 1/1998, art. 2). Sin el
+    // régimen declarado no hay regla: el módulo lo pide.
+    key: "ict",
+    cuando: (a) => a.propiedadHorizontal === false && a.esUnifamiliar,
+    resultado: "no_aplica",
+    nota:
+      "Infraestructuras comunes de telecomunicaciones: no es de aplicación — el " +
+      "edificio alberga una sola vivienda y no está acogido al régimen de propiedad " +
+      "horizontal (RD-ley 1/1998, art. 2).",
+    cita: "RD-ley 1/1998, art. 2",
+  },
+  {
+    key: "ict",
+    cuando: (a) => a.propiedadHorizontal === false,
+    resultado: "no_aplica",
+    nota:
+      "Infraestructuras comunes de telecomunicaciones: no es de aplicación — el " +
+      "edificio no está acogido, ni debe acogerse, al régimen de propiedad horizontal, " +
+      "ni se arrienda por plazo superior a un año (RD-ley 1/1998, art. 2).",
+    cita: "RD-ley 1/1998, art. 2",
   },
   // ── Habitabilidad (feature-32) ────────────────────────────────────────────
   {

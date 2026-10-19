@@ -73,7 +73,7 @@ describe("AsistenteAlcance", () => {
     render(<Arnes />);
     await u.click(screen.getByRole("checkbox", { name: /Solo mantenimiento/ }));
     expect(screen.queryByRole("combobox", { name: /Rehabilitación integral/ })).toBeNull();
-    expect(screen.getByText(/No aplican \(31\)/)).toBeTruthy();
+    expect(screen.getByText(/No aplican \(32\)/)).toBeTruthy();
   });
 
   it("la estructura sin tocar deja DB-SE entre las que no aplican", async () => {

@@ -598,6 +598,26 @@ function he3(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
   return noAplica(`${HE3}: no es de aplicación — la intervención no renueva ni amplía la instalación de iluminación de las zonas comunes (HE 3 ap. 1 pto 3).`, CITA_HE3);
 }
 
+const ICT = "Infraestructuras comunes de telecomunicaciones";
+const CITA_ICT = "RD-ley 1/1998, art. 3.1";
+
+/**
+ * ICT en un edificio existente (K-MEM.7 y 21; decisión 6 de feature-36): el
+ * proyecto técnico se exige para la construcción o la rehabilitación integral
+ * (art. 3.1). La norma no define «rehabilitación integral»: se usa la respuesta
+ * del asistente (INTERPRETACIÓN). El régimen lo decide antes la regla de
+ * atributos.
+ */
+function ict(_caso: CasoObra, c: ContextoExistente): PropuestaExistente {
+  if (c.alcance.integral === true) {
+    return aplica(`${ICT}: el edificio es objeto de rehabilitación integral y al proyecto se une el proyecto técnico de ICT (RD-ley 1/1998, art. 3.1).`, CITA_ICT);
+  }
+  return noAplica(
+    `${ICT}: no se exige proyecto técnico de ICT — la obra no es de construcción ni de rehabilitación integral del edificio (RD-ley 1/1998, art. 3.1; interpretación: la norma no define la rehabilitación integral). Lo que se crea o se reforma se conecta a la infraestructura existente.`,
+    CITA_ICT,
+  );
+}
+
 const HAB = "Habitabilidad";
 const CITA_HAB = "Norma de habitabilidad del municipio";
 
@@ -722,6 +742,7 @@ export const REGLAS_EXISTENTES: Partial<Record<JustificacionKey, Regla>> = {
   he6,
   rebt,
   hab,
+  ict,
   dbse,
 };
 

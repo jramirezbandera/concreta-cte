@@ -65,7 +65,7 @@ afterEach(() => {
  * nueva va a HULC con la verificación global.
  */
 const PUBLICADAS = [
-  "hab", "he3", "he4", "he5", "he6", "hr", "hs1", "hs2", "hs3", "hs4", "hs5", "hs6", "rebt", "si1", "si2", "si3", "si4", "si5", "si6",
+  "hab", "he3", "he4", "he5", "he6", "hr", "hs1", "hs2", "hs3", "hs4", "hs5", "hs6", "ict", "rebt", "si1", "si2", "si3", "si4", "si5", "si6",
   "sua1", "sua2", "sua3", "sua4", "sua7", "sua8", "sua9",
 ];
 

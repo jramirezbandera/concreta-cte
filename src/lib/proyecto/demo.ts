@@ -17,6 +17,7 @@ import { hs1EstadoDefaults, type Hs1Estado } from "../../modules/hs1/estado";
 import { he1EstadoDefaults, type He1Estado } from "../../modules/he1/estado";
 import { habEstadoDefaults, type EstanciaHab, type HabEstado } from "../../modules/hab/estado";
 import { he3EstadoDefaults, type He3Estado } from "../../modules/he3/estado";
+import { ictEstadoDefaults } from "../../modules/ict/estado";
 import { COMPUTAN_HABITUAL, type TipoEstancia } from "../habitabilidad/norma";
 import type { ZonaClimatica } from "../../modules/he1/tablas";
 import {
@@ -81,6 +82,9 @@ const DATOS_GENERALES_DEMO: DatosGenerales = {
   permeabilidadTerreno: "medio",
   // Los planos de las instalaciones (feature-33 y 34): la memoria remite a ellos.
   planos: { hs4: "I05", hs5: "I06 e I07", rebt: "I08–I11" },
+  // Régimen de la promoción (feature-36): el plurifamiliar del Demo, en
+  // propiedad horizontal; lo demás, sin contestar.
+  promocion: { propiedadHorizontal: true },
   // Habitabilidad (feature-32): NORMA DE DEMOSTRACIÓN, como el estudio
   // geotécnico. No es la de Cáceres: la herramienta no trae normas municipales
   // sin cotejar, y el rótulo lo dice para que no pase a una memoria real.
@@ -241,6 +245,7 @@ export function crearProyectoDemo(nowIso: string): Proyecto {
       he1: justificacionDemo(he1Inputs),
       hab: justificacionDemo(structuredClone({ ...habEstadoDefaults, estancias: ESTANCIAS_DEMO })),
       he3: justificacionDemo(structuredClone(HE3_DEMO)),
+      ict: justificacionDemo(structuredClone(ictEstadoDefaults)),
     },
   };
 }

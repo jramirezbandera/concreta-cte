@@ -9,7 +9,11 @@ import type { DatosGenerales } from "../tipos";
 // feature-36, paso 1: el régimen de la promoción y la comunidad autónoma.
 // =============================================================================
 
-const dg = (): DatosGenerales => crearProyectoDemo("2026-10-19T10:00:00.000Z").datosGenerales;
+/** Los datos del Demo sin el régimen (el Demo lo trae contestado desde el paso 3). */
+const dg = (): DatosGenerales => {
+  const { promocion: _p, ...d } = crearProyectoDemo("2026-10-19T10:00:00.000Z").datosGenerales;
+  return d;
+};
 
 describe("comunidades por el código INE", () => {
   it("las 52 provincias, cada una con su comunidad, y las 19 comunidades con nombre", () => {
@@ -47,6 +51,7 @@ describe("comunidades por el código INE", () => {
 
 describe("el régimen de la promoción", () => {
   it("sin contestar: nada, y un expediente de antes se lee igual", () => {
+    expect(crearProyectoDemo("2026-10-19T10:00:00.000Z").datosGenerales.promocion).toEqual({ propiedadHorizontal: true });
     expect(dg().promocion).toBeUndefined();
     expect(promocionDe(dg())).toEqual({});
   });
