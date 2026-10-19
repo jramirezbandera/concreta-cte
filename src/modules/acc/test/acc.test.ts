@@ -48,14 +48,15 @@ describe("el Decreto 293/2009 (K-MEM.22)", () => {
 });
 
 describe("aplicabilidad", () => {
-  it("unifamiliar andaluza de autopromoción para uso propio: no aplica, con el motivo", () => {
-    const a = aplicabilidadEfectiva(caso("unifamiliar", { promocion: { autopromocion: true } }), "acc");
+  it("unifamiliar andaluza: no aplica, sin elementos comunitarios (el art. 106 es de los plurifamiliares)", () => {
+    const a = aplicabilidadEfectiva(caso("unifamiliar"), "acc");
     expect(a.aplicabilidad).toBe("no_aplica");
-    expect(a.nota).toMatch(/sin elementos de uso comunitario \(art\. 2\.1 j\).*106\.5/);
+    expect(a.nota).toMatch(/es unifamiliar, sin elementos de uso comunitario \(art\. 2\.1 j\)/);
+    expect(a.nota).not.toMatch(/106/);
   });
 
-  it("fuera de Andalucía, la unifamiliar de autopromoción sigue aplicando (decide su norma)", () => {
-    expect(aplicabilidadEfectiva(caso("unifamiliar", { ine: CACERES, promocion: { autopromocion: true } }), "acc").aplicabilidad).toBe("aplica");
+  it("fuera de Andalucía, la unifamiliar sigue aplicando (decide su norma)", () => {
+    expect(aplicabilidadEfectiva(caso("unifamiliar", { ine: CACERES }), "acc").aplicabilidad).toBe("aplica");
   });
 
   it("local a vivienda en Andalucía: a las zonas comunes que se reforman (el portal); sin tocarlas, no aplica", () => {
@@ -93,11 +94,14 @@ describe("Andalucía", () => {
     expect(j(caso("plurifamiliar", { promocion: { protegida: false }, ascensor: true })).veredicto).toBe("ok");
   });
 
-  it("la unifamiliar que no dice si es autopromoción, con más de una planta, no cumple", () => {
-    const p = caso("unifamiliar");
-    expect(det(p, "ascensor")).toMatchObject({ exigencia: "reserva", plantas: 2, viviendas: 1 });
-    expect(j(p).elementos.find((e) => e.id === "ascensor")?.veredicto).toBe("fail");
-    expect(textoIncumplimientoAcc(j(p).elementos.find((e) => e.id === "ascensor")!)?.titulo).toMatch(/autopromoción/);
+  it("la unifamiliar (forzada a aplicar): sin exigencias y sin comunicación vertical", () => {
+    const r = j(caso("unifamiliar"));
+    expect(r.elementos.map((e) => [e.id, e.veredicto])).toEqual([
+      ["norma", "dato"],
+      ["unifamiliar", "dato"],
+    ]);
+    expect(r.veredicto).toBe("ok");
+    expect(memoriaAcc(r).parrafos[0][0]).toMatch(/La vivienda unifamiliar no los tiene/);
   });
 
   it("reserva: sin declarar la promoción, no cumple; protegida con menos de 17, cero y un aviso; las cuenta SUA 9", () => {

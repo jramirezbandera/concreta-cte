@@ -46,16 +46,17 @@ export function fraseAcc(j: JustificacionAcc): string {
   if (!j.residencial) return "Edificio de otros usos: la accesibilidad andaluza se justifica con la Ficha II, fuera del alcance de la herramienta.";
   const fallo = j.elementos.find((e) => e.veredicto === "fail");
   if (fallo) return textoIncumplimientoAcc(fallo)?.titulo ?? "Revisa la accesibilidad.";
+  if (j.unifamiliar) return "Decreto 293/2009: la vivienda unifamiliar no tiene elementos de uso comunitario y su interior, de vivienda libre, no tiene exigencias.";
   const asc = elemento(j, "ascensor")?.detalle;
-  const vertical = asc ? (asc.excluida ? "autopromoción para uso propio, excluida del art. 106" : asc.exigencia === "ninguna" ? "sin comunicación vertical que exigir" : NOMBRE_EXIGENCIA[asc.exigencia]) : "";
-  return `Decreto 293/2009: ${j.unifamiliar ? "sin zonas comunes" : "zonas comunes con itinerario accesible"}; ${vertical}.`;
+  const vertical = asc ? (asc.exigencia === "ninguna" ? "sin comunicación vertical que exigir" : NOMBRE_EXIGENCIA[asc.exigencia]) : "";
+  return `Decreto 293/2009: zonas comunes con itinerario accesible; ${vertical}.`;
 }
 
 export function metricasAcc(j: JustificacionAcc): string {
   if (!j.andalucia) return elemento(j, "norma")!.detalle.otra ?? "norma sin declarar";
   const asc = elemento(j, "ascensor")?.detalle;
   const res = elemento(j, "reserva")?.detalle;
-  return [asc ? (asc.excluida ? "106.5" : NOMBRE_EXIGENCIA[asc.exigencia]) : null, res && res.protegida ? `${res.reservadas} reservadas` : null].filter(Boolean).join(" · ") || "Decreto 293/2009";
+  return [asc ? NOMBRE_EXIGENCIA[asc.exigencia] : null, res && res.protegida ? `${res.reservadas} reservadas` : null].filter(Boolean).join(" · ") || "Decreto 293/2009";
 }
 
 export function piezasAcc(j: JustificacionAcc): { texto: string; acento: boolean }[] {
@@ -89,8 +90,6 @@ export function textoEtiquetaAcc(el: ElementoSi<unknown>): string {
     case "itinerarios":
       return "itinerario accesible";
     case "ascensor":
-      if (d.excluida) return "excluida (106.5)";
-      if (d.unifamiliar && d.autopromocion === undefined && d.exigencia !== "ninguna") return "¿autopromoción?";
       return d.exigencia === "ninguna" ? "sin exigencia" : d.hay ? "ascensor" : d.exigencia === "reserva" ? "reserva de hueco" : "sin ascensor";
     case "reserva":
       return d.protegida === undefined ? "promoción sin declarar" : `${d.reservadas} reservadas`;
@@ -98,6 +97,8 @@ export function textoEtiquetaAcc(el: ElementoSi<unknown>): string {
       return d.imposibilidad ? "DA 1.ª" : "lo modificado";
     case "otros_usos":
       return "Ficha II";
+    case "unifamiliar":
+      return "sin exigencias";
   }
 }
 
@@ -110,8 +111,6 @@ export function resultadoListaAcc(el: ElementoSi<unknown>): string {
     case "itinerarios":
       return d.existente ? "los que se construyen o reforman, con la Ficha III" : "desde el exterior, en las zonas comunes y hasta cada vivienda, con la Ficha III";
     case "ascensor":
-      if (d.excluida) return "vivienda de autopromoción individual para uso propio (art. 106.5)";
-      if (d.unifamiliar && d.autopromocion === undefined && d.exigencia !== "ninguna") return "declara en La obra si es autopromoción para uso propio (106.5)";
       return `${plantasTexto(d.plantas)} y ${viviendasTexto(d.viviendas)}: ${NOMBRE_EXIGENCIA[d.exigencia]}${d.exigencia !== "ninguna" ? (d.hay ? "; el edificio tiene ascensor" : d.exigencia === "ascensor" ? "; el edificio no lo tiene" : "") : ""}`;
     case "reserva":
       if (d.protegida === undefined) return "declara en La obra si la promoción es protegida o pública";
@@ -121,6 +120,8 @@ export function resultadoListaAcc(el: ElementoSi<unknown>): string {
       return d.imposibilidad ? "con la declaración de circunstancias de la DA 1.ª" : "solo los elementos comunitarios que se modifican (art. 2.1 j y 2.2)";
     case "otros_usos":
       return "fuera del alcance de la herramienta";
+    case "unifamiliar":
+      return "sin elementos de uso comunitario (art. 2.1 j); el interior de la vivienda libre no tiene exigencias";
   }
 }
 
@@ -157,14 +158,12 @@ export function franjaAcc(el: ElementoSi<unknown>, _j: JustificacionAcc, estado:
       return {
         clase: "Comunicación vertical · art. 106",
         titulo: el.nombre,
-        valor: d.excluida ? "Excluida" : d.exigencia === "ninguna" ? "No se exige" : d.exigencia === "reserva" ? "Reserva" : "Ascensor",
+        valor: d.exigencia === "ninguna" ? "No se exige" : d.exigencia === "reserva" ? "Reserva" : "Ascensor",
         estado,
-        manda: `Con ${A.plantasReserva} plantas sobre rasante y ${A.viviendasReservaMax} viviendas o menos, se reserva el espacio estructural para un ascensor futuro; con más viviendas, o con ${A.plantasAscensor} o más plantas, ascensor, que llega también a los sótanos de aparcamiento (106.4). Las viviendas de autopromoción individual para uso propio quedan excluidas (106.5).`,
+        manda: `Con ${A.plantasReserva} plantas sobre rasante y ${A.viviendasReservaMax} viviendas o menos, se reserva el espacio estructural para un ascensor futuro; con más viviendas, o con ${A.plantasAscensor} o más plantas, ascensor, que llega también a los sótanos de aparcamiento (106.4). Solo en los edificios plurifamiliares.`,
         nota: d.existente
           ? "En la reforma se aplica a lo que se modifica; con imposibilidad física, ayudas técnicas (106.6) y la declaración de la DA 1.ª."
-          : d.unifamiliar && !d.excluida
-            ? "La unifamiliar que no es de autopromoción para uso propio entra en el 106.2 (interpretación: la exclusión del 106.5 solo tiene sentido así)."
-            : d.supuesto && d.exigencia !== "ninguna"
+          : d.supuesto && d.exigencia !== "ninguna"
               ? "El edificio no dice si tiene ascensor: se supone el que se exige. Márcalo en El edificio."
               : undefined,
         filas: [
@@ -201,6 +200,16 @@ export function franjaAcc(el: ElementoSi<unknown>, _j: JustificacionAcc, estado:
         manda: "En la reforma de los espacios comunitarios, el Reglamento se aplica solo a los elementos o partes que se modifican. Si las condiciones físicas, históricas o normativas impiden cumplirlo del todo, la memoria indica de forma motivada los artículos imposibles de cumplir y se mejoran las condiciones existentes con ayudas técnicas.",
         filas: d.imposibilidad ? [{ k: "Declaración", v: d.imposibilidad }] : [],
         cita: "Decreto 293/2009 · art. 2.1 j y 2.2 · DA 1.ª",
+      };
+    case "unifamiliar":
+      return {
+        clase: "Ámbito · art. 2.1 j",
+        titulo: el.nombre,
+        valor: "Sin exigencias",
+        estado,
+        manda: "El Reglamento se aplica a los elementos de uso comunitario de las edificaciones de vivienda, y la comunicación vertical del art. 106, a los edificios plurifamiliares. La vivienda unifamiliar no tiene elementos comunitarios y su interior, de vivienda libre no reservada, no tiene exigencias.",
+        filas: [],
+        cita: "Decreto 293/2009 · art. 2.1 j",
       };
     case "otros_usos":
       return {
@@ -248,12 +257,6 @@ export function textoIncumplimientoAcc(el: ElementoSi<unknown>): TextoSi | null 
       : { titulo: "Falta el municipio de la obra.", detalle: "La norma de accesibilidad es la de la comunidad autónoma: elige el municipio en La obra." };
   }
   if (d.clase === "ascensor") {
-    if (d.unifamiliar && d.autopromocion === undefined) {
-      return {
-        titulo: "Falta decir si la vivienda es de autopromoción para uso propio.",
-        detalle: `Con ${plantasTexto(d.plantas)}, el art. 106.2 pide ${NOMBRE_EXIGENCIA[d.exigencia]} salvo en la autopromoción individual para uso propio (106.5). Contéstalo en La obra, «Régimen de la promoción».`,
-      };
-    }
     return {
       titulo: "El Decreto 293/2009 exige ascensor y el edificio no lo tiene.",
       detalle: `Con ${plantasTexto(d.plantas)} y ${viviendasTexto(d.viviendas)} (art. 106.2 b). Márcalo en El edificio.`,

@@ -11,9 +11,9 @@
 //     (sus medidas no están transcritas: la app no las imprime);
 //   - comunicación vertical (art. 106.2): reserva de hueco o ascensor por plantas
 //     sobre rasante y viviendas, frente a SUA 9 1.1.2; manda la más exigente
-//     (INTERPRETACIÓN) y se avisa si no coinciden. Exenta la autopromoción
-//     individual para uso propio (106.5). La unifamiliar que no lo es entra en el
-//     106.2 (INTERPRETACIÓN: el 106.5 solo tiene sentido si no fuera así);
+//     (INTERPRETACIÓN) y se avisa si no coinciden. Solo en plurifamiliares: la
+//     unifamiliar no tiene elementos comunitarios ni le alcanza el art. 106
+//     (validado por el usuario el 2026-10-19);
 //   - reserva de viviendas en promoción protegida o pública (Ley 4/2017 art. 58.1;
 //     Ficha IV), frente a las viviendas accesibles de SUA 9, que son las que la
 //     cuentan (SUA 9 1.2.1 remite a la reglamentación aplicable);
@@ -46,17 +46,15 @@ export type DetalleAcc =
       /** Ascensor en El edificio (o supuesto, si no se dice). */
       hay: boolean;
       supuesto: boolean;
-      /** Lo que exige SUA 9 1.1.2; null en la unifamiliar. */
+      /** Lo que exige SUA 9 1.1.2. */
       sua9: "ascensor" | "prevision" | null;
-      unifamiliar: boolean;
-      autopromocion: boolean | undefined;
-      excluida: boolean;
       existente: boolean;
       garajeSotano: boolean;
     }
   | { clase: "reserva"; protegida: boolean | undefined; viviendas: number; reservadas: number; sr: number }
   | { clase: "existente"; imposibilidad: string | undefined }
-  | { clase: "otros_usos" };
+  | { clase: "otros_usos" }
+  | { clase: "unifamiliar" };
 
 export type ElementoAcc = ElementoSi<DetalleAcc>;
 
@@ -112,63 +110,62 @@ export function justificarAcc(estado: Partial<AccEstado>, p: ProyectoSi): Justif
     return { ...base, elementos, avisos, veredicto: "ok" };
   }
 
-  // ── Los itinerarios (art. 104) ────────────────────────────────────────────
-  if (!unifamiliar) {
+  // ── La unifamiliar: sin elementos comunitarios (art. 2.1 j) ───────────────
+  if (unifamiliar) {
     elementos.push({
-      id: "itinerarios",
-      nombre: "Itinerarios accesibles comunitarios",
-      tipo: "itinerario",
+      id: "unifamiliar",
+      nombre: "Vivienda unifamiliar",
+      tipo: "ambito",
       veredicto: "dato",
-      valor: { texto: "art. 104" },
-      manda: { tipo: "dato_de_partida", fuente: "Decreto 293/2009, art. 104; Orden de 9-01-2012, Ficha III" },
-      cita: ["Decreto 293/2009 · art. 104"],
-      detalle: { clase: "itinerarios", existente },
+      valor: { texto: "sin exigencias" },
+      manda: { tipo: "dato_de_partida", fuente: "Decreto 293/2009, art. 2.1 j" },
+      cita: ["Decreto 293/2009 · art. 2.1 j"],
+      detalle: { clase: "unifamiliar" },
     });
+    return { ...base, elementos, avisos, veredicto: "ok" };
   }
+
+  // ── Los itinerarios (art. 104) ────────────────────────────────────────────
+  elementos.push({
+    id: "itinerarios",
+    nombre: "Itinerarios accesibles comunitarios",
+    tipo: "itinerario",
+    veredicto: "dato",
+    valor: { texto: "art. 104" },
+    manda: { tipo: "dato_de_partida", fuente: "Decreto 293/2009, art. 104; Orden de 9-01-2012, Ficha III" },
+    cita: ["Decreto 293/2009 · art. 104"],
+    detalle: { clase: "itinerarios", existente },
+  });
 
   // ── La comunicación vertical (art. 106) ───────────────────────────────────
   const promo = promocionDe(p.datosGenerales);
-  const viviendas = unifamiliar ? 1 : r.numViviendas;
+  const viviendas = r.numViviendas;
   const plantas = r.plantasSobreRasante;
   const exigencia = exigenciaVertical(plantas, viviendas);
-  const excluida = unifamiliar && promo.autopromocion === true;
-  const sua9 = unifamiliar ? null : justificarSua9({ ...sua9EstadoDefaults, ...((p.justificaciones?.sua9?.inputs ?? {}) as Partial<Sua9Estado>) }, p);
-  const sua9Exige = sua9?.ascensor ? (sua9.ascensor.exigido ? "ascensor" : "prevision") : null;
+  const sua9 = justificarSua9({ ...sua9EstadoDefaults, ...((p.justificaciones?.sua9?.inputs ?? {}) as Partial<Sua9Estado>) }, p);
+  const sua9Exige = sua9.ascensor ? (sua9.ascensor.exigido ? "ascensor" : "prevision") : null;
   const supuesto = p.edificio.ascensor === undefined;
   const hay = supuesto ? exigencia === "ascensor" || sua9Exige === "ascensor" : p.edificio.ascensor === true;
   const garajeSotano = edificioSua(p.edificio).zonas.some((z) => z.clase === "garaje" && z.bajoRasante);
-  const sinAutopromocion = unifamiliar && promo.autopromocion === undefined && exigencia !== "ninguna";
-  const falla = !existente && !excluida && (sinAutopromocion || (exigencia === "ascensor" && !hay));
+  const falla = !existente && exigencia === "ascensor" && !hay;
   elementos.push({
     id: "ascensor",
     nombre: "Comunicación vertical",
     tipo: "ascensor",
-    veredicto: falla ? "fail" : existente || excluida ? "dato" : "ok",
-    valor: {
-      texto: excluida
-        ? "excluida (106.5)"
-        : sinAutopromocion
-          ? "autopromoción sin declarar"
-          : exigencia === "ninguna"
-            ? "no se exige"
-            : hay
-              ? "ascensor"
-              : exigencia === "reserva"
-                ? "reserva de hueco"
-                : "falta el ascensor",
-    },
+    veredicto: falla ? "fail" : existente ? "dato" : "ok",
+    valor: { texto: exigencia === "ninguna" ? "no se exige" : hay ? "ascensor" : exigencia === "reserva" ? "reserva de hueco" : "falta el ascensor" },
     manda: { tipo: "altura_edificio", plantas, limite: 2 },
     cita: ["Decreto 293/2009 · art. 106"],
-    detalle: { clase: "ascensor", exigencia, plantas, viviendas, hay, supuesto, sua9: sua9Exige, unifamiliar, autopromocion: promo.autopromocion, excluida, existente, garajeSotano },
+    detalle: { clase: "ascensor", exigencia, plantas, viviendas, hay, supuesto, sua9: sua9Exige, existente, garajeSotano },
   });
-  if (!excluida && sua9Exige !== null && exigencia !== "ninguna" && (exigencia === "ascensor") !== (sua9Exige === "ascensor")) {
+  if (sua9Exige !== null && exigencia !== "ninguna" && (exigencia === "ascensor") !== (sua9Exige === "ascensor")) {
     avisos.push({ id: exigencia === "ascensor" ? "manda-decreto" : "manda-sua9", tipo: "caso_especial", elementoId: "ascensor", datos: { exigencia, sua9: sua9Exige } });
   }
 
   // ── La reserva de viviendas (Ley 4/2017 art. 58.1; Ficha IV) ──────────────
-  if (!unifamiliar) {
+  {
     const reservadas = promo.protegida === true ? viviendasReservadas(viviendas) : 0;
-    const sr = sua9?.viviendas.sr ?? 0;
+    const sr = sua9.viviendas.sr;
     elementos.push({
       id: "reserva",
       nombre: "Viviendas reservadas",

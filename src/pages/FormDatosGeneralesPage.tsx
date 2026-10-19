@@ -28,7 +28,6 @@ import { Field, InputLabel, NumberInput, SelectInput } from "../components/ui/In
 import { AsistenteAlcance } from "../components/proyecto/AsistenteAlcance";
 import { SeccionHabitabilidad } from "../components/proyecto/SeccionHabitabilidad";
 import { SeccionPromocion } from "../components/proyecto/SeccionPromocion";
-import { resumenEdificio } from "../lib/edificio/derivar";
 import { obraDeCaso } from "../lib/proyecto/alcance";
 import { SelectorMunicipio } from "../components/proyecto/SelectorMunicipio";
 import { BotonMapa, EnlaceVisor } from "../components/proyecto/MapaNormativo";
@@ -850,7 +849,7 @@ export function FormDatosGeneralesPage({ modo }: { modo: "crear" | "editar" }): 
 
             <SeccionDocumento dg={dg} setDg={setDg} />
 
-            <SeccionPromocion dg={dg} setDg={setDg} resumen={resumenEdificio(edificio)} />
+            <SeccionPromocion dg={dg} setDg={setDg} />
 
             <SeccionHabitabilidad dg={dg} setDg={setDg} />
           </div>

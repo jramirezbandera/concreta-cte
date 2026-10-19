@@ -1,19 +1,19 @@
 import { comunidadDeIne, type ComunidadAutonoma } from "../../data/comunidades";
-import type { ResumenEdificio } from "../edificio/derivar";
 import type { DatosGenerales, PromocionObra } from "./tipos";
 
 // =============================================================================
 // El régimen de la promoción (feature-36, paso 1). PURO.
 //
-// Tres preguntas sí / no que El edificio no sabe y que deciden apartados de la
-// fase 7: la propiedad horizontal (ICT), la promoción protegida o pública
-// (reserva de viviendas accesibles) y la autopromoción para uso propio (ascensor
-// del Decreto 293/2009). Sin valor por defecto: lo que no se contesta, el
+// Dos preguntas sí / no que El edificio no sabe y que deciden apartados de la
+// fase 7: la propiedad horizontal (ICT) y la promoción protegida o pública
+// (reserva de viviendas accesibles). La autopromoción para uso propio se quitó en
+// el paso 5: el art. 106 del Decreto 293/2009 solo alcanza a los plurifamiliares,
+// y en un expediente guardado se ignora. Sin valor por defecto: lo que no se contesta, el
 // apartado que lo necesita lo pide como pendiente. La comunidad autónoma no se
 // pregunta: sale del código INE del municipio.
 // =============================================================================
 
-const CAMPOS = ["propiedadHorizontal", "protegida", "autopromocion"] as const satisfies readonly (keyof PromocionObra)[];
+const CAMPOS = ["propiedadHorizontal", "protegida"] as const satisfies readonly (keyof PromocionObra)[];
 
 /** Lo declarado, leído con cuidado: solo los sí / no que tienen forma (un expediente tocado a mano no rompe nada). */
 export function promocionDe(dg: Pick<DatosGenerales, "promocion">): PromocionObra {
@@ -42,11 +42,6 @@ export function conPromocion(dg: DatosGenerales, cambio: Partial<Record<keyof Pr
   }
   const { promocion: _p, ...resto } = dg;
   return Object.keys(r).length > 0 ? { ...resto, promocion: r } : resto;
-}
-
-/** La autopromoción para uso propio solo se pregunta en vivienda unifamiliar (Decreto 293/2009, art. 106.5). */
-export function preguntaAutopromocion(r: Pick<ResumenEdificio, "esUnifamiliar">): boolean {
-  return r.esUnifamiliar;
 }
 
 /** La comunidad autónoma de la obra, por el municipio; sin municipio elegido, ninguna. */

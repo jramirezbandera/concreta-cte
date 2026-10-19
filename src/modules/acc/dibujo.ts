@@ -23,7 +23,7 @@ export function dibujoAcc(j: JustificacionAcc, edificio: Edificio): DibujoSi {
   const PASO = 30;
   let y = base.yRasante - 46;
   const etiquetas: EtiquetaSi[] = [];
-  for (const id of ["existente", "reserva", "ascensor", "otros-usos", "norma"].filter((x) => j.elementos.some((e) => e.id === x))) {
+  for (const id of ["existente", "reserva", "ascensor", "unifamiliar", "otros-usos", "norma"].filter((x) => j.elementos.some((e) => e.id === x))) {
     etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y });
     y -= PASO;
   }

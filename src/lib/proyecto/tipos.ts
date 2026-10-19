@@ -185,11 +185,6 @@ export interface PromocionObra {
    * la Ley 4/2017, art. 58.1; K-MEM.22) y SUA 9 1.2.1.
    */
   protegida?: boolean;
-  /**
-   * Vivienda de autopromoción individual para uso propio: exenta del ascensor del
-   * Decreto 293/2009 (art. 106.5). Solo se pregunta en vivienda unifamiliar.
-   */
-  autopromocion?: boolean;
 }
 
 /** Fase del proyecto, como la nombra el documento. */

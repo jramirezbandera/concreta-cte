@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { COMUNIDAD_DE_PROVINCIA, NOMBRE_COMUNIDAD, comunidadDeIne, provinciasDe } from "../../../data/comunidades";
 import { PLANTILLAS } from "../../habitabilidad/norma";
 import { crearProyectoDemo } from "../demo";
-import { comunidadDeObra, conPromocion, preguntaAutopromocion, promocionDe } from "../promocion";
+import { comunidadDeObra, conPromocion, promocionDe } from "../promocion";
 import type { DatosGenerales } from "../tipos";
 
 // =============================================================================
@@ -68,7 +68,7 @@ describe("el régimen de la promoción", () => {
   });
 
   it("un «no» es una respuesta, no un hueco", () => {
-    expect(promocionDe(conPromocion(dg(), { autopromocion: false }))).toEqual({ autopromocion: false });
+    expect(promocionDe(conPromocion(dg(), { protegida: false }))).toEqual({ protegida: false });
   });
 
   it("lo que no tiene forma se descarta al leer", () => {
@@ -77,8 +77,8 @@ describe("el régimen de la promoción", () => {
     expect(promocionDe({ promocion: "x" } as unknown as DatosGenerales)).toEqual({});
   });
 
-  it("la autopromoción solo se pregunta en vivienda unifamiliar", () => {
-    expect(preguntaAutopromocion({ esUnifamiliar: true })).toBe(true);
-    expect(preguntaAutopromocion({ esUnifamiliar: false })).toBe(false);
+  it("la autopromoción de un expediente guardado antes del paso 5 se ignora", () => {
+    const viejo = { ...dg(), promocion: { protegida: true, autopromocion: true } } as unknown as DatosGenerales;
+    expect(promocionDe(viejo)).toEqual({ protegida: true });
   });
 });

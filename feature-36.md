@@ -143,6 +143,7 @@ para que los expedientes guardados se sigan leyendo):
 - **promoción protegida o de las Administraciones públicas**: sí / no (reserva de viviendas del
   Decreto 293/2009 art. 111 y viviendas accesibles de SUA 9 1.2.1);
 - **autopromoción individual para uso propio**: sí / no, solo en vivienda unifamiliar (art. 106.5).
+  **Quitada en el paso 5**: el art. 106 solo alcanza a los plurifamiliares (corrección del usuario).
 - **Comunidad autónoma** derivada del INE del municipio (tabla de prefijos de provincia), sin
   pedirla.
 
@@ -168,8 +169,8 @@ navegador (se contesta, se guarda y se relee; sin errores de consola):
 **Decisiones del paso 1, a validar:**
 1. **La sección va en la columna izquierda de La obra, entre «Documento» y «Habitabilidad»**, y no
    en El edificio: es un dato de la promoción, no de la geometría.
-2. **La autopromoción solo se pregunta en vivienda unifamiliar**; si el edificio deja de serlo, la
-   respuesta guardada se queda pero nadie la lee.
+2. ~~**La autopromoción solo se pregunta en vivienda unifamiliar**~~. **Quitada en el paso 5**: sin
+   lector (el art. 106 es de los plurifamiliares); en un expediente guardado se ignora.
 3. **La comunidad no se puede cambiar a mano**: sin municipio, «elige el municipio».
 4. **Los controles sí / no son los de seguridad y salud** (ningún botón pulsado si no se contesta).
 
@@ -371,13 +372,14 @@ errores de consola):
   Ley 4/2017 y la Ficha IV, tramos del art. 104; `exigenciaVertical`, `viviendasReservadas`),
   `estado.ts` (la norma de otra comunidad y la declaración de la DA 1.ª), `justificacion.ts`,
   `textos.ts`, `memoria.ts`, `dibujo.ts`, `definicion.ts` y `ui.tsx`.
-- **Andalucía** (comunidad por el INE del municipio): la norma; itinerarios del art. 104 (sin medidas:
+- **Andalucía** (comunidad por el INE del municipio), en plurifamiliar: la norma; itinerarios del art. 104 (sin medidas:
   la Ficha III no está transcrita); comunicación vertical por el 106.2 frente a lo que exige SUA 9, con
   aviso si no coinciden y la tabla «DB-SUA 9 | Decreto | Proyecto»; reserva de viviendas frente a las
   accesibles de SUA 9; en existente, lo modificado y la DA 1.ª; otros usos, «fuera» (Ficha II).
 - **Otra comunidad**: solo la norma declarada; sin ella (o sin municipio), «no cumple».
-- Aplicabilidad: regla de atributos (Andalucía, unifamiliar y autopromoción → `no_aplica` con el
-  motivo); en existente, `acc` en `REGLAS_EXISTENTES` con `AlcanceEdificio.intervieneComunes` (nuevo:
+- **Unifamiliar andaluza**: `no_aplica` siempre, «sin elementos de uso comunitario (art. 2.1 j); el
+  interior de la vivienda libre no tiene exigencias»; forzada a aplicar, una línea «sin exigencias».
+- Aplicabilidad: regla de atributos (Andalucía y unifamiliar → `no_aplica` con el motivo); en existente, `acc` en `REGLAS_EXISTENTES` con `AlcanceEdificio.intervieneComunes` (nuevo:
   alguna zona común nueva, reformada o que cambia de uso) y `ContextoExistente.comunidad`.
 - Registro (ruta `accesibilidad`, grupo «Accesibilidad (autonómica)»), La obra, anejo, memoria (4.4) y
   Demo con una norma de demostración rotulada (Cáceres no tiene plantilla).
@@ -386,9 +388,10 @@ errores de consola):
 **Decisiones del paso 5, a validar:**
 1. **Solo Andalucía con plantilla**; en otra comunidad, la norma con su referencia y una línea de
    remisión, sin comprobar nada.
-2. **La unifamiliar que no es de autopromoción entra en el art. 106.2** (INTERPRETACIÓN: el 106.5 solo
-   tiene sentido si el 106 la alcanza): PB+1 pide reserva de hueco y PB+2, ascensor. Sin contestar la
-   autopromoción, «no cumple».
+2. **VALIDADA CON CORRECCIÓN (2026-10-19): el art. 106 solo se aplica a los plurifamiliares.** El primer
+   borrador metía en el 106.2 la unifamiliar que no fuera de autopromoción; el usuario lo corrige: la
+   unifamiliar andaluza no aplica nunca (sin elementos comunitarios, interior libre sin exigencias). Se
+   quita la pregunta de autopromoción de La obra.
 3. **Las viviendas reservadas las cuenta SUA 9** (sus viviendas accesibles para silla de ruedas): si
    son menos que la reserva, «no cumple» con el texto que dice cuántas indicar en SUA 9.
 4. **Sin ascensor declarado en El edificio, se supone el que exija el Decreto o SUA 9**; con «no»

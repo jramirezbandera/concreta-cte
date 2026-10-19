@@ -22,7 +22,7 @@ function detalle<C extends DetalleAcc["clase"]>(j: JustificacionAcc, c: C): Extr
 function tabla(j: JustificacionAcc, tras: number): TablaMemoria | undefined {
   const asc = detalle(j, "ascensor");
   const res = detalle(j, "reserva");
-  if (!asc || asc.excluida) return undefined;
+  if (!asc) return undefined;
   const filas: string[][] = [];
   const decretoMas = asc.exigencia === "ascensor" && asc.sua9 !== "ascensor";
   const suaMas = asc.sua9 === "ascensor" && asc.exigencia !== "ascensor";
@@ -65,12 +65,7 @@ export function memoriaAcc(j: JustificacionAcc): MemoriaDoc {
   const asc = detalle(j, "ascensor");
   if (j.unifamiliar) {
     parrafos.push([
-      `Es de aplicación el Reglamento de accesibilidad de Andalucía, aprobado por el ${CITA_D293}. La vivienda unifamiliar no tiene elementos de uso comunitario (art. 2.1 j) y su interior, como vivienda libre no reservada para personas con movilidad reducida, no tiene exigencias.`,
-      asc?.excluida
-        ? " Al ser de autopromoción individual para uso propio, queda excluida de las exigencias de comunicación vertical (art. 106.5)."
-        : asc && asc.exigencia !== "ninguna"
-          ? ` Con ${asc.plantas} plantas sobre rasante, el art. 106.2 pide ${NOMBRE_EXIGENCIA[asc.exigencia]}${asc.hay ? ", que se proyecta" : ""}.`
-          : "",
+      `El Reglamento de accesibilidad de Andalucía, aprobado por el ${CITA_D293}, se aplica a los elementos de uso comunitario de las edificaciones de vivienda (art. 2.1 j). La vivienda unifamiliar no los tiene y su interior, como vivienda libre no reservada para personas con movilidad reducida, no tiene exigencias.`,
     ]);
   } else {
     parrafos.push([

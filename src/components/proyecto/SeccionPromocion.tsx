@@ -3,12 +3,11 @@ import { CollapsibleSection } from "../ui/CollapsibleSection";
 import { InputLabel } from "../ui/InputLabel";
 import { SiNo } from "../ebss/controles";
 import { NOMBRE_COMUNIDAD } from "../../data/comunidades";
-import type { ResumenEdificio } from "../../lib/edificio/derivar";
-import { comunidadDeObra, conPromocion, preguntaAutopromocion, promocionDe } from "../../lib/proyecto/promocion";
+import { comunidadDeObra, conPromocion, promocionDe } from "../../lib/proyecto/promocion";
 import type { DatosGenerales, PromocionObra } from "../../lib/proyecto/tipos";
 
 // =============================================================================
-// «Régimen de la promoción» en La obra (feature-36, paso 1). Tres sí / no sin
+// «Régimen de la promoción» en La obra (feature-36, paso 1). Dos sí / no sin
 // valor por defecto: sin contestar, ninguno pulsado, y el apartado que lo
 // necesita lo pide. La comunidad autónoma se muestra, no se pregunta.
 // =============================================================================
@@ -33,22 +32,15 @@ const PREGUNTAS: readonly Pregunta[] = [
     help: "Vivienda protegida, o promovida o subvencionada por las Administraciones públicas. Decide la reserva de viviendas accesibles: en Andalucía, una de 17 a 25 viviendas y el 4 % con más de 25.",
     refText: "Decreto 293/2009, art. 111; Ley 4/2017, art. 58.1; DB-SUA 9 1.2.1",
   },
-  {
-    campo: "autopromocion",
-    etiqueta: "Autopromoción para uso propio",
-    help: "Vivienda unifamiliar que el promotor construye para sí. En Andalucía, queda exenta de las exigencias de ascensor del Decreto de accesibilidad.",
-    refText: "Decreto 293/2009, art. 106.5",
-  },
 ];
 
 export function SeccionPromocion(props: {
   dg: DatosGenerales;
   setDg: (f: (prev: DatosGenerales) => DatosGenerales) => void;
-  resumen: Pick<ResumenEdificio, "esUnifamiliar">;
 }): JSX.Element {
   const p = promocionDe(props.dg);
   const comunidad = comunidadDeObra(props.dg);
-  const preguntas = PREGUNTAS.filter((q) => q.campo !== "autopromocion" || preguntaAutopromocion(props.resumen));
+  const preguntas = PREGUNTAS;
   const contestadas = preguntas.filter((q) => p[q.campo] !== undefined).length;
   return (
     <CollapsibleSection label="Régimen de la promoción" refNorma="ICT · accesibilidad" defaultOpen={contestadas > 0}>
