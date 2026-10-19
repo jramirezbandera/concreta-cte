@@ -157,10 +157,39 @@ export interface DatosGenerales {
    */
   habitabilidad?: HabitabilidadObra;
   /**
+   * El régimen de la promoción (feature-36): lo que deciden la ICT, la reserva de
+   * viviendas accesibles y el ascensor de la norma autonómica. Sin respuesta, el
+   * apartado que lo necesita sale pendiente; no se deduce de El edificio.
+   */
+  promocion?: PromocionObra;
+  /**
    * Los planos de cada instalación, como los numera el proyectista («I05–I07»),
    * para que la memoria remita a ellos (feature-33).
    */
   planos?: Partial<Record<JustificacionKey, string>>;
+}
+
+/**
+ * Régimen de la promoción (feature-36, paso 1). Tres preguntas sí / no, sin
+ * valor por defecto: `undefined` es «sin contestar».
+ */
+export interface PromocionObra {
+  /**
+   * Propiedad horizontal, o arrendamiento de más de un año de un edificio con más
+   * de una vivienda: el ámbito de la ICT (RD-ley 1/1998, art. 2; K-MEM.7).
+   */
+  propiedadHorizontal?: boolean;
+  /**
+   * Vivienda protegida, o promovida o subvencionada por las Administraciones
+   * públicas: la reserva de viviendas accesibles (Decreto 293/2009, art. 111, con
+   * la Ley 4/2017, art. 58.1; K-MEM.22) y SUA 9 1.2.1.
+   */
+  protegida?: boolean;
+  /**
+   * Vivienda de autopromoción individual para uso propio: exenta del ascensor del
+   * Decreto 293/2009 (art. 106.5). Solo se pregunta en vivienda unifamiliar.
+   */
+  autopromocion?: boolean;
 }
 
 /** Fase del proyecto, como la nombra el documento. */

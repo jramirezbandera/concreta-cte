@@ -9,6 +9,8 @@
 // navegador, para las demás obras del mismo municipio.
 // =============================================================================
 
+import { provinciasDe } from "../../data/comunidades";
+
 /** Las estancias de una vivienda, por lo que importa a las normas de habitabilidad. */
 export type TipoEstancia =
   | "estar"
@@ -128,7 +130,7 @@ export interface PlantillaNorma {
 }
 
 /** Provincias de Andalucía (código INE). */
-const ANDALUCIA = ["04", "11", "14", "18", "21", "23", "29", "41"] as const;
+const ANDALUCIA = provinciasDe("andalucia");
 
 /**
  * Las plantillas, cotejadas en la imagen del boletín (K-MEM.17, 2026-10-11).

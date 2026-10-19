@@ -83,8 +83,9 @@ no se pueden dar sin un aviso.**
 
 - **Los de la memoria (§2 del plan).** «No aplica» en una línea con motivo y cita; nada de casillas
   ni de texto del reglamento pegado. Lo supuesto va a «Antes de entregar», no al texto.
-- **Un dato, una fuente.** El generador térmico se declara una vez (en el RITE) y lo leen HE 4, el
-  REBT y HS 4. Donde dos módulos guardan cada uno su dato (contadores, grupo de presión, plazas),
+- **Un dato, una fuente.** Cada servicio se declara una vez: el ACS en HE 4 (como hoy) y la
+  calefacción y la refrigeración en el RITE, que lee el ACS de HE 4; el REBT lee la climatización del
+  RITE. Donde dos módulos guardan cada uno su dato (contadores, grupo de presión, plazas),
   no se fusionan: se comparan y se avisa.
 - **Ninguna cifra sin cotejar.** Lo «LEÍDO (web)» de K-MEM se coteja en el paso 0; lo que quede
   sin confirmar no se imprime (dimensiones de recintos, tablas del RITE).
@@ -145,9 +146,32 @@ para que los expedientes guardados se sigan leyendo):
 - **Comunidad autónoma** derivada del INE del municipio (tabla de prefijos de provincia), sin
   pedirla.
 
-El **generador térmico** va en el módulo RITE (paso 4): es su dato.
+El **sistema de ACS** sigue en HE 4; la **calefacción y la refrigeración**, y la potencia de todos
+los generadores, van en el módulo RITE (paso 4, decisión 3).
 
 Sin respuesta, cada módulo que lo necesita sale pendiente (no supone).
+
+**Hecho (2026-10-19).** 10 tests en `src/lib/proyecto/test/promocion.test.ts`; comprobado en el
+navegador (se contesta, se guarda y se relee; sin errores de consola):
+- [src/data/comunidades.ts](src/data/comunidades.ts): las 52 provincias por código INE con sus 19
+  comunidades y ciudades autónomas, `comunidadDeIne` y `provinciasDe`. La plantilla andaluza de
+  habitabilidad toma de aquí sus provincias (antes, una lista suelta).
+- `DatosGenerales.promocion?: PromocionObra` en [tipos.ts](src/lib/proyecto/tipos.ts), con
+  `propiedadHorizontal`, `protegida` y `autopromocion`, opcionales.
+- [promocion.ts](src/lib/proyecto/promocion.ts), puro: `promocionDe` (lee solo los sí / no con
+  forma), `conPromocion` (borra la respuesta con `undefined` y el campo entero si se queda vacío),
+  `preguntaAutopromocion` (solo en unifamiliar) y `comunidadDeObra`.
+- [SeccionPromocion.tsx](src/components/proyecto/SeccionPromocion.tsx) en La obra, tras «Documento»:
+  las preguntas con su ayuda y su cita, y la comunidad autónoma que sale del municipio. Cerrada
+  mientras no haya nada contestado.
+
+**Decisiones del paso 1, a validar:**
+1. **La sección va en la columna izquierda de La obra, entre «Documento» y «Habitabilidad»**, y no
+   en El edificio: es un dato de la promoción, no de la geometría.
+2. **La autopromoción solo se pregunta en vivienda unifamiliar**; si el edificio deja de serlo, la
+   respuesta guardada se queda pero nadie la lee.
+3. **La comunidad no se puede cambiar a mano**: sin municipio, «elige el municipio».
+4. **Los controles sí / no son los de seguridad y salud** (ningún botón pulsado si no se contesta).
 
 ### Paso 2 · HE 3, iluminación
 
@@ -187,11 +211,13 @@ elección entre RITU obligatorio u opcional, no.
 
 ### Paso 4 · HE 2 / RITE
 
-Clave **`rite`** (rótulo «HE 2 · RITE»), en 3.6. Datos del módulo, que son la fuente del generador:
-- **generadores**: tipo (bomba de calor aire-agua, aire-aire, caldera, solar, biomasa, red, termo
-  eléctrico), servicio (calefacción, refrigeración, ACS), potencia nominal de calor y de frío, y
-  rendimiento declarado (COP/SCOP, EER/SEER); individual por vivienda o centralizado;
-- acumulación de ACS (l) y su tratamiento frente a la legionela;
+Clave **`rite`** (rótulo «HE 2 · RITE»), en 3.6. La fuente se reparte por servicio (decisión 3):
+- **ACS**: el sistema, si es individual o centralizado, y el apoyo, **los lee de HE 4** (sin
+  repetirlos); el RITE añade lo suyo: potencia nominal del generador de ACS y acumulación (l);
+- **calefacción y refrigeración**, que hoy no están en ningún sitio: tipo (bomba de calor
+  aire-agua, aire-aire, caldera, biomasa, red, eléctrica), potencia nominal de calor y de frío,
+  rendimiento declarado (COP/SCOP, EER/SEER), individual por vivienda o centralizado; si es la misma
+  máquina que la del ACS, se marca y no se suma dos veces;
 - emisores (suelo radiante, radiadores, fancoils, splits) y control.
 
 Lo que da (K-MEM.4 y 5):
@@ -202,8 +228,8 @@ Lo que da (K-MEM.4 y 5):
 - la ficha resumen de IT 1.1, 1.2 y 1.3 con remisión a ese documento: condiciones interiores de la
   tabla 1.4.1.1, calidad del aire por HS 3, higiene (IT 1.1.4.3) con remisión a la norma de legionela,
   sin temperaturas ni rendimientos mínimos (el RITE no los da);
-- **lectura por los demás**: HE 4 toma de aquí el generador de ACS (sin repetirlo); el REBT, la
-  climatización (decisión 3 de feature-34); HS 4, si el ACS es individual o central.
+- **lectura por los demás**: el REBT toma de aquí la climatización (decisión 3 de feature-34) y
+  deja de pedirla «para el anejo»; HE 4 y HS 4 no cambian (lo que no cuadre lo avisa el paso 6).
 
 En obra existente, por `Alcance.generacionTermica`: sin renovación, `no_aplica` con el motivo.
 
@@ -271,16 +297,19 @@ fuera del caudal de los aparatos.
 - **Tabla «otras normativas específicas»** del 1.2.3 de los ejemplos: la decisión 8 del plan
   («Normativa aplicada») sigue abierta.
 
-## Decisiones a validar
+## Decisiones (validadas el 2026-10-19)
 
-1. **Piscina privada**: ¿entra (paso 7) o se deja fuera? Propuesta: **entra, acotada**: la
+El usuario valida las nueve; la 3 cambia respecto al borrador (fuente repartida por servicio).
+
+1. **Piscina privada**: **entra, acotada** (paso 7): la
    ITC-BT-31 se aplica también a la piscina privada (K-MEM.23), así que el REBT debe decirlo, con los
    avisos de trámite por potencia; el resto, textos con cita, sin cálculo. La unifamiliar del ejemplo
    la tiene y su memoria no dice nada.
 2. **Dónde va cada apartado**: HE 2 / RITE y HE 3 en el 3.6 (son secciones del DB-HE); ICT y
    accesibilidad en el capítulo 4, tras el REBT y habitabilidad, como en los ejemplos.
-3. **El generador se declara en el RITE** y HE 4 lo lee: HE 4 deja de pedir el tipo de sistema si
-   el RITE lo tiene. Alternativa: que HE 4 siga siendo la fuente y el RITE lo lea.
+3. **La fuente, por servicio**: el ACS sigue en HE 4, que ya lo guarda y está probado (sin migrar
+   expedientes ni tocar su foto); la calefacción y la refrigeración, en el RITE, que lee el ACS de
+   HE 4 y solo añade su potencia y la acumulación; el REBT lee la climatización del RITE.
 4. **Régimen de la promoción en «La obra»**, con tres preguntas sí / no, sin valor por defecto.
 5. **HE 3 pide P y Em por zona común**; la app no calcula luminarias ni toma niveles de iluminación
    de ninguna norma (el CTE no los fija; la UNE-EN 12464-1 no está verificada).
