@@ -14,6 +14,7 @@ import { anejoInstalaciones } from "./anejoInstalaciones";
 import { INSTALACIONES_ANEJO } from "./remision";
 import { estudioBasico, pendientesEstudioBasico, SIN_FIRMANTES } from "./estudioBasico";
 import { UMBRAL_PEC, type ResultadoArt4 } from "../ebss/art4";
+import { CLAVE_COHERENCIA, coherenciaPendiente, type EnlaceCoherencia } from "./coherencia";
 
 /**
  * El estudio básico de seguridad y salud en «Antes de entregar» (feature-35,
@@ -27,8 +28,8 @@ export const RUTA_ESTUDIO_BASICO = "estudio-basico";
 export interface PendienteEntrega {
   /** Estable: `<clave>:<id>`. */
   id: string;
-  /** La justificación, o el estudio básico de seguridad y salud. */
-  key: JustificacionKey | typeof CLAVE_SEGURIDAD_SALUD;
+  /** La justificación, el estudio básico de seguridad y salud o la coherencia entre apartados. */
+  key: JustificacionKey | typeof CLAVE_SEGURIDAD_SALUD | typeof CLAVE_COHERENCIA;
   codigo: string;
   /** Subruta del módulo, para ir a verlo. */
   ruta?: string;
@@ -37,6 +38,11 @@ export interface PendienteEntrega {
   titulo: string;
   detalle: string;
   elementoId?: string;
+  /**
+   * La coherencia entre apartados (feature-36, paso 6): los apartados que no
+   * coinciden, para ir a cada uno; el aviso se marca como revisado aquí.
+   */
+  enlaces?: EnlaceCoherencia[];
 }
 
 /** Lo que queda por mirar antes de entregar: lo que no cumple y luego los avisos. */
@@ -57,7 +63,20 @@ export function antesDeEntregar(p: Proyecto): PendienteEntrega[] {
       (a): PendienteEntrega => ({ id: `${ev.key}:${a.id}`, ...base(ev), tipo: "revisar", titulo: a.titulo, detalle: a.detalle, ...(a.elementoId ? { elementoId: a.elementoId } : {}) }),
     ),
   );
-  return [...fallos, ...avisos, ...sinPlanos(p, evs), ...pendientesSeguridadSaludEntrega(p)];
+  return [...fallos, ...avisos, ...pendientesCoherencia(p), ...sinPlanos(p, evs), ...pendientesSeguridadSaludEntrega(p)];
+}
+
+/** Los avisos de coherencia sin revisar, tras los de los módulos. */
+function pendientesCoherencia(p: Proyecto): PendienteEntrega[] {
+  return coherenciaPendiente(p).map((a) => ({
+    id: `${CLAVE_COHERENCIA}:${a.id}`,
+    key: CLAVE_COHERENCIA,
+    codigo: "Coherencia",
+    tipo: "revisar",
+    titulo: a.titulo,
+    detalle: a.detalle,
+    enlaces: a.enlaces,
+  }));
 }
 
 const euros = (v: number): string => `${v.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;

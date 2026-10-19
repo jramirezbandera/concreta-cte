@@ -421,6 +421,54 @@ errores de consola):
 Antes de codificar, un inventario de qué módulos guardan **dato propio** que pisa El edificio: solo
 ahí puede haber contradicción. Lo que ya sale de una sola fuente no se comprueba.
 
+**Hecho (2026-10-19).** 17 tests en `src/lib/obra/test/coherencia.test.ts` y uno de pantalla en
+`src/components/obra/test/obra.test.tsx`.
+
+**El inventario.** Sale de una sola fuente, y por eso no se compara:
+- **plazas, viviendas, locales y garaje**: HE 6, SUA 7, SI 3, HS 4 y el REBT los leen de El edificio; la
+  recarga del REBT lee HE 6 (estaciones y esquema);
+- **ACS**: el RITE lee de HE 4 el sistema, la producción y el apoyo; el REBT lee la central de HE 4 y ya
+  avisa (`acs-central`); el anejo de HS 4 no nombra el generador ni la acumulación (el termo de 75 l del
+  ejemplo no puede salir);
+- **grupo de presión**: el anejo y la memoria lo leen de HS 4; el REBT no nombra el grupo, solo «los demás
+  servicios del edificio»;
+- **climatización**: el REBT la lee del RITE;
+- **superficies**: solo habitabilidad guarda las de las estancias, y ya avisa si suman más que la vivienda
+  (`util-*`); la superficie residencial (hab) y la cubierta no transitable (HE 5) se **declaran** porque la de
+  El edificio no vale para eso: no se comparan.
+
+Lo que guardan dos módulos y se compara, en [coherencia.ts](src/lib/obra/coherencia.ts):
+
+| Tema | Aviso |
+|---|---|
+| ACS | «Agua caliente» de HS 4 frente a la producción de HE 4 (solo con más de una vivienda: HE 4 no la pregunta en otro caso) |
+| Servicios | el grupo de presión de HS 4 y la producción centralizada del RITE con los «otros servicios» del REBT sin indicar o a 0 kW |
+| Electrificación | climatización eléctrica individual en el RITE y viviendas en básica en el REBT; o elevada solo «por equipos» sin climatización eléctrica, secadora ni automatización |
+| Garaje | HE 6 o SUA 7 forzados en contra de lo que propone la app (el «no se proyectan aparcamientos» con SUA 7 justificándolo); plazas exteriores de HE 6 en un edificio de viviendas, que la recarga del REBT no cuenta |
+| Contadores | viviendas y locales u oficinas de HS 4 frente a los del REBT (obra nueva, red deducida) |
+
+- `AvisoCoherencia` con `id` que lleva lo comparado (`acs:central-individual`): si cambia un dato, vuelve.
+- En «Antes de entregar», tras los avisos de los módulos, con el código «Coherencia», un botón «Ir a» por
+  cada apartado y «Marcar como revisado» allí mismo; los revisados se guardan en
+  `DatosGenerales.coherenciaRevisada` (sin schema nuevo) y se pueden volver a mostrar.
+- El Demo y los cinco casos de partida, sin ningún aviso; la foto del expediente no cambia.
+
+**Decisiones del paso 6, a validar:**
+1. **Los avisos se revisan en «Antes de entregar»**, no en los módulos: no son de ninguno. Se guardan en los
+   datos de la obra.
+2. **La central de ACS de HE 4 no se repite**: ya la avisa el REBT (`acs-central`); la coherencia solo añade
+   el grupo de presión y la climatización centralizada.
+3. **ACS solo con más de una vivienda** (HE 4 no pregunta la producción con una).
+4. **Electrificación en los dos sentidos**: la elevada sin motivo también avisa, porque la memoria del REBT
+   la explica por «climatización eléctrica u otros equipos».
+5. **Producción centralizada del RITE: la máquina no está en la vivienda**, así que no pide elevada. Ojo: el
+   REBT sigue poniendo el C8 o el C9 en la vivienda elevada aunque la producción sea centralizada (lo que
+   ya hacía en el paso 4); queda para otra vez.
+6. **Plazas exteriores de HE 6 en viviendas**: aviso sin arreglo en la app (el REBT solo calcula la
+   recarga del garaje); el proyectista lo revisa.
+7. **Contadores solo en obra nueva**: en una existente, HS 4 ve lo intervenido y el REBT el edificio.
+8. **Sin comprobación de superficies**: las únicas con dato propio se declaran a propósito o ya avisan.
+
 ### Paso 7 · Piscina (si entra, decisión 1)
 
 Para la piscina privada de una unifamiliar (K-MEM.23): SUA 6 ya dice que queda fuera; en el REBT y

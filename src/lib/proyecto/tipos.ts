@@ -167,6 +167,12 @@ export interface DatosGenerales {
    * para que la memoria remita a ellos (feature-33).
    */
   planos?: Partial<Record<JustificacionKey, string>>;
+  /**
+   * Los avisos de coherencia entre apartados que el proyectista ha marcado como
+   * revisados en «Antes de entregar» (feature-36, paso 6). El id lleva lo que
+   * se compara: si cambia un dato, el aviso vuelve.
+   */
+  coherenciaRevisada?: string[];
 }
 
 /**

@@ -255,6 +255,22 @@ describe("Antes de entregar", () => {
     });
     expect(screen.getByText(/Nada pendiente/)).toBeInTheDocument();
   });
+
+  it("la coherencia entre apartados (feature-36): un enlace a cada uno y se revisa aquí", async () => {
+    const user = userEvent.setup();
+    const p = demo();
+    const hs4 = p.justificaciones.hs4!;
+    montar(<AntesDeEntregar />, { ...p, justificaciones: { ...p.justificaciones, hs4: { ...hs4, inputs: { ...hs4.inputs, aguaCaliente: "central" } } } });
+    const coherencia = () => screen.getAllByRole("listitem").filter((li) => /Coherencia · HS 4 y HE 4/.test(li.textContent ?? ""));
+    const [item] = coherencia() as [HTMLElement];
+    expect(within(item).getByRole("link", { name: "Ir a HS4" })).toHaveAttribute("href", "/hs/fontaneria");
+    expect(within(item).getByRole("link", { name: "Ir a HE4" })).toHaveAttribute("href", "/he/acs");
+    await user.click(within(item).getByRole("button", { name: "Marcar como revisado" }));
+    expect(coherencia()).toHaveLength(0);
+    expect(screen.getByText("1 aviso de coherencia revisado.")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Volver a mostrarlo" }));
+    expect(coherencia()).toHaveLength(1);
+  });
 });
 
 describe("Lo que se entrega", () => {
