@@ -16,10 +16,17 @@ import { conPlanos } from "../../lib/obra/remision";
 import { useProyecto } from "../../lib/proyecto/ProyectoContext";
 import { PantallaSi, type PropsDecisionesSi } from "../si/PantallaSi";
 import { rebt } from "./definicion";
-import { CLIMATIZACION_HABITUAL, type Climatizacion, type Electrificacion, type RebtEstado, type Spl } from "./estado";
+import type { Climatizacion, Electrificacion, RebtEstado, Spl } from "./estado";
 import type { JustificacionRebt } from "./justificacion";
 import { CRITERIOS_REBT, GRADO_REBT } from "./tablas";
 import { kW, num, W } from "./textos";
+
+const NOMBRE_CLIMATIZACION: Record<Climatizacion, string> = {
+  aire_aire: "Bomba de calor aire-aire",
+  aire_agua: "Bomba de calor aire-agua",
+  emisores: "Emisores eléctricos",
+  ninguna: "Ninguna eléctrica",
+};
 
 function DecisionesRebt({ state, setField, j, edificio }: PropsDecisionesSi<RebtEstado, JustificacionRebt>): JSX.Element {
   const { proyecto, actualizarDatosGenerales } = useProyecto();
@@ -72,19 +79,19 @@ function DecisionesRebt({ state, setField, j, edificio }: PropsDecisionesSi<Rebt
       />
       {elevada && (
         <>
-          <CampoOpciones<Climatizacion>
-            id="rebt-clima"
-            etiqueta="Climatización"
-            valor={I.equipos.climatizacion}
-            opciones={[
-              { valor: "aire_aire", label: "Bomba de calor aire-aire" },
-              { valor: "aire_agua", label: "Bomba de calor aire-agua" },
-              { valor: "emisores", label: "Emisores eléctricos" },
-              { valor: "ninguna", label: "Ninguna eléctrica" },
-            ]}
-            onChange={(v) => setField("climatizacion", v === CLIMATIZACION_HABITUAL ? "habitual" : v)}
-            ayuda="La aire-aire (split) va en un C9; la aire-agua, en un C8; los radiadores o el suelo radiante eléctricos, en C8 con una toma por estancia (ITC-BT-25)."
-          />
+          <div className="border-border-sub border-t pt-3 pb-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-text-primary text-[13px] font-medium">Climatización</span>
+              <span className="text-text-primary text-[13px]">{NOMBRE_CLIMATIZACION[I.equipos.climatizacion]}</span>
+            </div>
+            <p className="text-text-secondary mt-1.5 text-[12px] leading-normal">
+              Sale de{" "}
+              <Link to={`/p/${proyecto.id}/he/termicas`} className="text-accent hover:text-accent-hover underline">
+                HE 2 · RITE
+              </Link>
+              , donde se cambia. La aire-aire (split) va en un C9; la aire-agua, en un C8; los radiadores o el suelo radiante eléctricos, en C8 con una toma por estancia (ITC-BT-25).
+            </p>
+          </div>
           <CampoOpciones<"si" | "no">
             id="rebt-secadora"
             etiqueta="Secadora"

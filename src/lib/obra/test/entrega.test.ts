@@ -102,8 +102,8 @@ describe("antesDeEntregar", () => {
 describe("entregables", () => {
   it("el Demo: todo listo", () => {
     expect(entregables(demo())).toEqual({
-      memoria: { listos: 29, total: 29, noCumplen: [] },
-      fichas: { listos: 27, total: 27, noCumplen: [] },
+      memoria: { listos: 30, total: 30, noCumplen: [] },
+      fichas: { listos: 28, total: 28, noCumplen: [] },
       esquemas: { listos: 2, total: 2, noCumplen: [], claves: ["hs5", "hs4"] },
       // HS 4 y HS 5 desarrollan su anejo desde feature-33; el REBT, desde feature-34.
       instalaciones: { listos: 3, total: 3, noCumplen: [] },
@@ -114,8 +114,8 @@ describe("entregables", () => {
 
   it("lo que no cumple no cuenta como listo", () => {
     expect(entregables(conHs4Fallando())).toEqual({
-      memoria: { listos: 28, total: 29, noCumplen: ["HS4"] },
-      fichas: { listos: 26, total: 27, noCumplen: ["HS4"] },
+      memoria: { listos: 29, total: 30, noCumplen: ["HS4"] },
+      fichas: { listos: 27, total: 28, noCumplen: ["HS4"] },
       esquemas: { listos: 1, total: 2, noCumplen: ["HS4"], claves: ["hs5"] },
       instalaciones: { listos: 2, total: 3, noCumplen: ["HS4"] },
       seguridadSalud: { listos: 10, total: 15, noCumplen: [], resultado: "pendiente", empezado: false },
@@ -152,6 +152,7 @@ describe("memoriaCte", () => {
       "HR:redactado",
       "HE0:externo",
       "HE1:externo",
+      "HE2:redactado",
       "HE3:redactado",
       "HE4:redactado",
       "HE5:redactado",
@@ -166,8 +167,9 @@ describe("memoriaCte", () => {
     expect(enc("sua6")).toBe("3.3.6. SUA 6 Seguridad frente al riesgo de ahogamiento");
     // Desde feature-25 (HR) no queda ningún apartado por redactar.
     expect(m.pendientes).toEqual([]);
-    expect(enc("he3")).toBe("3.6.3. HE 3 Condiciones de las instalaciones de iluminación");
-    expect(enc("he4")).toBe("3.6.4. HE 4 Contribución mínima de energía renovable para cubrir la demanda de agua caliente sanitaria");
+    expect(enc("rite")).toBe("3.6.3. HE 2 Condiciones de las instalaciones térmicas");
+    expect(enc("he3")).toBe("3.6.4. HE 3 Condiciones de las instalaciones de iluminación");
+    expect(enc("he4")).toBe("3.6.5. HE 4 Contribución mínima de energía renovable para cubrir la demanda de agua caliente sanitaria");
     expect(enc("rebt")).toBe("4.1.1. ITC-BT-10 Grado de electrificación y previsión de cargas");
     expect(enc("ict")).toBe("4.3. Infraestructuras comunes de telecomunicaciones (ICT)");
     // SE y HR son la sección entera: sin título propio.

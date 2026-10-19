@@ -52,7 +52,10 @@ export type RebtEstado = {
   garaje_kW: number | null;
 
   // ── Para el anejo (feature-34): no cambian la previsión ────────────────────
-  /** La climatización de las viviendas elevadas; «habitual» = aire-aire. */
+  /**
+   * La climatización de las viviendas elevadas, de antes de feature-36 (paso 4):
+   * ya no se pide aquí, sale del RITE; lo guardado solo decide lo habitual del RITE.
+   */
   climatizacion?: Opcion<Climatizacion>;
   /** Secadora independiente (C10) en las viviendas elevadas. */
   secadora?: boolean;
@@ -109,10 +112,14 @@ export interface EquiposVivienda {
   automatizacion: boolean;
 }
 
-export function equiposDe(e: Partial<RebtEstado>, d: DecisionesRebt): EquiposVivienda {
+/**
+ * `climatizacion`: la del RITE (feature-36, paso 4), que es de donde sale; sin
+ * ella, la que guardaba el REBT antes (o la habitual).
+ */
+export function equiposDe(e: Partial<RebtEstado>, d: DecisionesRebt, climatizacion?: Climatizacion): EquiposVivienda {
   if (d.electrificacion !== "elevada") return { climatizacion: "ninguna", secadora: false, automatizacion: false };
   return {
-    climatizacion: resolver(e.climatizacion, CLIMATIZACION_HABITUAL),
+    climatizacion: climatizacion ?? resolver(e.climatizacion, CLIMATIZACION_HABITUAL),
     secadora: e.secadora === true,
     automatizacion: e.automatizacion === true,
   };

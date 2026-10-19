@@ -54,16 +54,15 @@ describe("REBT · Grado de electrificación y previsión de cargas (feature-23)"
     await waitFor(() => expect(getByRole("region", { name: "Avisos" })).not.toHaveTextContent("Indica la potencia del ascensor"));
   });
 
-  it("para el anejo (feature-34): los planos, la climatización y el terreno; con la resistividad, sin aviso", async () => {
+  it("para el anejo (feature-34): los planos, la climatización (del RITE, feature-36) y el terreno; con la resistividad, sin aviso", async () => {
     const user = userEvent.setup();
     const { getByRole, getByLabelText } = await renderModulo();
     const anejo = getByRole("region", { name: "Para el anejo" });
     expect(getByLabelText("Planos")).toHaveValue("I08–I11");
-    expect(getByLabelText("Climatización")).toHaveValue("aire_aire");
+    expect(within(anejo).getByText("Bomba de calor aire-aire")).toBeInTheDocument();
+    expect(within(anejo).getByRole("link", { name: "HE 2 · RITE" })).toBeInTheDocument();
     expect(within(anejo).getByText(/Vacío, 3000 \(supuesta\)/)).toBeInTheDocument();
     expect(getByRole("region", { name: "Avisos" })).toHaveTextContent("Indica la resistividad del terreno.");
-    await user.selectOptions(getByLabelText("Climatización"), "aire_agua");
-    expect(getByLabelText("Climatización")).toHaveValue("aire_agua");
     const rho = getByLabelText("Resistividad del terreno");
     await user.type(rho, "500{Enter}");
     await waitFor(() => expect(getByRole("region", { name: "Avisos" })).not.toHaveTextContent("Indica la resistividad del terreno."));

@@ -303,6 +303,48 @@ Lo que da (K-MEM.4 y 5):
 
 En obra existente, por `Alcance.generacionTermica`: sin renovación, `no_aplica` con el motivo.
 
+**Hecho (2026-10-19).** 16 tests en `src/modules/rite/test/rite.test.ts`; comprobado en el navegador
+(pantalla, de «sin potencia» a «memoria técnica» al declarar las potencias; memoria 3.6.3; el REBT con la
+climatización de solo lectura; sin errores de consola):
+- [src/modules/rite/](src/modules/rite/) con el patrón de la ICT: `tablas.ts` (literal de HE 2, art. 15.1
+  y 15.2, tabla 1.4.1.1, umbral de la IT 1.2.4.5.2, `documentoExigible`), `estado.ts` (calefacción,
+  emisores, refrigeración, producción, potencias, SCOP y SEER, ACS de la misma máquina, potencia y
+  acumulación del ACS; `resolverRite` y `climatizacionParaRebt`), `justificacion.ts`, `textos.ts`,
+  `memoria.ts`, `dibujo.ts`, `definicion.ts` y `ui.tsx`.
+- Elementos: calefacción, refrigeración, ACS (de HE 4), el documento de cada instalación («no cumple» sin
+  alguna potencia), condiciones interiores, calidad del aire (HS 3 en viviendas), higiene (legionela),
+  contabilización, recuperación de calor (solo residencial) y el art. 15.6 en el cambio de uso.
+- Instalaciones: una si la climatización y el ACS se producen igual; dos si no. Potencia = la mayor de la
+  suma de calor (calefacción + ACS, sin la solar térmica ni el ACS de la misma máquina) y la de frío.
+- El REBT lee la climatización del RITE (`equiposDe` con la del RITE) y deja de pedirla: en su pantalla,
+  una línea de solo lectura con el enlace.
+- Aplicabilidad en existente: `rite` en `REGLAS_EXISTENTES` (cambio de uso característico, aplica por el
+  art. 2.3 e y 15.6; generación general o parcial, a lo renovado; sin responder, se propone; «no», no
+  aplica). Obra nueva: aplica siempre.
+- Registro (`he/termicas`, código HE2, en Ahorro de energía), La obra, anejo, memoria (3.6.3; HE 3 a HE 6
+  pasan a 3.6.4–3.6.7) y Demo con potencias de demostración (memoria técnica, 5,4 kW por vivienda).
+- Foto del expediente: la fila `rite` y la huella de la memoria; el REBT no cambia.
+
+**Decisiones del paso 4, a validar:**
+1. **Lo habitual: bomba de calor aire-aire reversible, con split, individual**, que es lo que el REBT
+   suponía; así el REBT de los expedientes guardados no cambia.
+2. **La climatización que guardaba el REBT decide lo habitual del RITE** (aire-agua → aire-agua;
+   emisores → eléctrica; «ninguna eléctrica» → caldera), para no perderla; el campo del REBT ya no se
+   edita.
+3. **Se suman calefacción y ACS** en la misma instalación (art. 15.2, «los necesarios para cubrir el
+   servicio»; INTERPRETACIÓN), salvo que el ACS salga de la misma máquina. Frente a esa suma, la de frío;
+   manda la mayor.
+4. **Sin alguna potencia, «no cumple»** (como HE 3): sin ella no se sabe el documento.
+5. **Dos instalaciones** cuando la climatización y el ACS (de HE 4) no se producen igual (individual o
+   centralizada); «misma máquina» solo si el tipo y la producción coinciden.
+6. **Potencias por vivienda (la mayor) en producción individual**; la total en centralizada.
+7. **El REBT con una sola climatización**: aire-agua de calefacción con split de frío sale como C8 (se
+   pierde el C9); habría que ampliar el REBT si se da.
+8. **Reparto de gastos** solo con alguna instalación centralizada y más de un usuario (viviendas más
+   locales y oficinas, uno por zona y planta).
+9. **Sin cifras de aislamiento, temperaturas de ACS ni rendimientos mínimos**: la memoria remite al
+   documento RITE.
+
 ### Paso 5 · Accesibilidad autonómica
 
 Clave **`acc`** (rótulo «Accesibilidad»), en el capítulo 4. Norma declarada, con el patrón de

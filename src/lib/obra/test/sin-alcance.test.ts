@@ -30,6 +30,9 @@ import antes from "./foto-antes.json";
 // numeración del 3.6; nada más. En el paso 3 (ICT) se añade la fila «ict» y
 // cambia la huella de la memoria, por el apartado 4.3; nada más (el Demo, del que
 // salen los datos de la obra de los 40, pasa a estar en propiedad horizontal).
+// En el paso 4 (HE 2 · RITE) se añade la fila «rite» y cambia la huella de la
+// memoria, por el apartado 3.6.3 y la numeración del 3.6; el REBT, que lee la
+// climatización del RITE, no cambia (lo habitual sigue siendo la aire-aire).
 // =============================================================================
 
 describe("sin asistente de alcance, nada cambia", () => {

@@ -2,7 +2,7 @@ import type { ComponentType } from "react";
 import {
   Wind, Droplets, Waves, Thermometer, FlaskConical, Radiation, CloudRain, BrickWallFire, Truck, Columns3, FireExtinguisher, Flame, DoorOpen,
   Footprints, ShieldAlert, LockKeyhole, Lightbulb, Users, Car, CloudLightning, Accessibility, Trash2,
-  ShowerHead, SolarPanel, Zap, EvCharger, Ear, Gauge, Weight, LifeBuoy, SunMedium, LampCeiling, RadioTower,
+  ShowerHead, SolarPanel, Zap, EvCharger, Ear, Gauge, Weight, LifeBuoy, SunMedium, LampCeiling, RadioTower, AirVent,
 } from "lucide-react";
 import type { JustificacionKey } from "../lib/proyecto/tipos";
 
@@ -366,6 +366,19 @@ export const justificacionRegistry: JustificacionEntry[] = [
     shipped: false,
     externo: { destino: "HULC o CE3X" },
     icon: Gauge,
+  },
+  {
+    key: "rite",
+    codigo: "HE2",
+    label: "Instalaciones térmicas (RITE)",
+    grupo: "Ahorro de energía (DB-HE)",
+    db: "RITE",
+    edicionDB: "RITE (RD 1027/2007), consolidado 02-ago-2022",
+    formato: "checker",
+    shipped: true,
+    route: "he/termicas",
+    icon: AirVent,
+    schemaVersion: "1",
   },
   {
     key: "he3",

@@ -175,10 +175,10 @@ describe("HE y HR (paso 5)", () => {
   const t = texto(p);
 
   it("HE 4, HE 5 y HE 6: el no aplica dice por qué en esta obra, con la cifra", () => {
-    expect(apartado(t, "3.6.4. HE 4")).toContain("En esta obra, el uso característico del edificio no cambia");
-    expect(apartado(t, "3.6.4. HE 4")).toMatch(/de \d+ l\/d antes de la obra y \d+ l\/d después/);
-    expect(apartado(t, "3.6.5. HE 5")).toMatch(/de \d+ m² construidos/);
-    expect(apartado(t, "3.6.6. HE 6")).toContain("la obra no actúa sobre el aparcamiento");
+    expect(apartado(t, "3.6.5. HE 4")).toContain("En esta obra, el uso característico del edificio no cambia");
+    expect(apartado(t, "3.6.5. HE 4")).toMatch(/de \d+ l\/d antes de la obra y \d+ l\/d después/);
+    expect(apartado(t, "3.6.6. HE 5")).toMatch(/de \d+ m² construidos/);
+    expect(apartado(t, "3.6.7. HE 6")).toContain("la obra no actúa sobre el aparcamiento");
   });
 
   it("HR: el forjado con la vivienda de arriba y el local de al lado, leídos del edificio entero", () => {

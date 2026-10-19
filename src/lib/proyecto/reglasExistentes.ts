@@ -598,6 +598,30 @@ function he3(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
   return noAplica(`${HE3}: no es de aplicación — la intervención no renueva ni amplía la instalación de iluminación de las zonas comunes (HE 3 ap. 1 pto 3).`, CITA_HE3);
 }
 
+const RITE = "DB-HE 2 Condiciones de las instalaciones térmicas (RITE)";
+const CITA_RITE = "RITE, arts. 2 y 15";
+
+/**
+ * HE 2 · RITE en un edificio existente (K-MEM.19): el cambio de uso del edificio
+ * es, a efectos del RITE, una reforma de la instalación (art. 2.3 e) y el
+ * documento analiza la idoneidad de lo existente (15.6); en el resto, lo que
+ * renueva la generación térmica (P6 del asistente). Sin responder, se propone
+ * (prudente).
+ */
+function rite(caso: CasoObra, c: ContextoExistente): PropuestaExistente {
+  const g = c.alcance.generacionTermica;
+  if (caso === "cambio_uso_caracteristico") {
+    return aplica(`${RITE}: el cambio de uso del edificio es una reforma de la instalación (RITE art. 2.3 e); el documento de la instalación analiza y justifica la idoneidad de las instalaciones existentes para el nuevo uso (art. 15.6).`, CITA_RITE);
+  }
+  if (g === "general" || g === "parcial") {
+    return reformado(`${RITE}: se aplica a la instalación térmica que se renueva o se instala${g === "parcial" ? ", en las unidades de uso en que se interviene" : ""} (RITE art. 2).`, CITA_RITE);
+  }
+  if (g === undefined) {
+    return reformado(`${RITE}: se propone su aplicación a la instalación térmica que se reforme, mientras no se precise si la obra renueva la generación térmica (RITE art. 2).`, CITA_RITE);
+  }
+  return noAplica(`${RITE}: no es de aplicación — la intervención no reforma ni amplía las instalaciones térmicas (RITE art. 2).`, CITA_RITE);
+}
+
 const ICT = "Infraestructuras comunes de telecomunicaciones";
 const CITA_ICT = "RD-ley 1/1998, art. 3.1";
 
@@ -743,6 +767,7 @@ export const REGLAS_EXISTENTES: Partial<Record<JustificacionKey, Regla>> = {
   rebt,
   hab,
   ict,
+  rite,
   dbse,
 };
 

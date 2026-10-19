@@ -148,11 +148,11 @@ describe("la memoria", () => {
     expect(texto).toMatch(/luz natural/);
   });
 
-  it("el Demo: HE 3 cumple y su apartado va en el 3.6, tras HE 1", () => {
+  it("el Demo: HE 3 cumple y su apartado va en el 3.6, tras HE 2", () => {
     const p = crearProyectoDemo(AHORA);
     expect(evaluarExpediente(p).porClave.he3).toMatchObject({ aplicabilidad: "aplica", veredicto: "ok" });
     const t = textoPlanoMemoriaCte(memoriaCte(p));
-    expect(t).toMatch(/3\.6\.3\. HE 3 Condiciones de las instalaciones de iluminación/);
+    expect(t).toMatch(/3\.6\.4\. HE 3 Condiciones de las instalaciones de iluminación/);
     expect(t.indexOf("HE 3 Condiciones")).toBeLessThan(t.indexOf("HE 4 Contribución"));
   });
 

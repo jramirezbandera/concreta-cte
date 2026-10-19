@@ -18,6 +18,7 @@ import type { ViviendaTipo, Zona } from "../../lib/edificio/tipos";
 import { estanciasDe, VIVIENDA_UNIFAMILIAR, type HabEstado } from "../hab/estado";
 import type { ProyectoSi } from "../si/definicion";
 import { edificioSi } from "../si/edificio";
+import { climatizacionParaRebt } from "../rite/estado";
 import { sua8EstadoDefaults, type Sua8Estado } from "../sua8/estado";
 import { justificarSua8 } from "../sua8/justificacion";
 import { equiposDe, type DecisionesRebt, type EquiposVivienda, type RebtEstado } from "./estado";
@@ -83,7 +84,7 @@ function plantaEdificio(p: ProyectoSi, sua8: Partial<Sua8Estado>): { largo_m: nu
 export function instalacionRebt(j: PrevisionParaInstalacion, estado: Partial<RebtEstado>, p: ProyectoSi): { instalacion: InstalacionRebt; avisos: Aviso[] } {
   const avisos: Aviso[] = [];
   const C = CRITERIOS_INSTALACION.datos;
-  const equipos = equiposDe(estado, j.decisiones);
+  const equipos = equiposDe(estado, j.decisiones, climatizacionParaRebt(p.justificaciones, j.unifamiliar));
   const ex = j.existente;
 
   // ── La instalación interior de cada vivienda tipo ─────────────────────────

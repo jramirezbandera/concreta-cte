@@ -18,6 +18,7 @@ import { he1EstadoDefaults, type He1Estado } from "../../modules/he1/estado";
 import { habEstadoDefaults, type EstanciaHab, type HabEstado } from "../../modules/hab/estado";
 import { he3EstadoDefaults, type He3Estado } from "../../modules/he3/estado";
 import { ictEstadoDefaults } from "../../modules/ict/estado";
+import { riteEstadoDefaults, type RiteEstado } from "../../modules/rite/estado";
 import { COMPUTAN_HABITUAL, type TipoEstancia } from "../habitabilidad/norma";
 import type { ZonaClimatica } from "../../modules/he1/tablas";
 import {
@@ -114,6 +115,20 @@ const HE3_DEMO: He3Estado = {
     z5: { potencia_W: 108, iluminancia_lx: 100 },
     z6: { potencia_W: 50, iluminancia_lx: 150 },
   },
+};
+
+/**
+ * HE 2 · RITE (feature-36): potencias de DEMOSTRACIÓN, como las de HE 3. La bomba
+ * de calor aire-aire reversible de cada vivienda y la de ACS de HE 4.
+ */
+const RITE_DEMO: RiteEstado = {
+  ...riteEstadoDefaults,
+  potenciaCalor_kW: 3.6,
+  potenciaFrio_kW: 3.4,
+  scop: 4.1,
+  seer: 6.5,
+  potenciaAcs_kW: 1.8,
+  acumulacion_l: 200,
 };
 
 /** Una estancia del Demo: [id, nombre, tipo, Su, hueco]. */
@@ -246,6 +261,7 @@ export function crearProyectoDemo(nowIso: string): Proyecto {
       hab: justificacionDemo(structuredClone({ ...habEstadoDefaults, estancias: ESTANCIAS_DEMO })),
       he3: justificacionDemo(structuredClone(HE3_DEMO)),
       ict: justificacionDemo(structuredClone(ictEstadoDefaults)),
+      rite: justificacionDemo(structuredClone(RITE_DEMO)),
     },
   };
 }

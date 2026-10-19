@@ -51,7 +51,7 @@ afterEach(() => {
 describe("Lo que se justifica", () => {
   it("el recuento y las filas con su estado, enlazadas al módulo", () => {
     montar(<LoQueSeJustifica />);
-    expect(screen.getByText("8 cumple · 19 por revisar · 2 no aplica · 3 externo")).toBeInTheDocument();
+    expect(screen.getByText("9 cumple · 19 por revisar · 2 no aplica · 3 externo")).toBeInTheDocument();
     const hs5 = screen.getByRole("link", { name: /HS5.*Evacuación de aguas/ });
     expect(hs5).toHaveAttribute("href", "/hs/saneamiento");
     expect(within(hs5).getByText("revisar")).toBeInTheDocument();
@@ -260,15 +260,15 @@ describe("Antes de entregar", () => {
 describe("Lo que se entrega", () => {
   it("el recuento de cada entregable", () => {
     montar(<LoQueSeEntrega />);
-    expect(screen.getByText("29 apartados")).toBeInTheDocument();
-    expect(screen.getByText("27 fichas")).toBeInTheDocument();
+    expect(screen.getByText("30 apartados")).toBeInTheDocument();
+    expect(screen.getByText("28 fichas")).toBeInTheDocument();
     expect(screen.getByText("2 esquemas")).toBeInTheDocument();
   });
 
   it("con algo que no cumple, lo nombra y no lo cuenta", () => {
     const p = demo();
     montar(<LoQueSeEntrega />, { ...p, datosGenerales: { ...p.datosGenerales, presionAcometida_kPa: 60 } });
-    expect(screen.getByText("28 de 29 apartados")).toBeInTheDocument();
+    expect(screen.getByText("29 de 30 apartados")).toBeInTheDocument();
     // Memoria, anejo de instalaciones, fichas y esquemas.
     expect(screen.getAllByText("HS4 no cumple")).toHaveLength(4);
     expect(screen.getByText("1 de 2 esquemas")).toBeInTheDocument();
