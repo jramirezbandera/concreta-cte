@@ -539,6 +539,46 @@ OCA, proyecto por los grupos e, g y n, y la memoria con su párrafo; sin errores
 - Los cinco ejemplos de contradicción, reproducidos como test: cada uno da su aviso.
 - Abrir el Word en Word y comprobar en el navegador.
 
+**Hecho (2026-10-20).** 2038 tests (11 nuevos), tipos y lint sin errores:
+- **Casos**: los tests de cada módulo ya los recorrían por separado. Se suma
+  [otros-reglamentos-casos.test.ts](src/lib/obra/test/otros-reglamentos-casos.test.ts), que pone los cuatro
+  apartados juntos en el Demo y, en Málaga (para la plantilla andaluza), en la unifamiliar, la plurifamiliar y
+  «Reforma: local a vivienda», con lo que declara el proyectista (potencias del RITE, potencia e iluminancia de
+  las zonas comunes, la promoción). El Demo: los cuatro cumplen. La unifamiliar: el RITE cumple y HE 3, ICT y
+  accesibilidad dicen «no aplica» en un párrafo con su cita. La plurifamiliar: cumplen, con la ICT en «revisar»
+  porque deduce las estancias (no hay las de habitabilidad). La reforma: RITE y accesibilidad a lo reformado,
+  sin HE 3 ni proyecto de ICT. En todos, los títulos van en orden (3.6.3, 3.6.4, 4.3, 4.4) y el Word se compone.
+- **Las cinco contradicciones** de los ejemplos, en
+  [coherencia.test.ts](src/lib/obra/test/coherencia.test.ts): faltaba la de los contadores. HS 4 cuenta los
+  locales por zona y el REBT descarta los que no tienen superficie: un local de 0 m² da el aviso. Un test junta
+  las cinco (ACS, servicios, garaje, contadores, electrificación) y comprueba que cada una da el suyo.
+- **Foto del expediente**: las filas `he3`, `rite`, `ict` y `acc` ya estaban (cada paso añadió la suya). Cambia
+  solo la huella de la memoria de las 8 filas del Demo, por el arreglo de HE 3 de abajo.
+- **Word en Word**: la memoria del Demo (22 páginas), la plurifamiliar (20), la reforma (17) y la unifamiliar con
+  piscina (14), y el anejo de la unifamiliar con piscina (6), abiertos con Word 16 por automatización sin avisos
+  ni reparación. El PDF que exporta Word, revisado a ojo en las páginas de 3.6.3, 3.6.4, 4.3, 4.4 y la parte
+  «Piscina (ITC-BT-31)» del anejo. Arreglado de esa revisión:
+  - **HE 3, tablas con dos decimales** en las columnas VEEI y PTOT/STOT: salía «3» junto a «3,33».
+  - **Accesibilidad en un edificio existente**: decía «Se disponen itinerarios accesibles… en cada planta, hasta
+    las viviendas…» y «El ascensor llega a las plantas de aparcamiento», cosas de todo el edificio, en una obra
+    que solo toca el portal. Ahora ese párrafo no sale; el de la reforma dice «se aplica solo a los elementos o
+    partes que se modifican (arts. 2.1 j y 2.2): en ellos, los itinerarios cumplen el art. 104…», y la tabla va
+    detrás. La obra nueva y la unifamiliar no cambian.
+- **Navegador** (`#/p/demo`): las pantallas de HE 2, HE 3, ICT y accesibilidad, la memoria (con «3,00» y
+  «2,00» en HE 3) y La obra con «Antes de entregar», sin errores de consola.
+
+**Decisiones del paso 8, a validar:**
+1. **Accesibilidad en existente: los itinerarios solo en lo que se modifica**, sin la frase del ascensor al
+   garaje. La tabla de comunicación vertical se queda: dice lo que tiene el edificio y lo que pide el Decreto.
+2. **Dos decimales fijos solo en las tablas de HE 3.** En la pantalla, la ficha de cada zona sigue con `num`
+   («VEEI 3»), como el resto de cifras sueltas del módulo.
+
+**Para más adelante** (de esta feature; no entran):
+- **Recarga de las plazas exteriores en el REBT** (decisión 6 del paso 6): hoy solo avisa la coherencia.
+- **«Normativa aplicada»** (decisión 8 del plan de la memoria) y la tabla de otras normativas del 1.2.3.
+- **El local sin superficie**: el REBT no lo cuenta ni en la carga ni en los contadores; la coherencia lo avisa.
+  Si el proyectista lo deja así, falta decidir si el REBT debe contarlo con el mínimo por local.
+
 ## Fuera de alcance
 
 - **Cargas térmicas y dimensionado del RITE**: son de la memoria técnica o del proyecto RITE.

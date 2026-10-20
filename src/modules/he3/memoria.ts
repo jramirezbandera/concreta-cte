@@ -16,6 +16,8 @@ import { NOMBRE_CONTROL, num } from "./textos";
 
 const C = CONTROL_HE3.datos;
 const cumple = (v: number | null, limite: number) => (v === null ? "sin declarar" : v <= limite ? "sí" : "no");
+/** En las columnas de VEEI y de W/m², siempre con dos decimales: «3,00» junto a «3,33». */
+const dos = (v: number) => v.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function zonas(j: JustificacionHe3): Extract<DetalleHe3, { clase: "zona" }>[] {
   return j.elementos.flatMap((e) => (e.detalle.clase === "zona" ? [e.detalle] : []));
@@ -33,7 +35,7 @@ function tablaZonas(j: JustificacionHe3, tras: number): TablaMemoria | undefined
       num(d.superficie_m2),
       d.potencia_W === null ? "—" : num(d.potencia_W, 0),
       d.iluminancia_lx === null ? "—" : num(d.iluminancia_lx, 0),
-      d.veei === null ? "—" : num(d.veei),
+      d.veei === null ? "—" : dos(d.veei),
       `≤ ${num(d.limite, 1)}`,
       cumple(d.veei === null ? null : Math.round(d.veei * 100) / 100, d.limite),
     ]),
@@ -51,7 +53,7 @@ function tablaPotencia(j: JustificacionHe3, tras: number): TablaMemoria | undefi
       d.aparcamiento ? "Aparcamiento" : "Zonas comunes",
       num(d.ptot_W, 0),
       num(d.stot_m2),
-      d.ratio === null ? "—" : num(d.ratio),
+      d.ratio === null ? "—" : dos(d.ratio),
       `≤ ${num(d.limite, 0)}`,
       cumple(d.ratio === null ? null : Math.round(d.ratio * 100) / 100, d.limite),
     ]);

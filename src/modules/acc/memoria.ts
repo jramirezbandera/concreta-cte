@@ -71,22 +71,27 @@ export function memoriaAcc(j: JustificacionAcc): MemoriaDoc {
     parrafos.push([
       `Es de aplicación el Reglamento de accesibilidad de Andalucía, aprobado por el ${CITA_D293}, a los espacios, instalaciones y elementos de uso comunitario del edificio${j.existente ? " que se construyen, reforman o cambian de uso" : ""} (art. 2.1 j). El interior de las viviendas libres no reservadas para personas con movilidad reducida no tiene exigencias.`,
     ]);
-    parrafos.push([
-      `Se disponen itinerarios accesibles ${lista([...ITINERARIOS_D293.datos.tramos])} (art. 104), con las condiciones que se justifican en la Ficha III de la Orden de 9 de enero de 2012.`,
-      asc && asc.exigencia === "ascensor" && asc.garajeSotano ? " El ascensor llega a las plantas de aparcamiento bajo rasante (art. 106.4)." : "",
-    ]);
+    // En un edificio existente, los itinerarios solo en lo que se modifica: el
+    // resto del edificio no se justifica (va en el párrafo de la reforma).
+    if (!j.existente) {
+      parrafos.push([
+        `Se disponen itinerarios accesibles ${lista([...ITINERARIOS_D293.datos.tramos])} (art. 104), con las condiciones que se justifican en la Ficha III de la Orden de 9 de enero de 2012.`,
+        asc && asc.exigencia === "ascensor" && asc.garajeSotano ? " El ascensor llega a las plantas de aparcamiento bajo rasante (art. 106.4)." : "",
+      ]);
+    }
   }
-  const tras = parrafos.length;
 
   const ex = detalle(j, "existente");
   if (ex) {
     parrafos.push([
-      "En la reforma de los espacios e instalaciones comunitarias, el Reglamento se aplica solo a los elementos o partes que se modifican (arts. 2.1 j y 2.2).",
+      "En la reforma de los espacios e instalaciones comunitarias, el Reglamento se aplica solo a los elementos o partes que se modifican (arts. 2.1 j y 2.2)",
+      j.unifamiliar ? "." : ": en ellos, los itinerarios cumplen el art. 104, con las condiciones que se justifican en la Ficha III de la Orden de 9 de enero de 2012.",
       ex.imposibilidad
         ? ` Conforme a la disposición adicional primera, no es posible cumplir íntegramente lo siguiente: ${ex.imposibilidad.replace(/\.$/, "")}. Se mejoran las condiciones existentes con las ayudas técnicas que se describen (arts. 75 y 106.6).`
         : "",
     ]);
   }
+  const tras = parrafos.length;
   return {
     titulo: "Accesibilidad",
     norma: "Accesibilidad",

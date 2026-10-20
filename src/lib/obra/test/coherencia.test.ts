@@ -127,6 +127,36 @@ describe("coherencia", () => {
     expect(a.detalle).toContain("a 4 plazas exteriores");
   });
 
+  it("contadores: un local sin superficie lo cuenta HS 4 y no el REBT", () => {
+    const base = deCaso("plurifamiliar_locales");
+    const edificio = {
+      ...base.edificio,
+      grupos: base.edificio.grupos.map((g) => ({ ...g, zonas: g.zonas.map((z) => (z.uso === "local_sin_uso" ? { ...z, superficieUtil_m2: 0 } : z)) })),
+    };
+    const a = coherencia({ ...base, edificio }).find((x) => x.tema === "contadores")!;
+    expect(a).toMatchObject({ titulo: "HS 4 y el REBT no cuentan los mismos contadores." });
+    expect(a.detalle).toMatch(/^HS 4 lleva .* y 1 de local u oficina; el REBT, .* y 0 de locales u oficinas\./);
+    expect(a.enlaces.map((e) => e.codigo)).toEqual(["HS4", "REBT"]);
+    // En una obra existente no se compara.
+    expect(coherencia({ ...base, edificio, datosGenerales: { ...base.datosGenerales, intervencion: "reforma" } }).some((x) => x.tema === "contadores")).toBe(false);
+  });
+
+  it("los cinco ejemplos de contradicción de feature-36 dan cada uno su aviso", () => {
+    const sinLocal = deCaso("plurifamiliar_locales");
+    sinLocal.edificio = {
+      ...sinLocal.edificio,
+      grupos: sinLocal.edificio.grupos.map((g) => ({ ...g, zonas: g.zonas.map((z) => (z.uso === "local_sin_uso" ? { ...z, superficieUtil_m2: 0 } : z)) })),
+    };
+    const ejemplos: [string, Proyecto][] = [
+      ["acs", con(demo(), "hs4", { aguaCaliente: "central" })],
+      ["servicios", con(demo(), "hs4", { grupoPresion: true })],
+      ["garaje", forzada(deCaso("plurifamiliar"), "he6", "no_aplica")],
+      ["contadores", sinLocal],
+      ["electrificacion", con(demo(), "rebt", { electrificacion: "superficie" })],
+    ];
+    for (const [tema, p] of ejemplos) expect(coherenciaPendiente(p).map((a) => a.tema), tema).toContain(tema);
+  });
+
   it("revisado: deja de estar pendiente y vuelve si cambia lo que se compara", () => {
     const p = con(demo(), "hs4", { aguaCaliente: "central" });
     const revisado = { ...p, datosGenerales: { ...p.datosGenerales, coherenciaRevisada: ["acs:central-individual"] } };

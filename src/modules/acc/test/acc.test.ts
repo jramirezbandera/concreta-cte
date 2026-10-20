@@ -144,6 +144,16 @@ describe("Andalucía", () => {
     expect(texto).toMatch(/solo a los elementos o partes que se modifican \(arts\. 2\.1 j y 2\.2\)/);
     expect(texto).toMatch(/disposición adicional primera, no es posible cumplir íntegramente lo siguiente: Art\. 106\.2, por la estructura protegida\. Se mejoran/);
   });
+
+  it("existente: los itinerarios, solo en lo que se modifica; ni los de todo el edificio ni el ascensor al garaje (paso 8)", () => {
+    const m = memoriaAcc(j(caso("reforma_local_vivienda", { promocion: { protegida: false } })));
+    const texto = m.parrafos.flat().join("");
+    expect(texto).not.toMatch(/Se disponen itinerarios accesibles/);
+    expect(texto).not.toMatch(/art\. 106\.4/);
+    expect(texto).toMatch(/que se modifican \(arts\. 2\.1 j y 2\.2\): en ellos, los itinerarios cumplen el art\. 104, con las condiciones que se justifican en la Ficha III/);
+    // La tabla, tras el párrafo de la reforma.
+    expect(m.tablas?.[0].tras).toBe(m.parrafos.length);
+  });
 });
 
 describe("la memoria", () => {
