@@ -453,7 +453,7 @@ Lo que guardan dos módulos y se compara, en [coherencia.ts](src/lib/obra/cohere
   `DatosGenerales.coherenciaRevisada` (sin schema nuevo) y se pueden volver a mostrar.
 - El Demo y los cinco casos de partida, sin ningún aviso; la foto del expediente no cambia.
 
-**Decisiones del paso 6, a validar:**
+**Decisiones del paso 6, validadas el 2026-10-20** (la 5, con el arreglo del REBT; la 6, para más adelante):
 1. **Los avisos se revisan en «Antes de entregar»**, no en los módulos: no son de ninguno. Se guardan en los
    datos de la obra.
 2. **La central de ACS de HE 4 no se repite**: ya la avisa el REBT (`acs-central`); la coherencia solo añade
@@ -461,11 +461,15 @@ Lo que guardan dos módulos y se compara, en [coherencia.ts](src/lib/obra/cohere
 3. **ACS solo con más de una vivienda** (HE 4 no pregunta la producción con una).
 4. **Electrificación en los dos sentidos**: la elevada sin motivo también avisa, porque la memoria del REBT
    la explica por «climatización eléctrica u otros equipos».
-5. **Producción centralizada del RITE: la máquina no está en la vivienda**, así que no pide elevada. Ojo: el
-   REBT sigue poniendo el C8 o el C9 en la vivienda elevada aunque la producción sea centralizada (lo que
-   ya hacía en el paso 4); queda para otra vez.
+5. **Producción centralizada del RITE: la máquina no está en la vivienda**, así que no pide elevada.
+   **Arreglado (2026-10-20):** el REBT ponía el C8 o el C9 en la vivienda elevada aunque la producción
+   fuera centralizada. Ahora `climatizacionDe` no da climatización en la vivienda con la centralizada,
+   salvo los emisores eléctricos, que siguen en cada estancia; los fancoils o emisores de la central
+   van en los circuitos normales. La elevada que quede solo «por equipos» (sin secadora ni
+   automatización) da el aviso de coherencia, con su texto para la centralizada.
 6. **Plazas exteriores de HE 6 en viviendas**: aviso sin arreglo en la app (el REBT solo calcula la
-   recarga del garaje); el proyectista lo revisa.
+   recarga del garaje); el proyectista lo revisa. **Para más adelante:** que el REBT calcule también la
+   recarga de las plazas exteriores.
 7. **Contadores solo en obra nueva**: en una existente, HS 4 ve lo intervenido y el REBT el edificio.
 8. **Sin comprobación de superficies**: las únicas con dato propio se declaran a propósito o ya avisan.
 

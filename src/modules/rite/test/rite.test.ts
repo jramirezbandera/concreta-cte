@@ -140,6 +140,26 @@ describe("el REBT lee la climatización del RITE", () => {
     expect(climatizacionParaRebt({}, false)).toBe("aire_aire");
   });
 
+  it("con la producción centralizada, la bomba de calor no está en la vivienda; los emisores eléctricos, sí", () => {
+    const de = (r: Partial<RiteEstado>) => climatizacionParaRebt({ rite: inputs({ ...riteEstadoDefaults, produccion: "centralizada", ...r }) }, false);
+    expect(de({ calefaccion: "aire_aire" })).toBe("ninguna");
+    expect(de({ calefaccion: "aire_agua" })).toBe("ninguna");
+    expect(de({ calefaccion: "caldera", refrigeracion: "aire_aire" })).toBe("ninguna");
+    expect(de({ calefaccion: "electrica" })).toBe("emisores");
+    // En la unifamiliar no se pregunta: individual.
+    expect(climatizacionParaRebt({ rite: inputs({ ...riteEstadoDefaults, produccion: "centralizada" }) }, true)).toBe("aire_aire");
+  });
+
+  it("el REBT no pone C8 ni C9 en la vivienda con la producción centralizada", () => {
+    const p = caso("plurifamiliar", { ...POT, calefaccion: "aire_agua", produccion: "centralizada" });
+    const r = justificarRebt({ ...rebtEstadoDefaults }, { edificio: p.edificio, datosGenerales: p.datosGenerales, justificaciones: p.justificaciones });
+    expect(r.instalacion.equipos.climatizacion).toBe("ninguna");
+    const codigos = r.instalacion.viviendas.flatMap((v) => v.interior.circuitos.map((c) => c.codigo));
+    expect(codigos.length).toBeGreaterThan(0);
+    expect(codigos).not.toContain("C8");
+    expect(codigos).not.toContain("C9");
+  });
+
   it("los circuitos del REBT siguen al RITE", () => {
     const p = caso("plurifamiliar", { ...POT, calefaccion: "aire_agua" });
     const r = justificarRebt({ ...rebtEstadoDefaults }, { edificio: p.edificio, datosGenerales: p.datosGenerales, justificaciones: p.justificaciones });

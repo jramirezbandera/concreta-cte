@@ -117,11 +117,14 @@ export function positivo(v: unknown): number | null {
  * La climatización eléctrica que lee el REBT para los circuitos de la vivienda
  * (decisión 3 de feature-34 y de feature-36): la aire-agua de calefacción en un
  * C8, los emisores eléctricos en C8 y la aire-aire (de calor o de frío) en un C9.
- * Con caldera, biomasa o red y sin refrigeración, ninguna eléctrica.
+ * Con caldera, biomasa o red y sin refrigeración, ninguna eléctrica. Con la
+ * producción centralizada, las bombas de calor están fuera de la vivienda y no
+ * llevan circuito en ella; los emisores eléctricos siguen en cada estancia.
  */
-export function climatizacionDe(d: Pick<DecisionesRite, "calefaccion" | "refrigeracion">): Climatizacion {
-  if (d.calefaccion === "aire_agua") return "aire_agua";
+export function climatizacionDe(d: Pick<DecisionesRite, "calefaccion" | "refrigeracion" | "produccion">): Climatizacion {
   if (d.calefaccion === "electrica") return "emisores";
+  if (d.produccion === "centralizada") return "ninguna";
+  if (d.calefaccion === "aire_agua") return "aire_agua";
   if (d.calefaccion === "aire_aire" || d.refrigeracion === "aire_aire") return "aire_aire";
   return "ninguna";
 }

@@ -89,7 +89,7 @@ function DecisionesRebt({ state, setField, j, edificio }: PropsDecisionesSi<Rebt
               <Link to={`/p/${proyecto.id}/he/termicas`} className="text-accent hover:text-accent-hover underline">
                 HE 2 · RITE
               </Link>
-              , donde se cambia. La aire-aire (split) va en un C9; la aire-agua, en un C8; los radiadores o el suelo radiante eléctricos, en C8 con una toma por estancia (ITC-BT-25).
+              , donde se cambia. La aire-aire (split) va en un C9; la aire-agua, en un C8; los radiadores o el suelo radiante eléctricos, en C8 con una toma por estancia (ITC-BT-25). Con la producción centralizada, la bomba de calor está fuera de la vivienda y no lleva circuito.
             </p>
           </div>
           <CampoOpciones<"si" | "no">

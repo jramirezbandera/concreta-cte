@@ -96,6 +96,14 @@ describe("coherencia", () => {
     expect(ids(con(p, "rebt", { electrificacion: "superficie" }))).toEqual([]);
   });
 
+  it("electrificación: producción centralizada en el RITE y el REBT elevada por equipos", () => {
+    const p = con(demo(), "rite", { produccion: "centralizada" });
+    const a = coherencia(p).find((x) => x.tema === "electrificacion")!;
+    expect(a.id).toBe("electrificacion:elevada-aire_aire-misma-centralizada");
+    expect(a.detalle).toMatch(/^El RITE prevé la producción de climatización centralizada, fuera de las viviendas, y el REBT no lleva secadora/);
+    expect(ids(con(p, "rebt", { electrificacion: "superficie" })).filter((x) => x.startsWith("electrificacion:"))).toEqual([]);
+  });
+
   it("garaje: HE 6 «no aplica» con el garaje de El edificio y SUA 7 justificándolo (el ejemplo)", () => {
     const p = forzada(deCaso("plurifamiliar"), "he6", "no_aplica");
     const a = coherencia(p).find((x) => x.tema === "garaje")!;

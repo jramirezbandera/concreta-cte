@@ -226,10 +226,10 @@ function electrificacion(c: Contexto): AvisoCoherencia[] {
   const j = c.rebt();
   if (!j || j.viviendas.length === 0) return [];
   const d = c.rite();
+  // La del RITE en la vivienda: con la producción centralizada, la bomba de calor no lo está.
   const clima = climatizacionDe(d);
-  const enVivienda = clima !== "ninguna" && d.produccion === "individual";
 
-  if (enVivienda) {
+  if (clima !== "ninguna") {
     const basicas = j.viviendas.filter((v) => v.grado === "basica");
     if (basicas.length === 0) return [];
     const cuales = j.unifamiliar ? "la vivienda queda" : basicas.length === j.viviendas.length ? "las viviendas quedan" : `${lista(basicas.map((v) => `la vivienda ${v.nombre}`))} quedan`;
@@ -248,16 +248,19 @@ function electrificacion(c: Contexto): AvisoCoherencia[] {
 
   const e = c.estado<RebtEstado>("rebt");
   const soloPorEquipos = j.viviendas.filter((v) => v.motivos.length === 1 && v.motivos[0] === "equipos");
-  if (clima !== "ninguna" || e.secadora === true || e.automatizacion === true || soloPorEquipos.length === 0) return [];
+  if (e.secadora === true || e.automatizacion === true || soloPorEquipos.length === 0) return [];
+  const central = d.produccion === "centralizada" && (d.calefaccion !== "ninguna" || d.refrigeracion !== "ninguna");
   return [
     {
-      id: `electrificacion:elevada-${d.calefaccion}-${d.refrigeracion}`,
+      id: `electrificacion:elevada-${d.calefaccion}-${d.refrigeracion}${central ? "-centralizada" : ""}`,
       tema: "electrificacion",
-      titulo: "El REBT da electrificación elevada por la climatización eléctrica y el RITE no la proyecta.",
+      titulo: "El REBT da electrificación elevada por la climatización eléctrica y el RITE no la pone en las viviendas.",
       detalle:
-        // Sin climatización eléctrica, la refrigeración es «ninguna» (la aire-aire lo sería).
-        `El RITE prevé ${d.calefaccion === "ninguna" ? "las viviendas sin calefacción" : `calefacción con ${NOMBRE_CALEFACCION[d.calefaccion]}`} ` +
-        "y sin refrigeración, y el REBT no lleva secadora ni automatización. " +
+        (central
+          ? "El RITE prevé la producción de climatización centralizada, fuera de las viviendas"
+          : // Sin climatización eléctrica, la refrigeración es «ninguna» (la aire-aire lo sería).
+            `El RITE prevé ${d.calefaccion === "ninguna" ? "las viviendas sin calefacción" : `calefacción con ${NOMBRE_CALEFACCION[d.calefaccion]}`} y sin refrigeración`) +
+        ", y el REBT no lleva secadora ni automatización. " +
         "Si no hay otro equipo que la pida, elige en el REBT la electrificación «Por superficie».",
       enlaces: [c.enlace("rebt"), c.enlace("rite")],
     },

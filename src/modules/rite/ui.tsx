@@ -81,7 +81,7 @@ function DecisionesRite({ state, setField, j }: PropsDecisionesSi<RiteEstado, Ju
           valor={d.produccion}
           habitual={h.produccion}
           onChange={(v) => setField("produccion", v === h.produccion ? "habitual" : v)}
-          texto={`De la calefacción y la refrigeración. El ACS es ${j.acs.he4.produccion}, como dice HE 4: si no coinciden, son dos instalaciones con su documento cada una.`}
+          texto={`De la calefacción y la refrigeración. El ACS es ${j.acs.he4.produccion}, como dice HE 4: si no coinciden, son dos instalaciones con su documento cada una. Con la centralizada, la bomba de calor no está en la vivienda y el REBT no le pone circuito.`}
         />
       )}
 
