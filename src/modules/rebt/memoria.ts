@@ -10,8 +10,8 @@ import { soloTablas } from "../../lib/cte/memoria";
 import { ENGINE_VERSION } from "../../lib/version";
 import { lista } from "../sua/colocar";
 import type { DetalleRebt, JustificacionRebt } from "./justificacion";
-import { CONTADORES_REBT, CRITERIOS_REBT, GARAJES_REBT, GRADO_REBT, LOCALES_REBT, RECARGA_REBT, RESERVA_CT_REBT } from "./tablas";
-import { kW, m2, NOMBRE_GRADO, num, textoDesglose, textoMotivos, textoUbicacion, W } from "./textos";
+import { CONTADORES_REBT, CRITERIOS_REBT, GARAJES_REBT, GRADO_REBT, LOCALES_REBT, PISCINA_REBT, RECARGA_REBT, RESERVA_CT_REBT } from "./tablas";
+import { kW, m2, NOMBRE_GRADO, num, textoDesglose, textoMotivos, textoSolo, textoUbicacion, W } from "./textos";
 
 function detalle<K extends DetalleRebt["clase"]>(j: JustificacionRebt, clase: K): Extract<DetalleRebt, { clase: K }> | null {
   const el = j.elementos.find((x) => x.detalle.clase === clase);
@@ -83,6 +83,7 @@ function parrafoCargas(j: JustificacionRebt): Trozo[] {
     const que = [
       ...(s.ascensor ? [`el ascensor (${num(s.ascensor.kW, 1)} kW${s.ascensor.kWSupuesta ? `, valor orientativo de la Guía técnica BT-10 para el tipo ${CRITERIOS_REBT.datos.ascensorHabitual}` : ""})`] : []),
       ...(s.alumbrado.length > 0 ? [`el alumbrado del portal, la escalera y los espacios comunes (${W(s.alumbrado.reduce((a, x) => a + x.W, 0))}, con los ratios orientativos de la Guía técnica BT-10)`] : []),
+      ...(s.piscina_kW ? [`la piscina comunitaria (${num(s.piscina_kW, 1)} kW)`] : []),
       ...(s.otrosIndicados && s.otros_kW > 0 ? [`los demás servicios del edificio (${num(s.otros_kW, 1)} kW)`] : []),
     ];
     p.push(` Los servicios generales suman ${que.length > 0 ? lista(que) : "nada"}, sin reducción por simultaneidad: `, { v: kW(s.p_W) }, " (ap. 3.2).");
@@ -169,14 +170,42 @@ function parrafoContadores(j: JustificacionRebt): Trozo[] {
 function parrafoDocumentacion(j: JustificacionRebt): Trozo[] {
   const d = detalle(j, "documentacion")!;
   const grupos = lista(d.grupos.map((g) => `grupo ${g.grupo}: ${g.motivo}`));
-  if (d.soloAparcamiento) {
+  if (d.solo.length > 0) {
     return [
-      `La instalación del aparcamiento precisa proyecto, redactado y firmado por técnico titulado competente (ITC-BT-04 ap. 3.1, ${grupos}); el resto del edificio no supera los límites del ap. 3.1 y se documenta con memoria técnica de diseño, salvo que la Administración pida un único proyecto.`,
+      `La instalación ${textoSolo(d.solo)} precisa proyecto, redactado y firmado por técnico titulado competente (ITC-BT-04 ap. 3.1, ${grupos}); el resto ${j.unifamiliar ? "de la vivienda" : "del edificio"} no supera los límites del ap. 3.1 y se documenta con memoria técnica de diseño, salvo que la Administración pida un único proyecto.`,
     ];
   }
   return d.proyecto
     ? [`La instalación precisa proyecto, redactado y firmado por técnico titulado competente (ITC-BT-04 ap. 3.1, ${grupos}).`]
     : ["La instalación no está en ninguno de los grupos que precisan proyecto: se documenta con una memoria técnica de diseño (ITC-BT-04 ap. 4)."];
+}
+
+/**
+ * La piscina (feature-36, paso 7): local de características especiales con su
+ * ITC-BT-31, que se desarrolla en el anejo; aquí, su potencia y el trámite.
+ */
+function parrafoPiscina(j: JustificacionRebt): Trozo[] {
+  const d = detalle(j, "piscina");
+  if (!d) return [];
+  const PI = PISCINA_REBT.datos;
+  const p: Trozo[] = [
+    `La instalación de la piscina${d.comunitaria ? " comunitaria" : ""} es la de un local de características especiales (REBT art. 11) y cumple la ITC-BT-31: zonas 0, 1 y 2 con su grado de protección, solo muy baja tensión de seguridad a ${PI.mbtsZona01_Vca} V en las zonas 0 y 1, con la fuente de alimentación fuera de las zonas 0, 1 y 2, y conexión equipotencial suplementaria local; se desarrolla en el anejo de instalaciones.`,
+  ];
+  if (d.kW === null) {
+    p.push(` Su potencia está sin indicar: de ella dependen el proyecto (más de ${PI.proyectoMasDe_kW} kW) y la inspección por organismo de control (más de ${PI.ocaMasDe_kW} kW).`);
+    return p;
+  }
+  p.push(
+    " Su potencia instalada es de ",
+    { v: kW(d.kW * 1000) },
+    d.proyecto
+      ? `, más de ${PI.proyectoMasDe_kW} kW: precisa proyecto (ITC-BT-04 tabla 3.1, grupo n)`
+      : `, no más de ${PI.proyectoMasDe_kW} kW: no precisa proyecto por sí sola (ITC-BT-04 tabla 3.1, grupo n)`,
+    d.oca
+      ? `, y al pasar de ${PI.ocaMasDe_kW} kW tiene inspección inicial por organismo de control y periódica cada ${PI.ocaPeriodo_anos} años (ITC-BT-05 ap. 4.1 e y 4.2).`
+      : ".",
+  );
+  return p;
 }
 
 function tablaPrevision(j: JustificacionRebt): TablaMemoria | undefined {
@@ -276,7 +305,8 @@ function tablaExistente(j: JustificacionRebt): TablaMemoria | undefined {
 }
 
 export function memoriaRebt(j: JustificacionRebt): MemoriaDoc {
-  const fuente = ["REBT (RD 842/2002), consolidado BOE 03-09-2025", "ITC-BT-04, 10, 16, 25 y 52", "guías técnicas BT-10 y BT-52", "datos de El edificio", `motor ${ENGINE_VERSION}`].join(" · ");
+  const itc = detalle(j, "piscina") ? "ITC-BT-04, 05, 10, 16, 25, 31 y 52" : "ITC-BT-04, 10, 16, 25 y 52";
+  const fuente = ["REBT (RD 842/2002), consolidado BOE 03-09-2025", itc, "guías técnicas BT-10 y BT-52", "datos de El edificio", `motor ${ENGINE_VERSION}`].join(" · ");
   if (j.existente) {
     return {
       titulo: "Grado de electrificación y previsión de cargas",
@@ -286,7 +316,7 @@ export function memoriaRebt(j: JustificacionRebt): MemoriaDoc {
       fuente: ["REBT (RD 842/2002), consolidado BOE 03-09-2025", "art. 2.2", "ITC-BT-04, 10, 13, 14, 15, 16 y 25", "guía técnica BT-10", "datos de El edificio", `motor ${ENGINE_VERSION}`].join(" · "),
     };
   }
-  const parrafos = [parrafoLugar(j), parrafoGrado(j), parrafoCargas(j), parrafoTotal(j), parrafoContadores(j), parrafoDocumentacion(j)];
+  const parrafos = [parrafoLugar(j), parrafoGrado(j), parrafoCargas(j), parrafoTotal(j), parrafoContadores(j), parrafoPiscina(j), parrafoDocumentacion(j)];
   return {
     titulo: "Grado de electrificación y previsión de cargas",
     norma: "REBT ITC-BT-10",

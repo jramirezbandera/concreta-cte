@@ -23,6 +23,7 @@ import type { DetalleRebt, JustificacionRebt } from "./justificacion";
 import type { LineaRebt } from "./lineas";
 import { kW, NOMBRE_GRADO, num, textoDesglose, textoUbicacion, W } from "./textos";
 import { CRITERIOS_INSTALACION, FORMULAS_ANEXO2, REGLAS_ITC_BT_25, TIERRA_GUIA_BT26, TIERRA_REBT } from "./tablasInstalacion";
+import { PISCINA_REBT } from "./tablas";
 
 /** Cifra con decimales fijos, en español: «0,45». */
 function f(v: number, d: number): string {
@@ -368,10 +369,75 @@ function parteTierra(j: JustificacionRebt): ParteAnejo {
   return { titulo: "Puesta a tierra", parrafos: p, tablas: [tabla] };
 }
 
-function fuente(): string {
+// -----------------------------------------------------------------------------
+// 6 · La piscina (ITC-BT-31; feature-36, paso 7)
+// -----------------------------------------------------------------------------
+
+/**
+ * Lo que la ITC-BT-31 pide a toda piscina, privada o comunitaria
+ * (research/verificacion-memoria.md K-MEM.23, cotejado en imagen): zonas y
+ * grados IP, protecciones, equipotencial, canalizaciones y aparatos, y el cuarto
+ * de máquinas. El circuito y sus protecciones, de la documentación de la
+ * instalación: no se calculan.
+ */
+function partePiscina(j: JustificacionRebt): ParteAnejo | null {
+  const d = detalle(j, "piscina");
+  if (!d) return null;
+  const PI = PISCINA_REBT.datos;
+  const mbts = `MBTS a ${PI.mbtsZona01_Vca} V en alterna o ${PI.mbtsZona01_Vcc} V en continua, con la fuente de alimentación de seguridad fuera de las zonas 0, 1 y 2`;
+  const p: Trozo[][] = [
+    [
+      `La instalación de la piscina${d.comunitaria ? " comunitaria" : ""} es la de un local de características especiales (REBT art. 11) y cumple la ITC-BT-31, que se aplica a toda piscina, también a la de una vivienda. Alrededor del vaso se distinguen tres zonas, con el grado de protección mínimo de los equipos y la protección contra los choques eléctricos de la tabla. No se admiten la protección por obstáculos o por alejamiento, los locales no conductores ni la conexión equipotencial no conectada a tierra.`,
+    ],
+    [
+      "Todos los elementos conductores de las zonas 0, 1 y 2, incluidos los suelos no aislados, y los conductores de protección de los equipos con partes conductoras accesibles situados en ellas se conectan a una conexión equipotencial suplementaria local.",
+    ],
+    [
+      "No hay canalizaciones en la zona 0 al alcance de los bañistas ni líneas aéreas sobre las zonas 0, 1 y 2; en ellas, las canalizaciones no tienen cubiertas metálicas accesibles y los cables y su instalación son los de los locales mojados (ITC-BT-30). En las zonas 0 y 1 no hay cajas de conexión, salvo las de MBTS de material aislante con IPX5 en la zona 1, ni interruptores, programadores o bases de toma de corriente; en la zona 2 van protegidos con MBTS, ",
+      `diferencial de ${PI.diferencial_mA} mA como máximo o separación eléctrica. Las bombas cumplen la UNE-EN 60335-2-41. Un equipo fijo de filtrado o de contracorriente en la zona 1 va en un recinto con aislamiento equivalente al suplementario, accesible solo por un registro que se abre con llave o útil y cuya apertura corta todos los conductores activos (ITC-BT-31 ap. 4).`,
+    ],
+    [
+      d.alumbrado
+        ? `El alumbrado del vaso, en la zona 0, se alimenta con ${mbts}; sus luminarias, para uso en el agua, cumplen la UNE-EN 60598-2-18. Es de la ITC-BT-31, no de la de alumbrado exterior (ITC-BT-09). `
+        : "",
+      "El cuarto de máquinas de la depuradora es inaccesible a las personas no autorizadas, y su instalación es la de un local húmedo o mojado, según corresponda (ITC-BT-31 ap. 2.1; ITC-BT-30).",
+    ],
+  ];
+  const doc: Trozo[] =
+    d.kW === null
+      ? [`Potencia de la piscina sin indicar: con más de ${PI.proyectoMasDe_kW} kW precisa proyecto (ITC-BT-04 tabla 3.1, grupo n) y con más de ${PI.ocaMasDe_kW} kW, inspección por organismo de control (ITC-BT-05).`]
+      : [
+          "Potencia instalada de la piscina: ",
+          { v: `${n(d.kW)} kW` },
+          d.proyecto ? `, más de ${PI.proyectoMasDe_kW} kW: precisa proyecto (ITC-BT-04 tabla 3.1, grupo n)` : `: memoria técnica de diseño (ITC-BT-04 ap. 4; el grupo n pide proyecto con más de ${PI.proyectoMasDe_kW} kW)`,
+          d.oca ? `; con más de ${PI.ocaMasDe_kW} kW, inspección inicial por organismo de control y periódica cada ${PI.ocaPeriodo_anos} años (ITC-BT-05 ap. 4.1 e y 4.2).` : ".",
+          d.comunitaria ? " Suma en los servicios generales del edificio." : "",
+          " El circuito de la piscina y sus protecciones se definen en esa documentación.",
+        ];
+  p.push(doc);
+  const tabla: TablaMemoria = {
+    rotulo: "Zonas de la piscina (ITC-BT-31 ap. 1 y 2)",
+    cabecera: ["Zona", "Extensión", "Grado mínimo", "Protección"],
+    columnas: ["texto", "texto", "texto", "texto"],
+    filas: [
+      ["0", "El interior del vaso, con sus canales, pediluvios, inyectores y cascadas", PI.ip.zona0, `Solo ${mbts}`],
+      [
+        "1",
+        `Hasta un plano vertical a ${n(PI.zona1_m)} m del borde del vaso y ${n(PI.altura_m)} m de altura; con trampolín, tobogán u otro elemento que se pueda ocupar, además ${n(PI.zona1Trampolin_m)} m alrededor y ${n(PI.altura_m)} m sobre su superficie más alta`,
+        PI.ip.zona1,
+        "La de la zona 0",
+      ],
+      ["2", `${n(PI.zona2_m)} m más allá de la zona 1, hasta ${n(PI.altura_m)} m de altura`, PI.ip.zona2, `MBTS, diferencial de ${PI.diferencial_mA} mA como máximo o separación eléctrica que alimente un solo equipo, con la fuente fuera de las zonas 0, 1 y 2`],
+    ],
+    ancha: true,
+  };
+  return { titulo: "Piscina (ITC-BT-31)", parrafos: p, tablas: [tabla] };
+}
+
+function fuente(piscina: boolean): string {
   return [
     "REBT (RD 842/2002), consolidado 03-09-2025",
-    "ITC-BT-13, 14, 15, 16, 17, 18, 19, 24, 25, 26 y 52",
+    piscina ? "ITC-BT-04, 05, 13, 14, 15, 16, 17, 18, 19, 24, 25, 26, 30, 31 y 52" : "ITC-BT-13, 14, 15, 16, 17, 18, 19, 24, 25, 26 y 52",
     "Guías técnicas BT-15, 19, 22, 26 y Anexo 2",
     "datos de El edificio",
     `motor ${ENGINE_VERSION}`,
@@ -395,5 +461,7 @@ export function anejoRebt(j: JustificacionRebt): AnejoDoc {
   const cont = parteContadores(j);
   if (cont) partes.push(cont);
   partes.push(parteTierra(j));
-  return { abreviaturas: ABREVIATURAS, partes, fuente: fuente() };
+  const piscina = partePiscina(j);
+  if (piscina) partes.push(piscina);
+  return { abreviaturas: ABREVIATURAS, partes, fuente: fuente(piscina !== null) };
 }

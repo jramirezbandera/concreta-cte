@@ -481,6 +481,48 @@ equipotencial) con el circuito de la depuradora y su potencia declarada, y los a
 (proyecto con más de 5 kW, OCA con más de 10 kW); HS 5, el vaciado a la red; HS 4, la depuradora
 fuera del caudal de los aparatos.
 
+**Hecho (2026-10-20).** 7 tests en `src/modules/rebt/test/piscina.test.ts`; comprobado en el navegador
+(el Demo con piscina: REBT «no cumple» sin la potencia; con 12 kW, servicios generales de 23,8 kW, aviso de
+OCA, proyecto por los grupos e, g y n, y la memoria con su párrafo; sin errores de consola):
+- **K-MEM.25** (research/verificacion-memoria.md): **el DB-HS no regula la piscina**. La palabra no aparece
+  ni en el DB-HS de 2022 ni en sus comentarios. HS 4 no la trae como aparato (la app ya no la cuenta en el
+  caudal) y HS 5 no regula el vaciado (va por la ordenanza municipal). **HS 4 y HS 5 no cambian.** Además,
+  la letra de la ITC-BT-31 que K-MEM.23 daba como resumen, leída en el texto del consolidado.
+- `PISCINA_REBT` en [tablas.ts](src/modules/rebt/tablas.ts): zonas, grados IP, MBTS de 12 V / 30 V,
+  30 mA, proyecto con más de 5 kW (grupo n) e inspección con más de 10 kW, cada 5 años.
+- `RebtEstado.piscina_kW` y `piscinaAlumbrado`, opcionales (los expedientes guardados se leen igual).
+- Elemento `piscina` del REBT con la piscina de La obra (`tienePiscina`), privada o comunitaria: sin
+  potencia, «no cumple»; con ella, el trámite. Aviso `piscina-oca` con más de 10 kW. La documentación
+  añade el grupo n, y `soloAparcamiento` pasa a `solo: ("aparcamiento" | "piscina")[]` («proyecto de la
+  piscina; el resto, MTD»).
+- En el edificio, la piscina comunitaria **suma en los servicios generales** (ITC-BT-10 ap. 3.2), con su
+  línea en la memoria; en la unifamiliar no cambia la previsión.
+- Memoria del REBT: un párrafo con la ITC-BT-31, la potencia y el trámite, que remite al anejo. Anejo
+  5.3.3: la parte «Piscina (ITC-BT-31)», con la tabla de zonas (extensión, grado mínimo y protección),
+  la equipotencial, las canalizaciones, cajas y aparatos, el alumbrado del vaso si lo hay y el cuarto de
+  máquinas (ITC-BT-30).
+- Pantalla del REBT: la decisión «Potencia de la piscina» y, en «Para el anejo», «Alumbrado en el vaso».
+  La ayuda de la casilla «Piscina» de La obra nombra la ITC-BT-31.
+- Foto del expediente: los 20 proyectos con piscina pasan a REBT «no cumple» (sin la potencia) y cambian
+  la huella de la memoria y la del anejo; nada más.
+
+**Decisiones del paso 7, a validar:**
+1. **También la piscina comunitaria**: la ITC-BT-31 no distingue (su ámbito es «las piscinas»), así que
+   no es una ampliación por exclusión. Sigue la letra.
+2. **Sin potencia, «no cumple»**, como el RITE y HE 3: sin ella no se sabe si hace falta proyecto. Un
+   expediente guardado con piscina sale con el REBT en rojo hasta que se indica.
+3. **La comunitaria suma en los servicios generales**; la ayuda de «Otros servicios» dice que no se
+   cuente allí. **La de la unifamiliar no cambia la previsión** (la ITC-BT-10 da la de la vivienda por su
+   grado; con una demanda mayor conocida, la memoria ya dice que se prevé esa).
+4. **Proyecto solo de la piscina**, como el del aparcamiento: con el grupo n y nada más, «el resto, MTD,
+   salvo que la Administración pida un único proyecto».
+5. **En un edificio existente no entra**: no se sabe si la piscina es de la obra.
+6. **El circuito de la piscina no se calcula**: el anejo dice que lo define la documentación de la
+   instalación (MTD o proyecto). No se imprime la excepción de las piscinas pequeñas.
+7. **HS 4 y HS 5, sin cambios** (K-MEM.25). El antirretorno de los «tubos de alimentación no destinados a
+   usos domésticos» (HS 4 ap. 2.1.2 d) en el llenado sería una interpretación que amplía lo exigible: no se
+   codifica sin que lo diga el usuario.
+
 ### Paso 8 · Casos y cierre
 
 - Tests puros de cada módulo en el Demo, la unifamiliar, la plurifamiliar y «Reforma: local a

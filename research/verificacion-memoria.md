@@ -1618,3 +1618,30 @@ La piscina de una comunidad de propietarios, o la compartida por varias unifamil
 - [Corrección de errores, BOJA 219/2009](https://cdn.juntadeandalucia.es/boja/2009/219/d1.pdf)
 - [Orden de 9-01-2012, BOJA 12/2012](https://juntadeandalucia.es/boja/2012/12/d2.pdf)
 - [Ley 4/2017, consolidado](https://www.boe.es/buscar/pdf/2017/BOE-A-2017-11910-consolidado.pdf)
+
+---
+
+## K-MEM.25 — La piscina en el DB-HS y la letra de la ITC-BT-31 (feature-36, paso 7)
+
+**Pregunta.** El plan del paso 7 pedía, además del REBT, «HS 5, el vaciado a la red; HS 4, la depuradora fuera del caudal de los aparatos». ¿Lo dice el DB-HS? Y ¿qué dice la ITC-BT-31 de lo que K-MEM.23 daba como resumen?
+
+**Cómo se ha leído.** Texto completo de `research/pdf/DBHS.pdf` (DB-HS, 14-06-2022) y `research/pdf/DccHS.pdf` (con comentarios), extraído con `pdftotext`, buscando «piscin», «vaso», «depurad», «llenado», «vaciado», «riego», «ordenanza», «fuentes ornamentales» y «usos no domésticos». ITC-BT-31: texto de las pp. 205–209 de `research/pdf/REBT.pdf` (consolidado 03-09-2025). **LEÍDO (texto)**: no se ha cotejado en imagen; para la ausencia de una palabra, la búsqueda en el texto basta.
+
+**DB-HS: no regula la piscina.**
+- La palabra «piscina» no aparece ni en el DB-HS ni en sus comentarios.
+- **HS 4:** ningún literal sobre el llenado ni la depuradora. La tabla 2.1 no la trae como aparato: el caudal de la vivienda no la cuenta, y la app ya no la cuenta. Lo único cercano es el ap. 2.1.2 pto 1 d) (p. 82): sistemas antirretorno «en los tubos de alimentación no destinados a usos domésticos». Decir que el llenado de una piscina privada es un uso no doméstico sería una **INTERPRETACIÓN que amplía lo exigible**: no se codifica (regla del proyecto).
+- **HS 5:** el DB-HS 5 **no regula el vaciado de piscinas** (ni rebosadero ni lavado de filtros; nada en la tabla 4.1). Va por la ordenanza municipal de vertidos, que la app no conoce.
+
+**ITC-BT-31, la letra de lo que K-MEM.23 resumía** (pp. 206–209):
+- **Cuarto de máquinas** (p. 206): es el local con «como mínimo un equipo eléctrico para el uso de la piscina»; puede estar «en cualquier lugar» si es inaccesible a las personas no autorizadas, y cumple la ITC-BT-30 «para locales húmedos o mojados, según corresponda». No pide nada más.
+- **Zona 2** (pp. 206–207): MBTS con la fuente fuera de 0, 1 y 2; diferencial de «corriente máxima 30 mA»; o separación eléctrica que alimente «un único elemento del equipo», con la fuente fuera de 0, 1 y 2.
+- **Canalizaciones** (2.2.1): en 0, 1 y 2, sin cubiertas metálicas accesibles; cables e instalación de la ITC-BT-30 para locales mojados.
+- **Cajas** (2.2.2): ninguna en 0 y 1, salvo en la 1 las de MBTS con IPX5, de material aislante y apertura con útil.
+- **Aparamenta** (2.2.4): «interruptores, programadores, y bases de toma de corriente» fuera de 0 y 1; en la 2, con MBTS, diferencial de 30 mA o separación. La excepción de las piscinas pequeñas (bases a 1,25 m y 0,3 m) no se imprime.
+- **Luminarias** (2.2.3): las de uso en el agua o en contacto con ella, UNE-EN 60598-2-18.
+- **Equipo fijo de filtrado o contracorriente en la zona 1** (ap. 4): recinto con aislamiento equivalente al suplementario y protección AG2; accesible solo por un registro con llave o útil, cuya apertura corta todos los conductores activos; MBTS ≤ 25 V ca, diferencial de 30 mA o separación.
+- **ITC-BT-04 ap. 4** (H.10 de `verificacion-rebt.md`): la piscina de hasta 5 kW no precisa proyecto por sí sola y va con la memoria técnica de diseño de la instalación. No cambia nada.
+
+**Consecuencia para la app.**
+- HS 4 y HS 5 **no cambian**. En la memoria, ninguna frase sobre el llenado ni el vaciado.
+- El anejo del REBT usa la letra de arriba.

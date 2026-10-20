@@ -799,7 +799,7 @@ export function FormDatosGeneralesPage({ modo }: { modo: "crear" | "editar" }): 
               <CheckRow
                 id="dg-piscina"
                 label="Piscina"
-                help="Márcalo si hay piscina, sea de uso colectivo o privada de una unifamiliar. El ámbito de SUA6 se limita a las colectivas y deja fuera las de vivienda unifamiliar: esa distinción la hace el motor, y en unifamiliar redacta el «no aplica» por ese motivo. Sin marcar, el anejo afirmaría que no hay piscina."
+                help="Márcalo si hay piscina, sea de uso colectivo o privada de una unifamiliar. El ámbito de SUA6 se limita a las colectivas y deja fuera las de vivienda unifamiliar: esa distinción la hace el motor, y en unifamiliar redacta el «no aplica» por ese motivo. La ITC-BT-31 del REBT se aplica a toda piscina: el REBT pide su potencia (proyecto con más de 5 kW) y el anejo de instalaciones trae sus zonas y protecciones. Sin marcar, el anejo afirmaría que no hay piscina."
                 refText="DB-SUA 6, ámbito de aplicación"
                 checked={dg.tienePiscina}
                 onChange={(v) => set("tienePiscina", v)}

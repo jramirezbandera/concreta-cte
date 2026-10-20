@@ -18,7 +18,7 @@ import { PantallaSi, type PropsDecisionesSi } from "../si/PantallaSi";
 import { rebt } from "./definicion";
 import type { Climatizacion, Electrificacion, RebtEstado, Spl } from "./estado";
 import type { JustificacionRebt } from "./justificacion";
-import { CRITERIOS_REBT, GRADO_REBT } from "./tablas";
+import { CRITERIOS_REBT, GRADO_REBT, PISCINA_REBT } from "./tablas";
 import { kW, num, W } from "./textos";
 
 const NOMBRE_CLIMATIZACION: Record<Climatizacion, string> = {
@@ -38,6 +38,8 @@ function DecisionesRebt({ state, setField, j, edificio }: PropsDecisionesSi<Rebt
   const recarga = rc && rc.clase === "recarga" ? rc : null;
   const g = j.elementos.find((e) => e.id === "garaje")?.detalle;
   const garaje = g && g.clase === "garaje" ? g : null;
+  const pi = j.elementos.find((e) => e.id === "piscina")?.detalle;
+  const piscina = pi && pi.clase === "piscina" ? pi : null;
   const conViviendas = j.viviendas.length > 0;
   const sinGaraje = j.unifamiliar && !edificio.grupos.some((gr) => gr.zonas.some((z) => z.uso === "garaje_privado"));
   const recargaViviendas = recarga?.ambito === "viviendas" ? recarga : null;
@@ -56,6 +58,7 @@ function DecisionesRebt({ state, setField, j, edificio }: PropsDecisionesSi<Rebt
     recarga: hastaOtros + 1,
     garaje: hastaRecarga + 1,
     humo: hastaRecarga + 2,
+    piscina: hastaRecarga + (garaje ? 1 : 0) + (garaje?.humo ? 1 : 0) + 1,
   };
   const numero = (v: number) => (Number.isFinite(v) && v >= 0 ? v : null);
   const G = GRADO_REBT.datos;
@@ -151,6 +154,19 @@ function DecisionesRebt({ state, setField, j, edificio }: PropsDecisionesSi<Rebt
           ]}
           onChange={(v) => setField("diEnterrada", v === "si")}
           ayuda="Con la caja de protección y medida en el límite de la parcela, la derivación suele ir enterrada: cable de 0,6/1 kV e intensidades de la ITC-BT-07."
+        />
+      )}
+      {piscina && (
+        <CampoOpciones<"si" | "no">
+          id="rebt-piscina-alumbrado"
+          etiqueta="Alumbrado en el vaso"
+          valor={piscina.alumbrado ? "si" : "no"}
+          opciones={[
+            { valor: "no", label: "No" },
+            { valor: "si", label: "Sí, a 12 V" },
+          ]}
+          onChange={(v) => setField("piscinaAlumbrado", v === "si")}
+          ayuda="Focos sumergidos en la zona 0: solo MBTS a 12 V, con el transformador fuera de las zonas 0, 1 y 2, y luminarias de la UNE-EN 60598-2-18 (ITC-BT-31)."
         />
       )}
       {!t.existente && (
@@ -311,6 +327,18 @@ function DecisionesRebt({ state, setField, j, edificio }: PropsDecisionesSi<Rebt
               />
             }
             texto={`Con los ventiladores de extracción del humo (150 l/s por plaza), el alumbrado y lo demás: la ITC-BT-10 pide estudiarla. No baja de ${garaje.W_m2} W/m².`}
+          />
+        )}
+
+        {piscina && (
+          <DecisionValor
+            numero={n.piscina}
+            pregunta="Potencia de la piscina"
+            marca={piscina.kW !== null ? { texto: "indicada" } : { texto: "sin indicar", aviso: true }}
+            control={
+              <CampoNumero id="rebt-piscina" etiqueta="Potencia de la piscina" value={piscina.kW ?? 0} unidad="kW" decimales={1} onChange={(v) => setField("piscina_kW", numero(v))} />
+            }
+            texto={`Depuradora, alumbrado y demás equipos. Con más de ${PISCINA_REBT.datos.proyectoMasDe_kW} kW precisa proyecto (ITC-BT-04, grupo n); con más de ${PISCINA_REBT.datos.ocaMasDe_kW} kW, inspección por organismo de control (ITC-BT-05).${piscina.comunitaria ? " Suma en los servicios generales: no la cuentes en «otros»." : ""}`}
           />
         )}
       </section>

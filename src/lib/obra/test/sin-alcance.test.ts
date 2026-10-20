@@ -34,7 +34,10 @@ import antes from "./foto-antes.json";
 // memoria, por el apartado 3.6.3 y la numeración del 3.6; el REBT, que lee la
 // climatización del RITE, no cambia (lo habitual sigue siendo la aire-aire). En
 // el paso 5 (accesibilidad autonómica) se añade la fila «acc» y cambia la huella
-// de la memoria, por el apartado 4.4; nada más.
+// de la memoria, por el apartado 4.4; nada más. En el paso 7 (la piscina en el
+// REBT, ITC-BT-31) los 20 proyectos con piscina pasan a REBT «no cumple» (falta
+// la potencia de la piscina) y cambian su huella de la memoria y la del anejo;
+// nada más.
 // =============================================================================
 
 describe("sin asistente de alcance, nada cambia", () => {

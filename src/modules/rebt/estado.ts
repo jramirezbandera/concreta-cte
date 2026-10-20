@@ -50,6 +50,12 @@ export type RebtEstado = {
   plazaParcela: boolean;
   /** Potencia del garaje con control de humo mecánico [kW] (ventiladores, alumbrado…); null = sin estudiar. */
   garaje_kW: number | null;
+  /**
+   * Potencia instalada de la piscina [kW] (depuradora, alumbrado y demás equipos;
+   * feature-36, paso 7): decide el proyecto (ITC-BT-04, grupo n) y la inspección
+   * (ITC-BT-05); en el edificio, suma en los servicios generales. null = sin indicar.
+   */
+  piscina_kW?: number | null;
 
   // ── Para el anejo (feature-34): no cambian la previsión ────────────────────
   /**
@@ -71,6 +77,8 @@ export type RebtEstado = {
   perimetroTierra_m?: number | null;
   /** Resistividad del terreno [Ω·m]; null = supuesta, la peor de la ITC-BT-18 tabla 4. */
   resistividad_ohm_m?: number | null;
+  /** La piscina lleva alumbrado en el vaso (zona 0: MBTS a 12 V, ITC-BT-31). */
+  piscinaAlumbrado?: boolean;
 };
 
 export const rebtEstadoDefaults: RebtEstado = {

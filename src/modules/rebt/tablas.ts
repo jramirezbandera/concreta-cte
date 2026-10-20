@@ -266,3 +266,40 @@ export const PROYECTO_REBT = tablaCTE(
     recargaMasDe_kW: 50,
   } as const,
 );
+
+/**
+ * La piscina (feature-36, paso 7; research/verificacion-memoria.md K-MEM.23,
+ * cotejado en imagen en el consolidado): «las instalaciones para piscinas» son de
+ * un local de características especiales (art. 11) y la ITC-BT-31 se aplica a toda
+ * piscina, privada o colectiva. Zonas 0, 1 y 2 (p. 205), grados IP (2.2) y
+ * protecciones (p. 206); trámite: proyecto con más de 5 kW (ITC-BT-04 tabla 3.1,
+ * grupo n; ap. 3.3, el criterio más exigente si coinciden grupos) e inspección
+ * inicial por organismo de control con más de 10 kW, periódica cada 5 años
+ * (ITC-BT-05 ap. 4.1 e y 4.2).
+ */
+export const PISCINA_REBT = tablaCTE(
+  { ...PROC_REBT, articulo: "art. 11; ITC-BT-31; ITC-BT-04 tabla 3.1 grupo n; ITC-BT-05 ap. 4.1 e) y 4.2" },
+  {
+    /** Zona 1: hasta un plano vertical a 2 m del borde del vaso y 2,5 m de altura. */
+    zona1_m: 2,
+    altura_m: 2.5,
+    /** Con trampolín o tobogán, además 1,5 m alrededor y 2,5 m sobre su punto más alto. */
+    zona1Trampolin_m: 1.5,
+    /** Zona 2: 1,5 m más allá de la zona 1, hasta 2,5 m de altura. */
+    zona2_m: 1.5,
+    ip: {
+      zona0: "IPX8",
+      zona1: "IPX5 (IPX4 en interiores que no se limpian con chorro)",
+      zona2: "IPX2 en interior, IPX4 en exterior, IPX5 si se limpia con chorro",
+    },
+    /** Zonas 0 y 1: solo MBTS a 12 V en alterna o 30 V en continua, con la fuente fuera de 0, 1 y 2. */
+    mbtsZona01_Vca: 12,
+    mbtsZona01_Vcc: 30,
+    diferencial_mA: 30,
+    /** Grupo n de la ITC-BT-04: «las correspondientes a piscinas y fuentes», P > 5 kW. */
+    proyectoMasDe_kW: 5,
+    /** ITC-BT-05 ap. 4.1 e): inspección inicial con más de 10 kW; ap. 4.2: periódica cada 5 años. */
+    ocaMasDe_kW: 10,
+    ocaPeriodo_anos: 5,
+  } as const,
+);

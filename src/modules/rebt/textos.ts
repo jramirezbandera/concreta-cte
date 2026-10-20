@@ -10,13 +10,14 @@ import type { Aviso } from "../../lib/cte/resultado";
 import type { TextoSi } from "../si/definicion";
 import type { ElementoSi } from "../si/tipos";
 import { lista } from "../sua/colocar";
-import type { DetalleRebt, ElementoRebt, JustificacionRebt, MotivoElevada, ViviendaRebt } from "./justificacion";
+import type { DetalleRebt, ElementoRebt, JustificacionRebt, MotivoElevada, ParteConProyecto, ViviendaRebt } from "./justificacion";
 import {
   CONTADORES_REBT,
   CRITERIOS_REBT,
   GARAJES_REBT,
   GRADO_REBT,
   LOCALES_REBT,
+  PISCINA_REBT,
   potenciaAscensorHabitual,
   PROYECTO_REBT,
   RECARGA_REBT,
@@ -114,7 +115,7 @@ export function fraseRebt(j: JustificacionRebt): string {
     return `${quien}: ${kW(t.p_W)} de carga total. Con ${c.n} contadores hace falta un local de contadores, y El edificio no lo tiene.`;
   }
   if (!c.plantaOk) return `${quien}: ${kW(t.p_W)} de carga total. El local de contadores no está en la planta baja ni en el primer sótano.`;
-  return `${quien}: ${kW(t.p_W)} de carga total, ${c.n} contadores ${textoUbicacion(c)} y ${doc.proyecto ? (doc.soloAparcamiento ? "proyecto del aparcamiento" : "proyecto") : "memoria técnica de diseño"}.`;
+  return `${quien}: ${kW(t.p_W)} de carga total, ${c.n} contadores ${textoUbicacion(c)} y ${doc.proyecto ? (doc.solo.length > 0 ? `proyecto ${textoSolo(doc.solo)}` : "proyecto") : "memoria técnica de diseño"}.`;
 }
 
 export function metricasRebt(j: JustificacionRebt): string {
@@ -224,9 +225,16 @@ export function textoEtiquetaRebt(el: ElementoSi<unknown>): string {
       return `P ${kW(d.p_W)}`;
     case "contadores":
       return `${d.n} contador${d.n === 1 ? "" : "es"}`;
+    case "piscina":
+      return d.kW === null ? "sin potencia" : kW(d.kW * 1000);
     case "documentacion":
       return d.proyecto ? "proyecto" : "MTD";
   }
+}
+
+/** «del aparcamiento», «de la piscina», «del aparcamiento y de la piscina». */
+export function textoSolo(solo: ParteConProyecto[]): string {
+  return lista(solo.map((x) => (x === "aparcamiento" ? "del aparcamiento" : "de la piscina")));
 }
 
 export function resultadoListaRebt(el: ElementoSi<unknown>): string {
@@ -242,6 +250,7 @@ export function resultadoListaRebt(el: ElementoSi<unknown>): string {
       const partes = [
         ...(d.ascensor ? [`ascensor ${num(d.ascensor.kW, 1)} kW`] : []),
         ...(d.alumbrado.length > 0 ? [`alumbrado ${W(d.alumbrado.reduce((a, x) => a + x.W, 0))}`] : []),
+        ...(d.piscina_kW ? [`piscina ${num(d.piscina_kW, 1)} kW`] : []),
         ...(d.otros_kW > 0 ? [`otros ${num(d.otros_kW, 1)} kW`] : []),
       ];
       return `${partes.length > 0 ? partes.join(" + ") : "nada"} = ${kW(d.p_W)}`;
@@ -260,9 +269,13 @@ export function resultadoListaRebt(el: ElementoSi<unknown>): string {
       return `${d.partes.map((x) => kW(x.p_W)).join(" + ")} = ${kW(d.p_W)} (${num(d.i_A, 1)} A${d.trifasica ? " a 400 V" : " a 230 V"})`;
     case "contadores":
       return `${lista(d.desglose.map(textoDesglose))}: ${d.n} contador${d.n === 1 ? "" : "es"} ${textoUbicacion(d)}${d.cuarto ? ` (${d.cuarto.plantas})` : ""}`;
+    case "piscina":
+      return d.kW === null
+        ? "sin la potencia, no se sabe si precisa proyecto"
+        : `${kW(d.kW * 1000)}: ${d.proyecto ? "proyecto (grupo n)" : "memoria técnica de diseño"}${d.oca ? " e inspección por organismo de control" : ""}`;
     case "documentacion":
       return d.proyecto
-        ? `Proyecto${d.soloAparcamiento ? " del aparcamiento" : ""} (grupo ${lista(d.grupos.map((g) => g.grupo))} de la ITC-BT-04)`
+        ? `Proyecto${d.solo.length > 0 ? ` ${textoSolo(d.solo)}` : ""} (grupo ${lista(d.grupos.map((g) => g.grupo))} de la ITC-BT-04)`
         : "Memoria técnica de diseño (ITC-BT-04 ap. 4)";
   }
 }
@@ -319,6 +332,7 @@ export function franjaRebt(el: ElementoSi<unknown>, j: JustificacionRebt, estado
         filas: [
           ...(d.ascensor ? [{ k: "Ascensor", v: `${num(d.ascensor.kW, 1)} kW${d.ascensor.kWSupuesta ? ` (${CRITERIOS_REBT.datos.ascensorHabitual}, supuesta)` : ""}` }] : []),
           ...d.alumbrado.map((a) => ({ k: a.que, v: `${m2(a.m2)} × ${a.W_m2} W/m² = ${W(a.W)}` })),
+          ...(d.piscina_kW !== null ? [{ k: "Piscina", v: `${num(d.piscina_kW, 1)} kW` }] : []),
           { k: "Otros", v: d.otrosIndicados ? `${num(d.otros_kW, 1)} kW` : "sin indicar" },
         ],
         cita: "ITC-BT-10 ap. 3.2 · Guía BT-10, tabla A",
@@ -439,15 +453,36 @@ export function franjaRebt(el: ElementoSi<unknown>, j: JustificacionRebt, estado
         filas: d.desglose.map((x) => ({ k: x.que.charAt(0).toUpperCase() + x.que.slice(1), v: String(x.n) })),
         cita: d.ubicacion === "cpm" ? "ITC-BT-16 ap. 2.1" : "ITC-BT-16 ap. 2.2",
       };
+    case "piscina": {
+      const PI = PISCINA_REBT.datos;
+      return {
+        clase: "Piscina · ITC-BT-31",
+        titulo: el.nombre,
+        valor: d.kW === null ? "—" : num(d.kW, 1),
+        unidad: d.kW === null ? "kW · sin indicar" : `kW · ${d.proyecto ? "proyecto" : "memoria técnica de diseño"}`,
+        estado,
+        manda: `La ITC-BT-31 se aplica a toda piscina, también a la privada de una vivienda: zonas 0, 1 y 2 con su grado IP, solo MBTS a ${PI.mbtsZona01_Vca} V en las zonas 0 y 1 (con la fuente fuera), MBTS, diferencial de ${PI.diferencial_mA} mA o separación en la 2, y conexión equipotencial local. Con más de ${PI.proyectoMasDe_kW} kW, proyecto (ITC-BT-04, grupo n); con más de ${PI.ocaMasDe_kW} kW, inspección inicial por organismo de control y cada ${PI.ocaPeriodo_anos} años (ITC-BT-05).`,
+        nota: d.comunitaria
+          ? "Su potencia suma en los servicios generales, sin simultaneidad (ITC-BT-10 ap. 3.2). Las condiciones de la ITC-BT-31 se desarrollan en el anejo de instalaciones."
+          : "No cambia la previsión de la vivienda. Las condiciones de la ITC-BT-31 se desarrollan en el anejo de instalaciones.",
+        filas: [
+          { k: "Potencia instalada", v: d.kW === null ? "sin indicar" : `${num(d.kW, 1)} kW` },
+          { k: "Alumbrado en el vaso", v: d.alumbrado ? `sí, MBTS a ${PI.mbtsZona01_Vca} V` : "no" },
+          { k: "Documentación", v: d.proyecto === null ? "—" : d.proyecto ? "proyecto (grupo n)" : "memoria técnica de diseño" },
+          { k: "Inspección (OCA)", v: d.oca === null ? "—" : d.oca ? `inicial y cada ${PI.ocaPeriodo_anos} años` : "no" },
+        ],
+        cita: "REBT art. 11 · ITC-BT-31 · ITC-BT-04 tabla 3.1 · ITC-BT-05 ap. 4",
+      };
+    }
     case "documentacion":
       return {
         clase: "Documentación · ITC-BT-04",
         titulo: el.nombre,
         valor: d.proyecto ? "Proyecto" : "MTD",
-        unidad: d.soloAparcamiento ? "del aparcamiento; el resto, MTD" : d.proyecto ? "técnico titulado competente" : "memoria técnica de diseño",
+        unidad: d.solo.length > 0 ? `${textoSolo(d.solo)}; el resto, MTD` : d.proyecto ? "técnico titulado competente" : "memoria técnica de diseño",
         estado,
-        manda: `Precisan proyecto, entre otras, las instalaciones de edificios de viviendas, locales y oficinas de más de ${PROYECTO_REBT.datos.edificioMasDe_kW} kW por caja general de protección, las de viviendas unifamiliares de más de ${PROYECTO_REBT.datos.unifamiliarMasDe_kW} kW, las de aparcamientos con ventilación forzada o con natural de más de ${PROYECTO_REBT.datos.garajeNaturalMasDe_plazas} plazas y las de recarga de más de ${PROYECTO_REBT.datos.recargaMasDe_kW} kW. Las demás, memoria técnica de diseño.`,
-        nota: d.soloAparcamiento ? "El grupo del aparcamiento pide proyecto para su instalación; muchas comunidades autónomas tramitan un único proyecto del edificio." : undefined,
+        manda: `Precisan proyecto, entre otras, las instalaciones de edificios de viviendas, locales y oficinas de más de ${PROYECTO_REBT.datos.edificioMasDe_kW} kW por caja general de protección, las de viviendas unifamiliares de más de ${PROYECTO_REBT.datos.unifamiliarMasDe_kW} kW, las de aparcamientos con ventilación forzada o con natural de más de ${PROYECTO_REBT.datos.garajeNaturalMasDe_plazas} plazas, las de recarga de más de ${PROYECTO_REBT.datos.recargaMasDe_kW} kW y las de piscinas de más de ${PISCINA_REBT.datos.proyectoMasDe_kW} kW. Las demás, memoria técnica de diseño.`,
+        nota: d.solo.length > 0 ? `El grupo ${textoSolo(d.solo)} pide proyecto para su instalación; muchas comunidades autónomas tramitan un único proyecto del edificio.` : undefined,
         filas: d.grupos.length > 0 ? d.grupos.map((g) => ({ k: `Grupo ${g.grupo}`, v: g.motivo })) : [{ k: "Ningún grupo", v: "memoria técnica de diseño" }],
         cita: "ITC-BT-04 ap. 3.1 y 4",
       };
@@ -499,6 +534,11 @@ export function textoAvisoRebt(a: Aviso): TextoSi {
         titulo: "El ascensor no está indicado en El edificio.",
         detalle: "Se cuenta el que exige SUA 9. Indica si lo hay o no en El edificio, en la zona Portal y escalera.",
       };
+    case "piscina-oca":
+      return {
+        titulo: "La piscina pasa de 10 kW: inspección por organismo de control.",
+        detalle: `Con más de ${PISCINA_REBT.datos.ocaMasDe_kW} kW, la instalación de la piscina tiene inspección inicial por un organismo de control (ITC-BT-05 ap. 4.1 e) y periódica cada ${PISCINA_REBT.datos.ocaPeriodo_anos} años (ap. 4.2). Inclúyelo en la tramitación.`,
+      };
     case "acs-central":
       return {
         titulo: "La producción de ACS es centralizada (HE 4).",
@@ -534,6 +574,12 @@ export function textoAvisoRebt(a: Aviso): TextoSi {
 export function textoIncumplimientoRebt(el: ElementoSi<unknown>): TextoSi | null {
   if (el.veredicto !== "fail") return null;
   const d = det(el);
+  if (d.clase === "piscina") {
+    return {
+      titulo: "Indica la potencia de la piscina.",
+      detalle: `La de la depuradora, el alumbrado y los demás equipos. Con más de ${PISCINA_REBT.datos.proyectoMasDe_kW} kW su instalación precisa proyecto (ITC-BT-04, grupo n) y con más de ${PISCINA_REBT.datos.ocaMasDe_kW} kW, inspección por organismo de control (ITC-BT-05)${d.comunitaria ? "; en el edificio, además, suma en los servicios generales" : ""}.`,
+    };
+  }
   if (d.clase !== "contadores") return null;
   if (d.exigeLocal && !d.cuarto) {
     return {

@@ -85,7 +85,7 @@ describe("REBT · con El edificio", () => {
     // 7 viviendas + servicios generales + ⌈0,2 × (16 − 7)⌉ = 2 módulos de reserva (ITC-BT-52 ap. 3.2 b).
     expect(detalle(j, "contadores")).toMatchObject({ n: 10, ubicacion: "armario", exigeLocal: false });
     expect(detalle(j, "contadores")!.desglose.at(-1)).toEqual({ que: "reserva para la recarga", n: 2 });
-    expect(detalle(j, "documentacion")).toMatchObject({ proyecto: true, soloAparcamiento: true, grupos: [{ grupo: "g", motivo: "aparcamiento con ventilación forzada" }] });
+    expect(detalle(j, "documentacion")).toMatchObject({ proyecto: true, solo: ["aparcamiento"], grupos: [{ grupo: "g", motivo: "aparcamiento con ventilación forzada" }] });
     expect(avisos(j)).toEqual(expect.arrayContaining(["ascensor-supuesto", "servicios", "humo"]));
   });
 
@@ -125,7 +125,7 @@ describe("REBT · con El edificio", () => {
     expect(detalle(j, "servicios")!.alumbrado).toEqual([{ zonaId: "z2", que: "Vestíbulo (PB)", m2: 60, W_m2: 8, W: 480 }]);
     expect(avisos(j)).toContain("garaje-oficinas");
     expect(detalle(j, "contadores")).toMatchObject({ n: 6 }); // 2 oficinas + local + servicios + ⌈0,2 × 10⌉
-    expect(detalle(j, "documentacion")).toMatchObject({ proyecto: true, soloAparcamiento: false });
+    expect(detalle(j, "documentacion")).toMatchObject({ proyecto: true, solo: [] });
     expect(detalle(j, "documentacion")!.grupos.map((g) => g.grupo)).toEqual(["e", "g"]);
     expect(avisos(j)).toContain("centro-transformacion"); // 102 kW
   });

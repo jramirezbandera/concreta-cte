@@ -47,6 +47,7 @@ import {
   GRADO_REBT,
   igaDe,
   LOCALES_REBT,
+  PISCINA_REBT,
   potenciaAscensorHabitual,
   PROYECTO_REBT,
   RECARGA_REBT,
@@ -91,6 +92,8 @@ export type DetalleRebt =
       alumbrado: AlumbradoRebt[];
       otros_kW: number;
       otrosIndicados: boolean;
+      /** La piscina comunitaria [kW] (feature-36, paso 7); null sin piscina o sin indicar. */
+      piscina_kW: number | null;
       p_W: number;
     }
   | {
@@ -163,12 +166,35 @@ export type DetalleRebt =
       candidato: { zonaId: string; plantas: string } | null;
     }
   | {
+      /**
+       * La piscina (feature-36, paso 7), privada o comunitaria: la ITC-BT-31 se
+       * aplica a toda piscina (K-MEM.23). Sin su potencia no se sabe el trámite.
+       */
+      clase: "piscina";
+      comunitaria: boolean;
+      /** Potencia instalada [kW]; null = sin indicar. */
+      kW: number | null;
+      /** Alumbrado en el vaso (zona 0). */
+      alumbrado: boolean;
+      /** Precisa proyecto (ITC-BT-04, grupo n); null sin la potencia. */
+      proyecto: boolean | null;
+      /** Inspección inicial y periódica por organismo de control (ITC-BT-05); null sin la potencia. */
+      oca: boolean | null;
+    }
+  | {
       clase: "documentacion";
       proyecto: boolean;
-      /** Solo el aparcamiento (grupos g o h): el resto, memoria técnica de diseño. */
-      soloAparcamiento: boolean;
+      /**
+       * Solo esas partes precisan proyecto (el aparcamiento, grupos g o h; la
+       * piscina, grupo n): el resto, memoria técnica de diseño. Vacío, toda la
+       * instalación o ninguna.
+       */
+      solo: ParteConProyecto[];
       grupos: { grupo: string; motivo: string }[];
     };
+
+/** Las partes de la instalación que pueden precisar proyecto por sí solas. */
+export type ParteConProyecto = "aparcamiento" | "piscina";
 
 export type ElementoRebt = ElementoSi<DetalleRebt>;
 
@@ -328,6 +354,11 @@ function justificarPrevision(estado: RebtEstado, p: ProyectoSi): Omit<Justificac
     partes.push({ id: "viviendas", que: "Viviendas", p_W });
   }
 
+  // ── La piscina (ITC-BT-31; feature-36, paso 7) ───────────────────────────
+  // En un edificio existente no se sabe si la piscina es de la obra: no entra.
+  const hayPiscina = p.datosGenerales.tienePiscina === true && !p.existente;
+  const piscina_kW = hayPiscina ? noNegativo(estado.piscina_kW) : null;
+
   // ── Los servicios generales (ap. 3.2) ────────────────────────────────────
   let hayAscensor = false;
   if (!unifamiliar) {
@@ -346,16 +377,20 @@ function justificarPrevision(estado: RebtEstado, p: ProyectoSi): Omit<Justificac
       });
     const otrosDados = noNegativo(estado.otrosServicios_kW);
     const otros_kW = otrosDados ?? 0;
-    const p_W = redondear((ascensor?.kW ?? 0) * 1000 + alumbrado.reduce((a, x) => a + x.W, 0) + otros_kW * 1000);
+    const p_W = redondear((ascensor?.kW ?? 0) * 1000 + alumbrado.reduce((a, x) => a + x.W, 0) + otros_kW * 1000 + (piscina_kW ?? 0) * 1000);
     elementos.push({
       id: "servicios",
       nombre: "Servicios generales",
       tipo: "carga",
       veredicto: "dato",
       valor: { valor: p_W, unidad: "W" },
-      manda: { tipo: "formula", formula: "P2 = ascensor + alumbrado común + otros (simultaneidad 1)", resultado: { valor: p_W, unidad: "W" } },
+      manda: {
+        tipo: "formula",
+        formula: hayPiscina ? "P2 = ascensor + alumbrado común + piscina + otros (simultaneidad 1)" : "P2 = ascensor + alumbrado común + otros (simultaneidad 1)",
+        resultado: { valor: p_W, unidad: "W" },
+      },
       cita: ["ITC-BT-10 · ap. 3.2", "Guía BT-10 · tabla A"],
-      detalle: { clase: "servicios", ascensor, alumbrado, otros_kW, otrosIndicados: otrosDados !== null, p_W },
+      detalle: { clase: "servicios", ascensor, alumbrado, otros_kW, otrosIndicados: otrosDados !== null, piscina_kW, p_W },
     });
     partes.push({ id: "servicios", que: "Servicios generales", p_W });
     if (ascensor?.supuesto) avisos.push({ id: "ascensor-supuesto", tipo: "supuesto", elementoId: "servicios", datos: {} });
@@ -540,6 +575,25 @@ function justificarPrevision(estado: RebtEstado, p: ProyectoSi): Omit<Justificac
   });
   if (muchasPlantas && !unifamiliar) avisos.push({ id: "plantas", tipo: "fuera_de_alcance", elementoId: "contadores", datos: {} });
 
+  // ── La piscina: ITC-BT-31 y su trámite (ITC-BT-04 grupo n; ITC-BT-05) ────
+  if (hayPiscina) {
+    const PI = PISCINA_REBT.datos;
+    const proyecto = piscina_kW === null ? null : piscina_kW > PI.proyectoMasDe_kW;
+    const oca = piscina_kW === null ? null : piscina_kW > PI.ocaMasDe_kW;
+    elementos.push({
+      id: "piscina",
+      nombre: unifamiliar ? "Piscina" : "Piscina comunitaria",
+      tipo: "piscina",
+      veredicto: piscina_kW === null ? "fail" : "ok",
+      valor: piscina_kW === null ? { texto: "sin indicar" } : { valor: piscina_kW, unidad: "kW" },
+      limite: { valor: PI.proyectoMasDe_kW, unidad: "kW sin proyecto" },
+      manda: { tipo: "dato_de_partida", fuente: "ITC-BT-31; ITC-BT-04 tabla 3.1 grupo n; ITC-BT-05 ap. 4" },
+      cita: ["REBT · art. 11", "ITC-BT-31", "ITC-BT-04 · tabla 3.1 grupo n", "ITC-BT-05 · ap. 4.1 e) y 4.2"],
+      detalle: { clase: "piscina", comunitaria: !unifamiliar, kW: piscina_kW, alumbrado: estado.piscinaAlumbrado === true, proyecto, oca },
+    });
+    if (oca) avisos.push({ id: "piscina-oca", tipo: "caso_especial", elementoId: "piscina", datos: {} });
+  }
+
   // ── Proyecto o memoria técnica de diseño (ITC-BT-04 ap. 3.1) ─────────────
   const P = PROYECTO_REBT.datos;
   const grupos: { grupo: string; motivo: string }[] = [];
@@ -556,6 +610,11 @@ function justificarPrevision(estado: RebtEstado, p: ProyectoSi): Omit<Justificac
   if (recarga && recarga.clase === "recarga" && recarga.p5_W > P.recargaMasDe_kW * 1000) {
     grupos.push({ grupo: "z", motivo: `infraestructura de recarga de más de ${P.recargaMasDe_kW} kW` });
   }
+  if (piscina_kW !== null && piscina_kW > PISCINA_REBT.datos.proyectoMasDe_kW) {
+    grupos.push({ grupo: "n", motivo: `piscina de más de ${PISCINA_REBT.datos.proyectoMasDe_kW} kW` });
+  }
+  const PARTE: Record<string, ParteConProyecto> = { g: "aparcamiento", h: "aparcamiento", n: "piscina" };
+  const solo = grupos.length > 0 && grupos.every((g) => PARTE[g.grupo]) ? [...new Set(grupos.map((g) => PARTE[g.grupo]))] : [];
   elementos.push({
     id: "documentacion",
     nombre: "Documentación de la instalación",
@@ -567,7 +626,7 @@ function justificarPrevision(estado: RebtEstado, p: ProyectoSi): Omit<Justificac
     detalle: {
       clase: "documentacion",
       proyecto: grupos.length > 0,
-      soloAparcamiento: grupos.length > 0 && grupos.every((g) => g.grupo === "g" || g.grupo === "h"),
+      solo,
       grupos,
     },
   });

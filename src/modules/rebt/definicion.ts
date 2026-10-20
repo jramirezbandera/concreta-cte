@@ -14,7 +14,7 @@ import { rebtEstadoDefaults, type RebtEstado } from "./estado";
 import { justificarRebt, type ElementoRebt, type JustificacionRebt } from "./justificacion";
 import { anejoRebt } from "./anejo";
 import { memoriaRebt } from "./memoria";
-import { CONTADORES_REBT, CRITERIOS_REBT, EDICION_REBT, GARAJES_REBT, GRADO_REBT, LOCALES_REBT, PROYECTO_REBT, RECARGA_REBT, SIMULTANEIDAD_REBT } from "./tablas";
+import { CONTADORES_REBT, CRITERIOS_REBT, EDICION_REBT, GARAJES_REBT, GRADO_REBT, LOCALES_REBT, PISCINA_REBT, PROYECTO_REBT, RECARGA_REBT, SIMULTANEIDAD_REBT } from "./tablas";
 import {
   describirDibujoRebt,
   franjaRebt,
@@ -58,6 +58,8 @@ function limite(el: ElementoRebt): string {
       return "ap. 6";
     case "contadores":
       return d.ubicacion === "cpm" ? "un usuario: CPM" : `local si > ${CONTADORES_REBT.datos.localSiMasDe}`;
+    case "piscina":
+      return `proyecto si > ${PISCINA_REBT.datos.proyectoMasDe_kW} kW`;
     case "documentacion":
       return "ITC-BT-04";
   }
