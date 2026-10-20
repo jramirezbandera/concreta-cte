@@ -288,9 +288,22 @@ function parrafosExistente(j: JustificacionRebt): Trozo[][] {
           " (ITC-BT-10 ap. 3), por lo que la línea general de alimentación y la caja general de protección existentes no se modifican.",
         ],
   );
-  p.push([
-    `La instalación ${n + ex.locales.length === 1 ? "nueva" : "de cada unidad nueva"} no está en ninguno de los grupos que precisan proyecto: se documenta con una memoria técnica de diseño (ITC-BT-04 ap. 3.1 y 4).`,
-  ]);
+  const piscina = parrafoPiscina(j);
+  if (piscina.length > 0) p.push(piscina);
+  const pi = detalle(j, "piscina");
+  const unidades = n + ex.locales.length;
+  if (unidades > 0 || !pi) {
+    p.push([
+      pi?.proyecto ? "La instalación de la piscina precisa proyecto (ITC-BT-04 tabla 3.1, grupo n); la" : "La",
+      ` instalación ${unidades === 1 ? "nueva" : "de cada unidad nueva"} no está en ninguno de los grupos que precisan proyecto: se documenta con una memoria técnica de diseño (ITC-BT-04 ap. 3.1 y 4).`,
+    ]);
+  } else if (pi) {
+    p.push([
+      pi.proyecto
+        ? "La instalación de la piscina precisa proyecto, redactado y firmado por técnico titulado competente (ITC-BT-04 tabla 3.1, grupo n)."
+        : "La instalación de la piscina no está en ninguno de los grupos que precisan proyecto: se documenta con una memoria técnica de diseño (ITC-BT-04 ap. 3.1 y 4).",
+    ]);
+  }
   return p;
 }
 

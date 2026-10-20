@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
+import { obraExistenteDe } from "../../../lib/proyecto/alcance";
 import { crearProyectoDemo } from "../../../lib/proyecto/demo";
 import type { ProyectoSi } from "../../si/definicion";
 import { anejoRebt } from "../anejo";
@@ -99,9 +100,23 @@ describe("REBT · la piscina", () => {
     expect(anejoRebt(j).fuente).toMatch(/30, 31 y 52/);
   });
 
-  it("en un edificio existente no entra (no se sabe si la piscina es de la obra)", () => {
+  it("en un edificio existente, por la respuesta del asistente: sin responder entra (lo prudente); con «no», no", () => {
     const e = edificioDeCaso("unifamiliar");
-    const ex = { edificio: e, deduccion: {}, respuestas: {}, intervencion: {} } as unknown as ProyectoSi["existente"];
-    expect(detalle(caso("unifamiliar", { piscina_kW: 3 }, true, ex), "piscina")).toBeUndefined();
+    const ex = (piscina?: boolean) =>
+      ({ edificio: e, deduccion: {}, respuestas: piscina === undefined ? {} : { piscina }, intervencion: {} }) as unknown as ProyectoSi["existente"];
+    expect(detalle(caso("unifamiliar", { piscina_kW: 3 }, true, ex()), "piscina")).toMatchObject({ kW: 3 });
+    expect(detalle(caso("unifamiliar", { piscina_kW: 3 }, true, ex(true)), "piscina")).toMatchObject({ kW: 3 });
+    expect(detalle(caso("unifamiliar", { piscina_kW: 3 }, true, ex(false)), "piscina")).toBeUndefined();
+  });
+
+  it("el plurifamiliar existente: la piscina de la obra es carga añadida, y la memoria la justifica", () => {
+    const edificio = edificioDeCaso("plurifamiliar");
+    const dg = { ...demo.datosGenerales, tienePiscina: true, intervencion: "reforma" as const, alcance: { tipos: ["reforma" as const], piscina: true } };
+    const existente = obraExistenteDe(dg, edificio)!;
+    const j = justificarRebt({ ...rebtEstadoDefaults, piscina_kW: 7.5 }, { edificio, datosGenerales: dg, justificaciones: {}, existente });
+    expect(j.existente!.despues_W - j.existente!.antes_W).toBe(7500);
+    const texto = textoPlanoMemoria(rebt.memoria(j));
+    expect(texto).toMatch(/cumple la ITC-BT-31/);
+    expect(texto).toMatch(/La instalación de la piscina precisa proyecto, redactado y firmado/);
   });
 });

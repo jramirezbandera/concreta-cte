@@ -333,6 +333,11 @@ export interface Alcance {
   protegido?: boolean;
   /** P12: instalación eléctrica (REBT art. 2.2). */
   electrica?: "no" | "modifica" | "nueva";
+  /**
+   * P13: la obra construye la piscina o actúa en su instalación (feature-36, paso 7):
+   * el REBT la justifica con la ITC-BT-31. Solo con piscina en La obra.
+   */
+  piscina?: boolean;
 }
 
 // -----------------------------------------------------------------------------

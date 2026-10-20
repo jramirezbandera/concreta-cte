@@ -506,7 +506,7 @@ OCA, proyecto por los grupos e, g y n, y la memoria con su párrafo; sin errores
 - Foto del expediente: los 20 proyectos con piscina pasan a REBT «no cumple» (sin la potencia) y cambian
   la huella de la memoria y la del anejo; nada más.
 
-**Decisiones del paso 7, a validar:**
+**Decisiones del paso 7, VALIDADAS el 2026-10-20** (la 5, cambiada a propuesta de la revisión):
 1. **También la piscina comunitaria**: la ITC-BT-31 no distingue (su ámbito es «las piscinas»), así que
    no es una ampliación por exclusión. Sigue la letra.
 2. **Sin potencia, «no cumple»**, como el RITE y HE 3: sin ella no se sabe si hace falta proyecto. Un
@@ -515,8 +515,15 @@ OCA, proyecto por los grupos e, g y n, y la memoria con su párrafo; sin errores
    cuente allí. **La de la unifamiliar no cambia la previsión** (la ITC-BT-10 da la de la vivienda por su
    grado; con una demanda mayor conocida, la memoria ya dice que se prevé esa).
 4. **Proyecto solo de la piscina**, como el del aparcamiento: con el grupo n y nada más, «el resto, MTD,
-   salvo que la Administración pida un único proyecto».
-5. **En un edificio existente no entra**: no se sabe si la piscina es de la obra.
+   salvo que la Administración pida un único proyecto». El usuario confirma la práctica: la piscina de una
+   unifamiliar no lleva trámite propio en Industria (con menos de 5 kW, la MTD del instalador). Se queda la
+   letra literal; no se lee el ap. 3.3 como «proyecto de toda la instalación».
+5. ~~**En un edificio existente no entra**~~. **Cambiada**: el asistente de alcance pregunta «Obra en la
+   piscina» (`Alcance.piscina`, P13), solo con piscina en La obra. Sin responder o «sí», el REBT la
+   justifica (lo prudente, como el aparcamiento); «no», no entra. En el plurifamiliar existente, la
+   potencia de la piscina cuenta como carga añadida (el «antes» se calcula sin ella) y la memoria trae su
+   párrafo y su documentación. SUA 6 no lee la respuesta (sigue «se aplica a la piscina, los pozos o los
+   depósitos solo si son objeto de la intervención»).
 6. **El circuito de la piscina no se calcula**: el anejo dice que lo define la documentación de la
    instalación (MTD o proyecto). No se imprime la excepción de las piscinas pequeñas.
 7. **HS 4 y HS 5, sin cambios** (K-MEM.25). El antirretorno de los «tubos de alimentación no destinados a

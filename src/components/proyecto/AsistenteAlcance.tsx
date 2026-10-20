@@ -386,6 +386,17 @@ export function AsistenteAlcance(props: {
             </>
           )}
 
+          {dg.tienePiscina && (
+            <Field
+              id="al-piscina"
+              label="Obra en la piscina"
+              help="Se construye la piscina o se actúa en su instalación eléctrica (depuradora, alumbrado). Con «Sí» o sin responder, el REBT la justifica con la ITC-BT-31 y pide su potencia."
+              refText="REBT, ITC-BT-31"
+            >
+              <SelectInput<Tri> id="al-piscina" value={tri(a.piscina)} options={SI_NO} onChange={(v) => set("piscina", deTri(v))} />
+            </Field>
+          )}
+
           <div className="mt-2 flex items-center justify-between gap-3">
             <InputLabel
               htmlFor="al-protegido"

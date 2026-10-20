@@ -355,8 +355,9 @@ function justificarPrevision(estado: RebtEstado, p: ProyectoSi): Omit<Justificac
   }
 
   // ── La piscina (ITC-BT-31; feature-36, paso 7) ───────────────────────────
-  // En un edificio existente no se sabe si la piscina es de la obra: no entra.
-  const hayPiscina = p.datosGenerales.tienePiscina === true && !p.existente;
+  // En un edificio existente, solo si la obra actúa en ella; sin responder, entra
+  // (lo prudente, como el aparcamiento).
+  const hayPiscina = p.datosGenerales.tienePiscina === true && p.existente?.respuestas.piscina !== false;
   const piscina_kW = hayPiscina ? noNegativo(estado.piscina_kW) : null;
 
   // ── Los servicios generales (ap. 3.2) ────────────────────────────────────
@@ -639,7 +640,13 @@ function justificarPrevision(estado: RebtEstado, p: ProyectoSi): Omit<Justificac
       const o = obraDeZona(z, ex.intervencion);
       return o === "nueva" || o === "cambia_uso";
     };
-    const antes = justificarPrevision(estado, { ...p, edificio: edificioAntes(ex), existente: undefined });
+    // Antes de la obra, sin la piscina de la obra: su carga cuenta como añadida.
+    const antes = justificarPrevision(estado, {
+      ...p,
+      edificio: edificioAntes(ex),
+      datosGenerales: hayPiscina ? { ...p.datosGenerales, tienePiscina: false } : p.datosGenerales,
+      existente: undefined,
+    });
     const enObra = viviendasDe(soloZonas(p.edificio, nueva), false);
     const viviendasNuevas = enObra.flatMap(({ tipo, cantidad }) => {
       const v = viviendas.find((x) => x.tipoId === tipo.id);

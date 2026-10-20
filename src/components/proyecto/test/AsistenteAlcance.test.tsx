@@ -22,8 +22,8 @@ const DG: DatosGenerales = {
 
 let ultimo: Alcance | undefined;
 
-function Arnes({ inicial }: { inicial?: Alcance }): JSX.Element {
-  const [dg, setDg] = useState<DatosGenerales>({ ...DG, alcance: inicial });
+function Arnes({ inicial, piscina = false }: { inicial?: Alcance; piscina?: boolean }): JSX.Element {
+  const [dg, setDg] = useState<DatosGenerales>({ ...DG, tienePiscina: piscina, alcance: inicial });
   return (
     <AsistenteAlcance
       dg={dg}
@@ -82,5 +82,15 @@ describe("AsistenteAlcance", () => {
     await u.selectOptions(screen.getByRole("combobox", { name: /Se toca la estructura/ }), "no");
     expect(ultimo?.estructura).toBe(false);
     expect(screen.getByText(/No aplican/).parentElement?.textContent).toContain("DB-SE");
+  });
+
+  it("la obra en la piscina solo se pregunta si La obra tiene piscina (feature-36, paso 7)", async () => {
+    const u = userEvent.setup();
+    render(<Arnes inicial={{}} />);
+    expect(screen.queryByRole("combobox", { name: /Obra en la piscina/ })).toBeNull();
+    cleanup();
+    render(<Arnes inicial={{}} piscina />);
+    await u.selectOptions(screen.getByRole("combobox", { name: /Obra en la piscina/ }), "no");
+    expect(ultimo?.piscina).toBe(false);
   });
 });
