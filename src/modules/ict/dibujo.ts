@@ -39,13 +39,14 @@ export function dibujoIct(j: JustificacionIct, edificio: Edificio): DibujoSi {
   });
 
   // ── La columna de la derecha, de abajo arriba ─────────────────────────────
-  const xCol = (S.X1 + ANCHO) / 2 + 8;
+  /** La columna de cifras, alineada a la izquierda junto a la fachada. */
+  const xCol = S.X1 + 24;
   const PASO = 30;
   let y = base.yRasante - 46;
   const etiquetas: EtiquetaSi[] = [];
   const orden = ["arqueta", "canalizacion-externa", "recinto", "canalizacion-principal", "rtr", "pau", "regimen", "proyecto"];
   for (const id of orden.filter((x) => j.elementos.some((e) => e.id === x))) {
-    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y });
+    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y, alinear: "inicio" });
     y -= PASO;
   }
   return componerDibujo(base, zonas, marcas, etiquetas, { cubiertaInclinada: edificio.cubierta.tipo === "inclinada", ancho: ANCHO });

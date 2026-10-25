@@ -93,7 +93,8 @@ export type MarcaSi =
     }
   | { tipo: "flecha"; key: string; d: string; elementoId?: string }
   | { tipo: "icono"; key: string; icono: IconoSi; x: number; y: number; elementoId?: string }
-  | { tipo: "texto"; key: string; x: number; y: number; texto: string; ancla?: "start" | "middle" | "end" };
+  /** `cifra`: una medida (cotas, alturas), en mono como las cotas de las plantas. */
+  | { tipo: "texto"; key: string; x: number; y: number; texto: string; ancla?: "start" | "middle" | "end"; cifra?: boolean };
 
 /** Ancla de una etiqueta pulsable. */
 export interface EtiquetaSi {
@@ -101,6 +102,8 @@ export interface EtiquetaSi {
   elementoId: string;
   x: number;
   y: number;
+  /** «inicio»: (x, y) es el borde izquierdo de la cifra (las columnas junto al dibujo). */
+  alinear?: "inicio";
 }
 
 export interface DibujoSi extends BaseSeccion {
@@ -230,6 +233,47 @@ export function marcasZonasNeutras(zonas: readonly ZonaDibujada[]): MarcaSi[] {
     rotulo: USOS[z.uso].etiqueta,
   }));
 }
+
+// ── La escalera en sección (SI 3, SUA 1): el mismo trazo en todos los dibujos ──
+
+/** Medio ancho del zigzag de una escalera. */
+export const MEDIO_ESCALERA = 16;
+
+/** Lo que sube una escalera dentro de cada planta (o banda) dibujada: del suelo al suelo de encima. */
+export function tramosVerticales(base: BaseSeccion, niveles: readonly number[]): { nivel: number; ySup: number; yInf: number }[] {
+  const lo = Math.min(...niveles);
+  const hi = Math.max(...niveles);
+  const out: { nivel: number; ySup: number; yInf: number }[] = [];
+  const bandasVistas = new Set<number>();
+  for (let n = lo; n < hi; n++) {
+    const p = pisoDe(base, n);
+    if (p) {
+      out.push({ nivel: n, ySup: p.yTecho - S.LOSA, yInf: p.ySuelo });
+      continue;
+    }
+    const i = base.bandas.findIndex((b) => b.niveles.includes(n));
+    if (i >= 0 && !bandasVistas.has(i)) {
+      bandasVistas.add(i);
+      out.push({ nivel: n, ySup: base.bandas[i].y0 - S.LOSA, yInf: base.bandas[i].y1 });
+    }
+  }
+  return out;
+}
+
+/**
+ * El zigzag de una escalera en sección dentro de una planta: `tramos` trazos
+ * alternos entre xa y xb. Encadenado planta a planta, se lee como una escalera.
+ */
+export function zigzag(xa: number, xb: number, yInf: number, ySup: number, tramos: number): string {
+  const pasos = Array.from({ length: tramos }, (_, i) => {
+    const k = i + 1;
+    const x = k % 2 === 1 ? xb : xa;
+    const y = yInf - (k * (yInf - ySup)) / tramos;
+    return `L${x.toFixed(1)} ${y.toFixed(1)}`;
+  });
+  return `M${xa.toFixed(1)} ${yInf.toFixed(1)}${pasos.join("")}`;
+}
+
 
 /** Centro de una zona dibujada. */
 export function centro(z: ZonaDibujada): { x: number; y: number } {

@@ -30,7 +30,8 @@ export function dibujoHe5(j: JustificacionHe5, edificio: Edificio): DibujoSi {
   // Todas las zonas cuentan en S: pulsarlas lleva a la superficie.
   const marcas: MarcaSi[] = marcasZonasNeutras(zonas).map((m) => (m.tipo === "zona" ? { ...m, elementoId: "superficie" } : m));
   const etiquetas: EtiquetaSi[] = [];
-  const xCol = (S.X1 + ANCHO) / 2 + 8;
+  /** La columna de cifras, alineada a la izquierda junto a la fachada. */
+  const xCol = S.X1 + 24;
 
   const p2 = j.elementos.find((e) => e.id === "p2")?.detalle;
   if (p2 && p2.clase === "p2") {
@@ -60,14 +61,14 @@ export function dibujoHe5(j: JustificacionHe5, edificio: Edificio): DibujoSi {
   const PASO = 28;
   // Arranca por encima del rótulo «terreno» de la rasante.
   let y = base.yRasante - 46;
-  etiquetas.push({ key: "et-superficie", elementoId: "superficie", x: xCol, y });
+  etiquetas.push({ key: "et-superficie", elementoId: "superficie", x: xCol, y, alinear: "inicio" });
   if (ids.has("p1")) {
     y -= PASO;
-    etiquetas.push({ key: "et-p1", elementoId: "p1", x: xCol, y });
+    etiquetas.push({ key: "et-p1", elementoId: "p1", x: xCol, y, alinear: "inicio" });
   }
   if (ids.has("p2")) {
     y -= PASO;
-    etiquetas.push({ key: "et-p2", elementoId: "p2", x: xCol, y: Math.min(y, S.ROOF + 4) });
+    etiquetas.push({ key: "et-p2", elementoId: "p2", x: xCol, y: Math.min(y, S.ROOF + 4), alinear: "inicio" });
   }
   // El garaje, dentro de S: un rótulo bajo el terreno si lo hay.
   if (j.superficies.garaje_m2 > 0 && base.haySotano) {

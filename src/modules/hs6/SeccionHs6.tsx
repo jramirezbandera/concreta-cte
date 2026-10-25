@@ -105,8 +105,22 @@ export function SeccionHs6({
       {s.terrenoBajo.map((t, i) => (
         <rect key={`tb-${i}`} x={t.x0} y={t.y} width={t.x1 - t.x0} height={s.alto - t.y} fill={`url(#${uid}-tierra)`} />
       ))}
-      <line x1={0} y1={yPb} x2={S.X0 - 8} y2={yPb} stroke={P.ink} strokeWidth={1.5} />
-      <line x1={S.X1 + 4} y1={yPb} x2={s.ancho} y2={yPb} stroke={P.ink} strokeWidth={1.5} />
+      {/* La rasante llega hasta los muros, como en las demás secciones. */}
+      <line x1={0} y1={yPb} x2={S.X0} y2={yPb} stroke={P.ink} strokeWidth={1.5} />
+      <line x1={S.X1} y1={yPb} x2={s.ancho} y2={yPb} stroke={P.ink} strokeWidth={1.5} />
+
+      {/* La columna de plantas: nombre y cota (las altas, agrupadas, sin cota). */}
+      {s.altas && (
+        <text x={10} y={(S.Y_ALTAS + S.Y_PB_TECHO) / 2 + 4} fontSize={12} fontWeight={600} fontFamily={FUENTE_SANS} fill={P.texto2}>
+          {s.altas.nombre}
+        </text>
+      )}
+      <text x={10} y={yPb - 26} fontSize={12} fontWeight={600} fontFamily={FUENTE_SANS} fill={P.texto2}>
+        PB
+      </text>
+      <text x={10} y={yPb - 12} fontSize={10} fontFamily={FUENTE_MONO} fill={P.texto3}>
+        ±0,00
+      </text>
 
       {/* Plantas altas */}
       {s.altas &&
@@ -141,9 +155,6 @@ export function SeccionHs6({
           {te.texto}
         </text>
       )}
-      <text x={S.X0 + 8} y={yPb - 10} fontSize={10} fontFamily={FUENTE_MONO} fill={P.texto3}>
-        PB
-      </text>
       <rect x={S.X0} y={yPb} width={S.X1 - S.X0} height={S.LOSA} fill={P.slab} />
 
       {/* Sótano: el espacio de contención */}

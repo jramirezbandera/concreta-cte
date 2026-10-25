@@ -23,6 +23,12 @@ export interface EtiquetaDibujo {
   estado: EstadoPresentacion;
   /** Nombre del elemento para el lector de pantalla («Bajante A · fecales»). */
   nombre: string;
+  /**
+   * «inicio»: el ancla es el borde izquierdo del chip, no su centro. Para las
+   * columnas de cifras junto al dibujo: alineadas a la izquierda se leen como
+   * una lista y no se meten en el edificio por mucho que midan.
+   */
+  alinear?: "inicio";
 }
 
 const CHIP: Record<EstadoPresentacion, string> = {
@@ -74,6 +80,8 @@ const HUECOS: [number, number][] = [
 const HUECOS_POR_ROTULO = 5;
 /** Lo que un chip puede rozar un rótulo sin taparlo [px]: la caja del texto incluye su interlineado. */
 const ROCE = 4;
+/** Si no hay hueco limpio tan cerca, se busca uno que no tape nada hasta aquí (índice en HUECOS). */
+const HUECOS_LIMPIOS = 11;
 
 /** Un rectángulo [px] en coordenadas del lienzo: centro y medidas. */
 interface Caja {
@@ -93,8 +101,9 @@ const solape = (a: Caja, b: Caja, holgura: number): number => {
  * Centro de cada chip [px]. Las anclas vienen del dibujo, pero los chips miden
  * lo mismo a cualquier escala: con el dibujo estrecho, dos anclas vecinas se
  * pisan. En orden, cada chip busca el primer hueco que no choque con otro chip
- * ni tape un rótulo del dibujo (`rotulos`); si no lo hay cerca, uno que solo no
- * choque con otro chip; y si tampoco, el que menos se pise.
+ * ni tape un rótulo del dibujo (`rotulos`); si no lo hay cerca, uno algo más
+ * lejos que tampoco tape nada; luego, de los que no chocan con otro chip, el que
+ * menos tape los rótulos; y si tampoco, el que menos se pise.
  */
 function colocar(
   etiquetas: EtiquetaDibujo[],
@@ -106,24 +115,33 @@ function colocar(
 ) {
   const puestas: Caja[] = [];
   return etiquetas.map((e) => {
-    const x0 = (e.x / viewW) * ancho;
-    const y0 = (e.y / viewH) * alto;
     const w = e.texto.length * CHIP_CARACTER + CHIP_FIJO;
-    const candidatas = HUECOS.map(([dx, dy]) => ({
-      x: x0 + dx * (w / 2 + HOLGURA * 2),
-      y: y0 + dy * (CHIP_ALTO + HOLGURA),
-      w,
-      h: CHIP_ALTO,
-    })).filter(
-      (c, i) =>
-        i === 0 ||
-        (c.y - CHIP_ALTO / 2 >= 0 && c.y + CHIP_ALTO / 2 <= alto && c.x - w / 2 >= 0 && c.x + w / 2 <= ancho),
+    const xAncla = (e.x / viewW) * ancho;
+    const x0 = e.alinear === "inicio" ? xAncla + w / 2 : xAncla;
+    const y0 = (e.y / viewH) * alto;
+    // Los huecos de repuesto, arrimados hacia dentro si se salen del lienzo
+    // (junto al borde, descartarlos dejaba a las cifras anchas casi sin sitio).
+    // El de su ancla puede asomar fuera, salvo en las columnas alineadas al
+    // inicio, que no deben salirse por la derecha.
+    const dentro = (v: number, medio: number, total: number) => Math.min(Math.max(v, medio + 2), Math.max(medio + 2, total - medio - 2));
+    const candidatas = HUECOS.map(([dx, dy], i) =>
+      i === 0 && e.alinear !== "inicio"
+        ? { x: x0, y: y0, w, h: CHIP_ALTO }
+        : {
+            x: dentro(x0 + dx * (w / 2 + HOLGURA * 2), w / 2, ancho),
+            y: dentro(y0 + dy * (CHIP_ALTO + HOLGURA), CHIP_ALTO / 2, alto),
+            w,
+            h: CHIP_ALTO,
+          },
     );
     const contraChips = (c: Caja) => puestas.reduce((s, p) => s + solape(c, p, HOLGURA), 0);
-    const tapaRotulo = (c: Caja) => rotulos.some((r) => solape(c, r, -ROCE) > 0);
+    const contraRotulos = (c: Caja) => rotulos.reduce((s, r) => s + solape(c, r, -ROCE), 0);
+    const limpia = (c: Caja) => contraChips(c) === 0 && contraRotulos(c) === 0;
+    const sinChips = candidatas.filter((c) => contraChips(c) === 0);
     const elegida =
-      candidatas.slice(0, HUECOS_POR_ROTULO).find((c) => contraChips(c) === 0 && !tapaRotulo(c)) ??
-      candidatas.find((c) => contraChips(c) === 0) ??
+      candidatas.slice(0, HUECOS_POR_ROTULO).find(limpia) ??
+      candidatas.slice(0, HUECOS_LIMPIOS).find(limpia) ??
+      (sinChips.length > 0 ? sinChips.reduce((mejor, c) => (contraRotulos(c) < contraRotulos(mejor) ? c : mejor)) : undefined) ??
       candidatas.reduce((mejor, c) => (contraChips(c) < contraChips(mejor) ? c : mejor));
     puestas.push(elegida);
     return { x: elegida.x, y: elegida.y };

@@ -107,7 +107,7 @@ export function dibujoSua6(j: JustificacionSua6, edificio: Edificio): DibujoSi {
       const x140 = d.profMin_m >= L ? xRec0 : xb + ((L - d.profMin_m) / (d.profMax_m - d.profMin_m)) * (xc - xb);
       marcas.push(
         { tipo: "linea", key: "linea-140", d: `M${x140} ${yR + py(L)}H${xRec1 - 2}`, grosor: 1.2, dash: "3 3", elementoId: "senalizacion", tono: "suave" },
-        { tipo: "texto", key: "t-140", x: xRec1 + 5, y: yR + py(L) + 4, texto: "1,40", ancla: "start" },
+        { tipo: "texto", key: "t-140", x: xRec1 + 5, y: yR + py(L) + 4, texto: "1,40", ancla: "start", cifra: true },
       );
     }
     if (hay("escaleras")) {

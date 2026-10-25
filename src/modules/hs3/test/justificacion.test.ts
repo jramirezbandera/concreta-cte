@@ -157,7 +157,7 @@ describe("textos de HS3", () => {
   it("la lista y las etiquetas", () => {
     expect(resultadoLista(el(j, "a-salon"))).toBe("10 → 12,7 l/s");
     expect(resultadoLista(el(j, "trasteros-s1"))).toBe("25,2 l/s · con el garaje");
-    expect(textoEtiqueta(el(j, "a-campana"))).toBe("+50 campana");
+    expect(textoEtiqueta(el(j, "a-campana"))).toBe("+50 l/s");
     expect(textoEtiqueta(el(j, "garaje-s1"))).toBe("1680 l/s");
   });
 });

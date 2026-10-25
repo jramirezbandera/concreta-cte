@@ -59,11 +59,11 @@ export function dibujoSua4(j: JustificacionSua4, edificio: Edificio): DibujoSi {
   // Las etiquetas, sin pisar los iconos ni los rótulos.
   const huecos = huecosEtiquetas(base, zonas, marcas);
   let debajo = 0;
-  const poner = (elementoId: string, preds: ((z: ZonaDibujada) => boolean)[], desdeAbajo = false) => {
+  const poner = (elementoId: string, preds: ((z: ZonaDibujada) => boolean)[], desdeAbajo = false, enOtraZona = true) => {
     const el = j.elementos.find((e) => e.id === elementoId);
     if (!el) return;
     const texto = textoEtiquetaSua4(el);
-    for (const p of [...preds, () => true]) {
+    for (const p of enOtraZona ? [...preds, () => true] : preds) {
       const h = huecos.tomar(p, texto, desdeAbajo);
       if (h) {
         etiquetas.push({ key: `et-${elementoId}`, elementoId, x: h.x, y: h.y });
@@ -80,7 +80,8 @@ export function dibujoSua4(j: JustificacionSua4, edificio: Edificio): DibujoSi {
   poner("normal-garaje", [de("normal-garaje")]);
   poner("emergencia-recorridos", [(w) => w.uso === "viviendas" || w.uso === "oficinas", de("emergencia-recorridos")]);
   poner("emergencia-garaje", [de("emergencia-garaje"), (w) => w.uso === "garaje" || w.uso === "garaje_privado"]);
-  poner("emergencia-locales", [de("emergencia-locales"), (w) => w.nivel < 0, cualquiera], true);
+  // Sin sitio junto a su local, mejor debajo del edificio que en otra zona.
+  poner("emergencia-locales", [de("emergencia-locales"), (w) => w.nivel < 0], true, false);
   poner("emergencia", [cualquiera]);
   for (const el of j.elementos) {
     if (el.detalle.clase !== "local") continue;

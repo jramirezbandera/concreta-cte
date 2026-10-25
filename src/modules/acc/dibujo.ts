@@ -19,12 +19,13 @@ export function dibujoAcc(j: JustificacionAcc, edificio: Edificio): DibujoSi {
   const marcas: MarcaSi[] = marcasZonasNeutras(zonas).map((m) =>
     m.tipo === "zona" && itinerarios && (m.zona.uso === "zona_comun" || m.zona.uso === "vestibulo") ? { ...m, tono: "acento", elementoId: "itinerarios" } : m,
   );
-  const xCol = (S.X1 + ANCHO) / 2 + 8;
+  /** La columna de cifras, alineada a la izquierda junto a la fachada. */
+  const xCol = S.X1 + 24;
   const PASO = 30;
   let y = base.yRasante - 46;
   const etiquetas: EtiquetaSi[] = [];
   for (const id of ["existente", "reserva", "ascensor", "unifamiliar", "otros-usos", "norma"].filter((x) => j.elementos.some((e) => e.id === x))) {
-    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y });
+    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y, alinear: "inicio" });
     y -= PASO;
   }
   return componerDibujo(base, zonas, marcas, etiquetas, { cubiertaInclinada: edificio.cubierta.tipo === "inclinada", ancho: ANCHO });

@@ -24,7 +24,8 @@ export function dibujoHe6(j: JustificacionHe6, edificio: Edificio): DibujoSi {
   const deGaraje = ids.has("conduccion") ? "conduccion" : "plazas";
   const marcas: MarcaSi[] = marcasZonasNeutras(zonas).map((m) => (m.tipo === "zona" && GARAJE.has(m.zona.uso) ? { ...m, elementoId: deGaraje } : m));
   const etiquetas: EtiquetaSi[] = [];
-  const xCol = (S.X1 + ANCHO) / 2 + 8;
+  /** La columna de cifras, alineada a la izquierda junto a la fachada. */
+  const xCol = S.X1 + 24;
 
   // ── Las estaciones, en cada garaje (la de la unifamiliar, el circuito C13) ──
   const conEstacion = ids.has("estaciones") ? "estaciones" : ids.has("estacion") ? "estacion" : null;
@@ -55,7 +56,7 @@ export function dibujoHe6(j: JustificacionHe6, edificio: Edificio): DibujoSi {
   let y = base.yRasante - 46;
   const columna = ["plazas", "conduccion", "estaciones", "esquema", "estacion"].filter((id) => ids.has(id) && !(enGaraje && id === el?.id));
   for (const id of columna) {
-    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y });
+    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y, alinear: "inicio" });
     y -= PASO;
   }
 

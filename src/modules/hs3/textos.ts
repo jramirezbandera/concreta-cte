@@ -94,7 +94,7 @@ export function textoEtiqueta(el: ElementoHs3): string {
     case "local":
       return ls(det.local.adoptado_l_s);
     case "campana":
-      return `+${n0(det.caudal_l_s)} campana`;
+      return `+${ls(det.caudal_l_s)}`;
     case "paso":
       return `pasos ≥ ${n0(AREA_EFECTIVA_ABERTURAS.datos.pasoMin_cm2)} cm²`;
     case "equilibrio":

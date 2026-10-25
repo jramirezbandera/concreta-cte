@@ -18,8 +18,9 @@ import { textoEtiquetaSua2 } from "./textos";
 
 const S = SECCION_BASE;
 /** A la derecha de la fachada van las cotas de cada planta y la fila de sus vidrios. */
-const ANCHO = S.W + 150;
-const X_FILA = S.X1 + 125;
+const ANCHO = S.W + 180;
+/** Donde empieza la fila de cifras: pasadas las cotas «Δ 10,00 m». */
+const X_FILA = S.X1 + 72;
 
 const COMUN: readonly UsoZona[] = ["zona_comun", "vestibulo"];
 const VIVIENDA: readonly UsoZona[] = ["viviendas", "vivienda_unifamiliar"];
@@ -82,7 +83,7 @@ export function dibujoSua2(j: JustificacionSua2, edificio: Edificio): DibujoSi {
     const f = filaVidrioSua2(c);
     marcas.push(
       { tipo: "linea", key: `vidrio-${p.nivel}`, d: `M${S.X1 + 6} ${p.ySuelo - 1}V${p.ySuelo - alto}`, grosor: 4, elementoId: `vidrios-${f}`, tono: "fuerte" },
-      { tipo: "texto", key: `cota-${p.nivel}`, x: S.X1 + 14, y: p.ySuelo - 6, texto: `Δ ${metros(c)}` },
+      { tipo: "texto", key: `cota-${p.nivel}`, x: S.X1 + 14, y: p.ySuelo - 6, texto: `Δ ${metros(c)}`, cifra: true },
     );
     anotar(f, p.ySuelo - 22);
   }
@@ -96,12 +97,12 @@ export function dibujoSua2(j: JustificacionSua2, edificio: Edificio): DibujoSi {
       marcas.push({ tipo: "linea", key: `vidrio-banda-${b.niveles[0]}-${f}`, d: `M${S.X1 + 6} ${y1}V${y1 - paso + 2}`, grosor: 4, elementoId: `vidrios-${f}`, tono: "fuerte" });
       anotar(f, (b.y0 + b.y1) / 2);
     });
-    marcas.push({ tipo: "texto", key: `cota-banda-${b.niveles[0]}`, x: S.X1 + 14, y: (b.y0 + b.y1) / 2 + 4, texto: `Δ ${metros(Math.min(...cotas))}–${metros(Math.max(...cotas)).replace(" m", "")}` });
+    marcas.push({ tipo: "texto", key: `cota-banda-${b.niveles[0]}`, x: S.X1 + 14, y: (b.y0 + b.y1) / 2 + 4, texto: `Δ ${metros(Math.min(...cotas))}–${metros(Math.max(...cotas)).replace(" m", "")}`, cifra: true });
   }
   for (const [f, ys] of yPorFila) {
     if (!ids.has(`vidrios-${f}`)) continue;
     const y = ys.reduce((a, v) => a + v, 0) / ys.length;
-    etiquetas.push({ key: `et-vidrios-${f}`, elementoId: `vidrios-${f}`, x: X_FILA, y: Math.round(y) });
+    etiquetas.push({ key: `et-vidrios-${f}`, elementoId: `vidrios-${f}`, x: X_FILA, y: Math.round(y), alinear: "inicio" });
   }
 
   // ── Las etiquetas dentro de las zonas, sin pisar nada ─────────────────────
@@ -119,7 +120,7 @@ export function dibujoSua2(j: JustificacionSua2, edificio: Edificio): DibujoSi {
       }
     }
     // Sin sitio dentro: encima de la cubierta, a la derecha.
-    etiquetas.push({ key: `et-${elementoId}`, elementoId, x: X_FILA, y: Math.max(12, S.ROOF - 24 - 22 * arriba++) });
+    etiquetas.push({ key: `et-${elementoId}`, elementoId, x: X_FILA, y: Math.max(12, S.ROOF - 24 - 22 * arriba++), alinear: "inicio" });
   };
   const cualquiera = zonaGeneral;
   const noVivienda = (w: ZonaDibujada) => !VIVIENDA.includes(w.uso) && zonaGeneral(w);

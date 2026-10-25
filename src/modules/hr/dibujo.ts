@@ -16,7 +16,7 @@ import { claseRecinto, type ClaseRecinto } from "./edificio";
 import type { JustificacionHr } from "./justificacion";
 
 const S = SECCION_BASE;
-const ANCHO = S.W + 130;
+const ANCHO = S.W + 150;
 
 export function dibujoHr(j: JustificacionHr, edificio: Edificio): DibujoSi {
   const { base, zonas } = seccionConZonas(edificio);
@@ -119,8 +119,9 @@ export function dibujoHr(j: JustificacionHr, edificio: Edificio): DibujoSi {
   if (ids.has("cubierta")) marcas.push({ tipo: "linea", key: "cubierta", d: `M${S.X0} ${S.ROOF - 4}H${S.X1}`, grosor: 5, elementoId: "cubierta" });
 
   // ── La columna de la derecha, de abajo arriba ─────────────────────────────
-  const xCol = (S.X1 + ANCHO) / 2 + 8;
-  const PASO = 30;
+  /** La columna de cifras, alineada a la izquierda junto a la fachada. */
+  const xCol = S.X1 + 24;
+  const PASO = 32;
   let y = yR - 46;
   const columna = [
     "instalaciones",
@@ -143,7 +144,7 @@ export function dibujoHr(j: JustificacionHr, edificio: Edificio): DibujoSi {
     "cubierta",
   ].filter((id) => ids.has(id) && !enLinea.has(id));
   for (const id of columna) {
-    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y });
+    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y, alinear: "inicio" });
     y -= PASO;
   }
 

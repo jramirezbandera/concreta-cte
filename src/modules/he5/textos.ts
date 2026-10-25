@@ -123,9 +123,9 @@ export function textoEtiquetaHe5(el: ElementoSi<unknown>): string {
     case "superficie":
       return `S ${m2(d.s_m2)}`;
     case "p1":
-      return `P1 ${kW(d.p1_kW)}`;
+      return `P₁ ${kW(d.p1_kW)}`;
     case "p2":
-      return `P2 ${kW(d.p2_kW)}`;
+      return `P₂ ${kW(d.p2_kW)}`;
     case "potencia":
       return `P ${kW(d.instalada_kW)}`;
   }

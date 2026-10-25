@@ -212,7 +212,7 @@ export function textoEtiquetaRebt(el: ElementoSi<unknown>): string {
     case "vivienda":
       return `${NOMBRE_GRADO[d.vivienda.grado]} · ${kW(d.vivienda.potencia_W)}`;
     case "viviendas":
-      return `P1 ${kW(d.p_W)}`;
+      return `P₁ ${kW(d.p_W)}`;
     case "servicios":
       return `SG ${kW(d.p_W)}`;
     case "local":

@@ -44,13 +44,14 @@ export function dibujoSua7(j: JustificacionSua7, edificio: Edificio): DibujoSi {
   const yGaraje = j.rampa && salidaDe ? salidaDe.y1 : yR;
 
   // ── La rampa, la salida y la calle ──────────────────────────────────────
-  if (j.rampa) {
-    marcas.push(
-      { tipo: "linea", key: "rampa", d: `M${S.X1} ${yGaraje}L${X_RAMPA} ${yR}`, grosor: 3, tono: "fuerte" },
-      { tipo: "texto", key: "t-velocidad", x: (S.X1 + X_RAMPA) / 2 + 18, y: (yGaraje + yR) / 2 + 18, texto: `${SUA7_SENALIZACION.datos.velocidadMax_km_h} km/h`, ancla: "start" },
-    );
-  } else {
-    marcas.push({ tipo: "texto", key: "t-velocidad", x: S.X1 + 12, y: yR - 10, texto: `${SUA7_SENALIZACION.datos.velocidadMax_km_h} km/h`, ancla: "start" });
+  // La velocidad, donde se circula: con señalización que justificar, es su
+  // cifra pulsable; si no, un texto (no las dos cosas a la vez).
+  const velocidad = j.rampa
+    ? { x: (S.X1 + X_RAMPA) / 2 + 18, y: (yGaraje + yR) / 2 + 18 }
+    : { x: S.X1 + 12, y: yR - 10 };
+  if (j.rampa) marcas.push({ tipo: "linea", key: "rampa", d: `M${S.X1} ${yGaraje}L${X_RAMPA} ${yR}`, grosor: 3, tono: "fuerte" });
+  if (!hay("senalizacion")) {
+    marcas.push({ tipo: "texto", key: "t-velocidad", ...velocidad, texto: `${SUA7_SENALIZACION.datos.velocidadMax_km_h} km/h`, ancla: "start" });
   }
   const xEspera0 = j.rampa ? X_RAMPA : S.X1;
   marcas.push(
@@ -93,7 +94,8 @@ export function dibujoSua7(j: JustificacionSua7, edificio: Edificio): DibujoSi {
   }
   const xCol = (S.X1 + X_SALIDA) / 2 + 24;
   const PASO = 28;
-  const arriba = ["senalizacion", "alerta", "espera"].filter(hay);
+  if (hay("senalizacion")) etiquetas.push({ key: "et-senalizacion", elementoId: "senalizacion", x: velocidad.x, y: velocidad.y - 4, alinear: "inicio" });
+  const arriba = ["alerta", "espera"].filter(hay);
   arriba.forEach((id, i) => etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y: yR - 56 - (arriba.length - 1 - i) * PASO }));
   etiquetas.push({ key: "et-peatones", elementoId: "peatones", x: (S.X1 + X_RAMPA) / 2 + 30, y: (j.rampa ? Math.max(yGaraje, yR) : yR) + 26 });
   if (hay("itinerarios")) etiquetas.push({ key: "et-itinerarios", elementoId: "itinerarios", x: S.X0 + 90, y: terrenoBajo(base) + 22 });

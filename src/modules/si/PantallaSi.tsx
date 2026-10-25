@@ -183,7 +183,7 @@ export function PantallaSi<E extends Record<string, unknown>, J extends Justific
   const etiquetasDibujo = dibujo.etiquetas.flatMap((e) => {
     const el = j.elementos.find((x) => x.id === e.elementoId);
     if (!el) return [];
-    return [{ key: e.key, elementoId: e.elementoId, x: e.x, y: e.y, texto: def.etiqueta(el), estado: estados[el.id] ?? "ok", nombre: el.nombre }];
+    return [{ key: e.key, elementoId: e.elementoId, x: e.x, y: e.y, texto: def.etiqueta(el), estado: estados[el.id] ?? "ok", nombre: el.nombre, alinear: e.alinear }];
   });
   const lienzo = (
     <LienzoAjustado anchoMin={560}>

@@ -16,10 +16,11 @@ import type { JustificacionHs6 } from "./justificacion";
 import { nombresUsos, rangoNiveles } from "./proteccion";
 
 export const SECCION_HS6 = {
-  W: 640,
+  /** A la izquierda, la columna de plantas (como en las demás secciones). */
+  W: 670,
   H: 500,
-  X0: 40,
-  X1: 600,
+  X0: 70,
+  X1: 630,
   Y_ALTAS: 40,
   Y_PB_TECHO: 140,
   /** Cara superior del forjado del suelo de la PB (la rasante). */
@@ -43,7 +44,8 @@ export interface EtiquetaHs6 {
 export interface SeccionHs6Geo {
   ancho: number;
   alto: number;
-  altas: { texto: string; sub: string } | null;
+  /** Las plantas altas, agrupadas: su rótulo dentro y su nombre en la columna («P1–P3»). */
+  altas: { texto: string; sub: string; nombre: string } | null;
   /** Zonas de la planta baja: rótulos en su tramo (`xTexto`, apartado del núcleo). */
   zonasPb: { x0: number; x1: number; texto: string; xTexto: number }[];
   /**
@@ -120,7 +122,7 @@ export function calcularSeccionHs6(j: JustificacionHs6, zonasPb: { uso: UsoZona;
   const sx1 = S.X1;
   const terreno: SeccionHs6Geo["terreno"] =
     parcial && conSotano
-      ? { x0: S.X0, x1: sx0, texto: "sin sótano debajo", flechaCamara: [0, sx0 - 12], xConducto: S.X0 - 22 }
+      ? { x0: S.X0, x1: sx0, texto: "sin sótano debajo", flechaCamara: [0, sx0 - 12], xConducto: S.X0 - 12 }
       : pbEnTerreno || (!conSotano && pr.sobreTerreno.length > 0)
         ? { x0: S.X0, x1: S.X1, texto: "apoya en el terreno", flechaCamara: [S.W, S.X0 + 12], xConducto: S.X1 + 22 }
         : null;
@@ -199,7 +201,7 @@ export function calcularSeccionHs6(j: JustificacionHs6, zonasPb: { uso: UsoZona;
     etiquetas.push({
       key: "et-barrera",
       elementoId: "barrera",
-      x: enSolera ? sx0 + (sx1 - sx0) * 0.55 : sotano ? (sx0 + sx1) / 2 : 300,
+      x: enSolera ? sx0 + (sx1 - sx0) * 0.55 : sotano ? (sx0 + sx1) / 2 : (S.X0 + S.X1) / 2,
       y: enSolera ? S.Y_SOTANO : S.Y_PB_SUELO - 3,
     });
   }
@@ -211,13 +213,14 @@ export function calcularSeccionHs6(j: JustificacionHs6, zonasPb: { uso: UsoZona;
     etiquetas.push({ key: "et-despresurizacion", elementoId: "despresurizacion", x: (terreno.x0 + terreno.x1) / 2, y: yBajoPb + 56 });
   }
   if (nucleo) etiquetas.push({ key: "et-nucleo", elementoId: "nucleo", x: (nucleo.x0 + nucleo.x1) / 2, y: 215 });
-  if (hay("no-tocan")) etiquetas.push({ key: "et-no-tocan", elementoId: "no-tocan", x: 440, y: 88 });
+  if (hay("no-tocan")) etiquetas.push({ key: "et-no-tocan", elementoId: "no-tocan", x: S.X0 + 400, y: 88 });
 
   const altas =
     pr.noTocan.niveles.length > 0
       ? {
           texto: `${nombresUsos(pr.noTocan.usos).replace(/^./, (c) => c.toUpperCase())} · ${rangoNiveles(pr.noTocan.niveles)}`,
           sub: pr.noTocan.niveles.length === 1 ? "no toca el terreno" : "no tocan el terreno",
+          nombre: rangoNiveles(pr.noTocan.niveles),
         }
       : null;
 

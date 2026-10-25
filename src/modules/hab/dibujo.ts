@@ -46,7 +46,8 @@ export function dibujoHab(j: JustificacionHab, edificio: Edificio): DibujoSi {
   });
 
   // ── La columna de la derecha, de abajo arriba ─────────────────────────────
-  const xCol = (S.X1 + ANCHO) / 2 + 8;
+  /** La columna de cifras, alineada a la izquierda junto a la fachada. */
+  const xCol = S.X1 + 24;
   const PASO = 30;
   let y = base.yRasante - 46;
   const etiquetas: EtiquetaSi[] = [];
@@ -56,7 +57,7 @@ export function dibujoHab(j: JustificacionHab, edificio: Edificio): DibujoSi {
     ...j.elementos.filter((e) => e.detalle.clase === "norma" || e.detalle.clase === "sin_norma").map((e) => e.id),
   ];
   for (const id of columna.slice(0, 6)) {
-    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y });
+    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y, alinear: "inicio" });
     y -= PASO;
   }
   return componerDibujo(base, zonas, marcas, etiquetas, { cubiertaInclinada: inclinada, ancho: ANCHO });

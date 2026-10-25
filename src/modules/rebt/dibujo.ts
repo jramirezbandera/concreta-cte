@@ -35,7 +35,8 @@ export function dibujoRebt(j: JustificacionRebt, edificio: Edificio): DibujoSi {
   const yR = base.yRasante;
   const dibujadas = zonas.filter((z) => !z.enBanda);
   const ids = new Set(j.elementos.map((e) => e.id));
-  const xCol = (S.X1 + ANCHO) / 2 + 8;
+  /** La columna de cifras, alineada a la izquierda junto a la fachada. */
+  const xCol = S.X1 + 24;
   const contadores = j.elementos.find((e) => e.id === "contadores")?.detalle;
 
   // El elemento de previsión de cada zona de viviendas: el de su primer tipo.
@@ -64,9 +65,11 @@ export function dibujoRebt(j: JustificacionRebt, edificio: Edificio): DibujoSi {
   const etiquetas: EtiquetaSi[] = [];
 
   // ── El ascensor, en la zona común de cada planta ─────────────────────────
+  // Abajo a la izquierda (a la derecha van los contadores): arriba, en una
+  // zona estrecha, pisaba su rótulo.
   if (j.ascensor) {
     for (const z of dibujadas) {
-      if (z.uso === "zona_comun") marcas.push({ tipo: "icono", key: `ascensor-${z.zonaId}-${z.nivel}`, icono: "ascensor", x: z.x1 - 12, y: z.y0 + 14, elementoId: "servicios" });
+      if (z.uso === "zona_comun") marcas.push({ tipo: "icono", key: `ascensor-${z.zonaId}-${z.nivel}`, icono: "ascensor", x: z.x0 + 12, y: z.y1 - 11, elementoId: "servicios" });
     }
   }
 
@@ -118,12 +121,12 @@ export function dibujoRebt(j: JustificacionRebt, edificio: Edificio): DibujoSi {
   // (la documentación, solo en la lista: no es de ningún sitio del edificio).
   const PASO = 34;
   let y = yR - 46;
-  etiquetas.push({ key: "et-contadores", elementoId: "contadores", x: xCol, y });
+  etiquetas.push({ key: "et-contadores", elementoId: "contadores", x: xCol, y, alinear: "inicio" });
   y -= PASO;
-  etiquetas.push({ key: "et-total", elementoId: "total", x: xCol, y });
+  etiquetas.push({ key: "et-total", elementoId: "total", x: xCol, y, alinear: "inicio" });
   if (ids.has("viviendas")) {
     y -= PASO;
-    etiquetas.push({ key: "et-viviendas", elementoId: "viviendas", x: xCol, y });
+    etiquetas.push({ key: "et-viviendas", elementoId: "viviendas", x: xCol, y, alinear: "inicio" });
   }
 
   return componerDibujo(base, zonas, marcas, etiquetas, { cubiertaInclinada: inclinada, ancho: ANCHO });

@@ -7,13 +7,15 @@
 
 import { SECCION_BASE } from "../../lib/edificio/seccion";
 import type { Edificio } from "../../lib/edificio/tipos";
-import { componerDibujo, marcasZonasNeutras, seccionConZonas, type DibujoSi, type EtiquetaSi, type MarcaSi } from "../si/seccion";
+import { componerDibujo, marcasZonasNeutras, MEDIO_ESCALERA, seccionConZonas, tramosVerticales, zigzag, type DibujoSi, type EtiquetaSi, type MarcaSi } from "../si/seccion";
 import type { JustificacionSi3 } from "./justificacion";
 
 const S = SECCION_BASE;
 /** La caja de la escalera, junto a la fachada derecha. */
 const XE0 = S.X1 - 64;
 const XE1 = S.X1 - 12;
+/** El eje del zigzag de la escalera. */
+const XC = (XE0 + XE1) / 2;
 
 export function dibujoSi3(j: JustificacionSi3, edificio: Edificio): DibujoSi {
   const { base, zonas } = seccionConZonas(edificio);
@@ -25,15 +27,12 @@ export function dibujoSi3(j: JustificacionSi3, edificio: Edificio): DibujoSi {
 
   etiquetas.push({ key: "et-ocupacion", elementoId: "ocupacion", x: (S.X0 + S.X1) / 2 - 60, y: edificio.cubierta.tipo === "inclinada" ? 12 : S.ROOF - 18 });
 
-  // La escalera común: un zigzag por planta, de la más alta a la PB.
+  // La escalera común: el zigzag de siempre (el de SUA 1), de la PB a la planta
+  // más alta, dos tramos por planta.
+  const niveles = base.pisos.map((x) => x.nivel).concat(base.bandas.flatMap((b) => b.niveles));
   if (hay("escalera")) {
-    for (const p of base.pisos.filter((x) => x.nivel > 0)) {
-      const yA = p.yTecho + 6;
-      const yB = p.ySuelo - 2;
-      const ym = (yA + yB) / 2;
-      marcas.push({ tipo: "linea", key: `tramo-${p.nivel}`, d: `M${XE1} ${ym}L${XE0} ${yB}M${XE0} ${yA}L${XE1} ${ym}`, grosor: 2, elementoId: "escalera" });
-      // El tramo que baja a la planta de debajo.
-      marcas.push({ tipo: "linea", key: `caja-${p.nivel}`, d: `M${XE0 - 2} ${yA - 4}V${yB + 4}`, grosor: 1.5, elementoId: "escalera", tono: "suave" });
+    for (const v of tramosVerticales(base, [0, Math.max(0, ...niveles)])) {
+      marcas.push({ tipo: "linea", key: `tramo-${v.nivel}`, d: zigzag(XC - MEDIO_ESCALERA, XC + MEDIO_ESCALERA, v.yInf, v.ySup, 2), grosor: 2, elementoId: "escalera", tono: "fuerte" });
     }
     const arriba = base.pisos.find((x) => x.nivel > 0);
     if (arriba) etiquetas.push({ key: "et-escalera", elementoId: "escalera", x: XE0 - 70, y: arriba.yTecho + 18 });
@@ -66,11 +65,10 @@ export function dibujoSi3(j: JustificacionSi3, edificio: Edificio): DibujoSi {
   // El garaje: escalera especialmente protegida con su vestíbulo y su recorrido.
   if (hay("escalera-garaje") && pb) {
     const garajes = base.pisos.filter((x) => x.nivel < 0);
+    for (const v of tramosVerticales(base, [Math.min(0, ...niveles), 0])) {
+      marcas.push({ tipo: "linea", key: `tramo-g-${v.nivel}`, d: zigzag(XC - MEDIO_ESCALERA, XC + MEDIO_ESCALERA, v.yInf, v.ySup, 2), grosor: 2, elementoId: "escalera-garaje", tono: "fuerte" });
+    }
     for (const g of garajes) {
-      const yA = g.yTecho + 6;
-      const yB = g.ySuelo - 2;
-      const ym = (yA + yB) / 2;
-      marcas.push({ tipo: "linea", key: `tramo-g-${g.nivel}`, d: `M${XE1} ${ym}L${XE0} ${yB}M${XE0} ${yA}L${XE1} ${ym}`, grosor: 2, elementoId: "escalera-garaje" });
       // El vestíbulo de independencia, delante de la escalera.
       marcas.push({ tipo: "linea", key: `vest-${g.nivel}`, d: `M${XE0 - 30} ${g.ySuelo - 26}H${XE0 - 4}V${g.ySuelo - 1}M${XE0 - 30} ${g.ySuelo - 26}V${g.ySuelo - 1}`, grosor: 1.5, elementoId: "escalera-garaje" });
     }

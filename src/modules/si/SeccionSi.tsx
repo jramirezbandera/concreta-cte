@@ -27,8 +27,10 @@ const TONOS: Record<"screen" | "pdf", Record<TonoZona, string>> = {
     comun: "var(--color-bg-surface)",
     garaje: "var(--color-bg-elevated)",
     local: "var(--color-bg-primary)",
-    oficinas: "var(--color-tint-accent-soft)",
-    acento: "var(--color-tint-accent)",
+    // Opacos (mezclados con el fondo): un tinte transparente deja ver la retícula
+    // del lienzo dentro del edificio y el halo de los rótulos no tapa nada.
+    oficinas: "color-mix(in srgb, var(--color-accent) 4%, var(--color-bg-primary))",
+    acento: "color-mix(in srgb, var(--color-accent) 8%, var(--color-bg-primary))",
   },
   pdf: {
     vivienda: "#ffffff",
@@ -52,6 +54,25 @@ interface SeccionSiProps {
   /** Texto de cada etiqueta (solo se pinta en papel). */
   textos?: Record<string, string>;
   onSelect?: (elementoId: string) => void;
+}
+
+/** Ancho medio de un carácter del rótulo de zona (Geist Sans) por unidad de cuerpo. */
+const CARACTER_ROTULO = 0.43;
+const CUERPO_ROTULO = 9.5;
+/** Por debajo de este cuerpo el rótulo ya no se encoge: se corta con «…». */
+const CUERPO_ROTULO_MIN = 8;
+
+/**
+ * El rótulo de una zona, encogido o cortado para que no se salga de ella (las
+ * zonas estrechas, como «Instalaciones», pisaban la fachada o lo de al lado).
+ */
+function rotuloQueCabe(texto: string, hueco: number): { texto: string; cuerpo: number } {
+  const mide = (t: string, cuerpo: number) => t.length * CARACTER_ROTULO * cuerpo;
+  if (mide(texto, CUERPO_ROTULO) <= hueco) return { texto, cuerpo: CUERPO_ROTULO };
+  const cuerpo = Math.max(CUERPO_ROTULO_MIN, (CUERPO_ROTULO * hueco) / mide(texto, CUERPO_ROTULO));
+  if (mide(texto, cuerpo) <= hueco) return { texto, cuerpo: Math.round(cuerpo * 10) / 10 };
+  const caben = Math.max(1, Math.floor(hueco / (CARACTER_ROTULO * cuerpo)) - 1);
+  return { texto: `${texto.slice(0, caben).trimEnd()}…`, cuerpo };
 }
 
 /** Un pictograma de 16 × 16 centrado en (x, y). */
@@ -88,11 +109,13 @@ function Icono({ icono, x, y, color, P }: { icono: IconoSi; x: number; y: number
         </g>
       );
     case "detector":
+      // Pegado al techo, con su piloto, y el humo que le sube (no un ojo).
       return (
         <g transform={t} fill="none" stroke={color} strokeWidth={sw}>
-          <path d="M2 4h12" />
-          <path d="M4 4a4 4 0 0 0 8 0" fill={P.fondo} />
-          <circle cx={8} cy={6} r={0.9} fill={color} />
+          <path d="M1.5 2.5h13" />
+          <path d="M4 2.5h8v2.5a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 4 5z" fill={P.fondo} strokeLinejoin="round" />
+          <circle cx={8} cy={4.6} r={0.8} fill={color} stroke="none" />
+          <path d="M6 15c-1.2-1.2.8-2-.4-3.4M10.4 15c-1.2-1.2.8-2-.4-3.4" strokeWidth={1.1} strokeLinecap="round" />
         </g>
       );
     case "alarma":
@@ -391,30 +414,33 @@ export function SeccionSi({
           }
           case "texto":
             return (
-              <text key={m.key} x={m.x} y={m.y} fontSize={10} textAnchor={m.ancla ?? "start"} fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode, P.fondo)}>
+              <text key={m.key} x={m.x} y={m.y} fontSize={10} textAnchor={m.ancla ?? "start"} fontFamily={m.cifra ? FUENTE_MONO : FUENTE_SANS} fill={P.texto3} {...halo(mode, P.fondo)}>
                 {m.texto}
               </text>
             );
         }
       })}
-      {/* Los nombres de las zonas, encima de escaleras, flechas y líneas: con el
-          halo del color de su zona, lo que los cruza no los tapa. */}
+      {/* Los nombres de las zonas, encima de escaleras, flechas y líneas: con un
+          halo ancho del color de su zona, lo que los cruza no ensucia la letra. */}
       <g pointerEvents="none">
-        {zonas.map((m) =>
-          m.rotulo && !m.zona.enBanda ? (
+        {zonas.map((m) => {
+          if (!m.rotulo || m.zona.enBanda) return null;
+          const r = rotuloQueCabe(m.rotulo, m.zona.x1 - m.zona.x0 - 10);
+          return (
             <text
               key={`rot-${m.key}`}
               x={m.zona.x0 + 6}
               y={m.zona.y0 + 13}
-              fontSize={9.5}
+              fontSize={r.cuerpo}
               fontFamily={FUENTE_SANS}
               fill={P.texto3}
-              {...halo(mode, tonos[m.tono])}
+              {...halo(mode, tonos[m.tono], 5)}
             >
-              {m.rotulo}
+              {r.texto}
+              {r.texto !== m.rotulo && <title>{m.rotulo}</title>}
             </text>
-          ) : null,
-        )}
+          );
+        })}
       </g>
       <defs>
         <marker id={`${uid}-punta`} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -436,10 +462,11 @@ export function SeccionSi({
           const t = textos[e.elementoId];
           if (!t) return null;
           const w = t.length * 6.2 + 12;
+          const xc = e.alinear === "inicio" ? e.x + w / 2 : e.x;
           return (
             <g key={e.key}>
-              <rect x={e.x - w / 2} y={e.y - 9} width={w} height={18} rx={3} fill={P.fondo} stroke={P.caja} />
-              <text x={e.x} y={e.y + 4} fontSize={10.5} textAnchor="middle" fontFamily={FUENTE_MONO} fill={P.texto}>
+              <rect x={xc - w / 2} y={e.y - 9} width={w} height={18} rx={3} fill={P.fondo} stroke={P.caja} />
+              <text x={xc} y={e.y + 4} fontSize={10.5} textAnchor="middle" fontFamily={FUENTE_MONO} fill={P.texto}>
                 {t}
               </text>
             </g>

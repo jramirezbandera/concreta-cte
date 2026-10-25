@@ -21,13 +21,14 @@ export function dibujoRite(j: JustificacionRite, edificio: Edificio): DibujoSi {
   const marcas: MarcaSi[] = marcasZonasNeutras(zonas).map((m) => (m.tipo === "zona" && SIRVE.has(m.zona.uso) && principal ? { ...m, tono: "acento", elementoId: principal } : m));
 
   // ── La columna de la derecha, de abajo arriba ─────────────────────────────
-  const xCol = (S.X1 + ANCHO) / 2 + 8;
+  /** La columna de cifras, alineada a la izquierda junto a la fachada. */
+  const xCol = S.X1 + 24;
   const PASO = 30;
   let y = base.yRasante - 46;
   const etiquetas: EtiquetaSi[] = [];
   const orden = ["higiene", "condiciones", "acs", "refrigeracion", "calefaccion", ...j.elementos.filter((e) => e.id.startsWith("documento-")).map((e) => e.id)];
   for (const id of orden.filter((x) => j.elementos.some((e) => e.id === x))) {
-    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y });
+    etiquetas.push({ key: `et-${id}`, elementoId: id, x: xCol, y, alinear: "inicio" });
     y -= PASO;
   }
   return componerDibujo(base, zonas, marcas, etiquetas, { cubiertaInclinada: edificio.cubierta.tipo === "inclinada", ancho: ANCHO });

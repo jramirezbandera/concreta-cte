@@ -6,52 +6,20 @@
 // limpiar desde dentro. PURA; el render es el común del DB-SI.
 // =============================================================================
 
-import { SECCION_BASE, type BaseSeccion } from "../../lib/edificio/seccion";
+import { SECCION_BASE } from "../../lib/edificio/seccion";
 import type { Edificio } from "../../lib/edificio/tipos";
-import { centro, componerDibujo, marcasZonasNeutras, pisoDe, seccionConZonas, type DibujoSi, type EtiquetaSi, type MarcaSi, type ZonaDibujada } from "../si/seccion";
+import { centro, componerDibujo, MEDIO_ESCALERA, marcasZonasNeutras, pisoDe, seccionConZonas, tramosVerticales, zigzag, type DibujoSi, type EtiquetaSi, type MarcaSi, type ZonaDibujada } from "../si/seccion";
 import type { DetalleEscalera, JustificacionSua1 } from "./justificacion";
 
 const S = SECCION_BASE;
 /** Con las barreras y la rampa de acceso a la derecha, el dibujo es más ancho que la sección común. */
 const ANCHO = S.W + 120;
-/** Medio ancho del zigzag de una escalera. */
-const MEDIO = 16;
+/** Medio ancho del zigzag (el común de las escaleras). */
+const MEDIO = MEDIO_ESCALERA;
 /** Separación entre la escalera común y la del garaje. */
 const PASO_ESCALERAS = 48;
 /** Distancia del centro de una escalera al de su etiqueta. */
 const LADO_ETIQUETA = MEDIO + 56;
-
-/** Lo que sube una escalera dentro de cada planta (o banda) dibujada: del suelo al suelo de encima. */
-function tramosVerticales(base: BaseSeccion, niveles: readonly number[]): { nivel: number; ySup: number; yInf: number }[] {
-  const lo = Math.min(...niveles);
-  const hi = Math.max(...niveles);
-  const out: { nivel: number; ySup: number; yInf: number }[] = [];
-  const bandasVistas = new Set<number>();
-  for (let n = lo; n < hi; n++) {
-    const p = pisoDe(base, n);
-    if (p) {
-      out.push({ nivel: n, ySup: p.yTecho - S.LOSA, yInf: p.ySuelo });
-      continue;
-    }
-    const i = base.bandas.findIndex((b) => b.niveles.includes(n));
-    if (i >= 0 && !bandasVistas.has(i)) {
-      bandasVistas.add(i);
-      out.push({ nivel: n, ySup: base.bandas[i].y0 - S.LOSA, yInf: base.bandas[i].y1 });
-    }
-  }
-  return out;
-}
-
-/** El zigzag de un tramo de planta: `tramos` trazos alternos entre xa y xb. */
-function zigzag(xa: number, xb: number, yInf: number, ySup: number, tramos: number): string {
-  const pasos = Array.from({ length: tramos }, (_, i) => {
-    const k = i + 1;
-    const x = k % 2 === 1 ? xb : xa;
-    const y = yInf - (k * (yInf - ySup)) / tramos;
-    return `L${x.toFixed(1)} ${y.toFixed(1)}`;
-  });
-  return `M${xa.toFixed(1)} ${yInf.toFixed(1)}${pasos.join("")}`;
-}
 
 /** El centro de la escalera común: el portal o vestíbulo de la PB, o junto a la fachada derecha. */
 function xEscalera(zonas: readonly ZonaDibujada[], d: DetalleEscalera): number {

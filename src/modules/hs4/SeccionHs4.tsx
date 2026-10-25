@@ -11,7 +11,7 @@
 
 import { useId, type JSX, type ReactNode } from "react";
 import { PisosSeccion } from "../../components/edificio/PisosSeccion";
-import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL, halo } from "../../lib/svg/paletaSeccion";
+import { FUENTE_MONO, FUENTE_SANS, PALETA_PANTALLA, PALETA_PAPEL, halo, type PaletaSeccion } from "../../lib/svg/paletaSeccion";
 import { estadosElementos } from "../../lib/cte/estados";
 import type { EstadoPresentacion } from "../../lib/cte/presentacion";
 import type { Edificio } from "../../lib/edificio/tipos";
@@ -33,6 +33,23 @@ interface SeccionHs4Props {
   /** Texto de cada etiqueta (solo se pinta en papel). */
   textos?: Record<string, string>;
   onSelect?: (elementoId: string) => void;
+}
+
+/**
+ * El rótulo de una fila de la gráfica, sobre un recuadro del fondo: la línea
+ * del mínimo pasa por detrás sin cruzar la letra. Algo separado de la barra,
+ * para que la cifra de una barra corta no lo tape.
+ */
+function RotuloFila({ texto, y, P }: { texto: string; y: number; P: PaletaSeccion }): JSX.Element {
+  const w = texto.length * 0.43 * 9.5 + 4;
+  return (
+    <>
+      <rect x={SECCION_HS4.G_X0 - 2} y={y - 18} width={w} height={12} fill={P.fondo} />
+      <text x={SECCION_HS4.G_X0} y={y - 8} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3}>
+        {texto}
+      </text>
+    </>
+  );
 }
 
 export function SeccionHs4({
@@ -290,9 +307,7 @@ export function SeccionHs4({
           b.elementoId,
           <>
             <line x1={S.X1} y1={b.y + 7} x2={S.G_X0 - 6} y2={b.y + 7} stroke={P.wall} strokeWidth={1} strokeDasharray="2 4" />
-            <text x={S.G_X0} y={b.y - 5} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode)}>
-              {b.rotulo}
-            </text>
+            <RotuloFila texto={b.rotulo} y={b.y} P={P} />
             <rect x={S.G_X0} y={b.y} width={b.w} height={14} rx={2} fill={r.fill} opacity={r.opacity} />
             {b.recortada && <path d={`M${S.G_X0 + b.w - 6} ${b.y}l6 7l-6 7`} stroke={P.fondo} strokeWidth={1.5} fill="none" />}
           </>,
@@ -303,9 +318,7 @@ export function SeccionHs4({
           "b-red",
           "presion-red",
           <>
-            <text x={S.G_X0} y={s.barraRed.y - 5} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode)}>
-              {s.barraRed.rotulo}
-            </text>
+            <RotuloFila texto={s.barraRed.rotulo} y={s.barraRed.y} P={P} />
             <rect
               x={S.G_X0}
               y={s.barraRed.y}
@@ -318,9 +331,7 @@ export function SeccionHs4({
         )}
       {s.barraGrupo && (
         <g>
-          <text x={S.G_X0} y={s.barraGrupo.y - 5} fontSize={9.5} fontFamily={FUENTE_SANS} fill={P.texto3} {...halo(mode)}>
-            {s.barraGrupo.rotulo}
-          </text>
+          <RotuloFila texto={s.barraGrupo.rotulo} y={s.barraGrupo.y} P={P} />
           <rect x={S.G_X0} y={s.barraGrupo.y} width={s.barraGrupo.w} height={14} rx={2} fill={P.accent} opacity={0.35} />
         </g>
       )}

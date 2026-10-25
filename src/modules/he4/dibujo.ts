@@ -33,7 +33,8 @@ export function dibujoHe4(j: JustificacionHe4, edificio: Edificio): DibujoSi {
   const yR = base.yRasante;
   const dibujadas = zonas.filter((z) => !z.enBanda);
   const ids = new Set(j.elementos.map((e) => e.id));
-  const xCol = (S.X1 + ANCHO) / 2 + 8;
+  /** La columna de cifras, alineada a la izquierda junto a la fachada. */
+  const xCol = S.X1 + 24;
 
   // El elemento de demanda de cada zona de viviendas: el de su primer tipo.
   const tipoDeZona = (z: ZonaDibujada): string | null => {
@@ -118,14 +119,14 @@ export function dibujoHe4(j: JustificacionHe4, edificio: Edificio): DibujoSi {
   const PASO = 28;
   // Arranca por encima del rótulo «terreno» de la rasante (y de la red urbana).
   let y = yR - 46 - (c?.clase === "contribucion" && c.sistema === "red" ? PASO : 0);
-  etiquetas.push({ key: "et-demanda", elementoId: "demanda", x: xCol, y });
+  etiquetas.push({ key: "et-demanda", elementoId: "demanda", x: xCol, y, alinear: "inicio" });
   if (ids.has("energia")) {
     y -= PASO;
-    etiquetas.push({ key: "et-energia", elementoId: "energia", x: xCol, y });
+    etiquetas.push({ key: "et-energia", elementoId: "energia", x: xCol, y, alinear: "inicio" });
   }
   if (ids.has("contribucion")) {
     y -= PASO;
-    etiquetas.push({ key: "et-contribucion", elementoId: "contribucion", x: xCol, y });
+    etiquetas.push({ key: "et-contribucion", elementoId: "contribucion", x: xCol, y, alinear: "inicio" });
   }
 
   return componerDibujo(base, zonas, marcas, etiquetas, { cubiertaInclinada: inclinada, ancho: ANCHO });

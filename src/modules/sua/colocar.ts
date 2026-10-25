@@ -31,10 +31,11 @@ export function zonaGeneral(z: ZonaDibujada): boolean {
   return z.uso !== "local_sin_uso" && z.uso !== "instalaciones" && z.uso !== "trasteros";
 }
 
-/** Ancho de una etiqueta con este texto (el del recuadro del papel). */
-export function anchoEtiqueta(texto: string): number {
-  return texto.length * 6.2 + 12;
+/** La cifra en pantalla (`DibujoConEtiquetas`: mono 12 px, punto y márgenes), en unidades del dibujo a escala 1. */
+function anchoEnPantalla(texto: string): number {
+  return texto.length * 7.25 + 22;
 }
+const ALTO_EN_PANTALLA = 26;
 
 interface Rect {
   x0: number;
@@ -96,7 +97,9 @@ export function huecosEtiquetas(base: BaseSeccion, zonas: readonly ZonaDibujada[
   }
   return {
     tomar(pred, texto, desdeAbajo = false) {
-      const medio = anchoEtiqueta(texto) / 2;
+      // Con la medida de la cifra en pantalla (más ancha y alta que la del
+      // papel): con la del papel, dos cifras «cabían» juntas y en pantalla no.
+      const medio = anchoEnPantalla(texto) / 2;
       const orden = desdeAbajo ? [...libres].reverse() : libres;
       for (const l of orden) {
         if (!pred(l.zona)) continue;
@@ -104,7 +107,7 @@ export function huecosEtiquetas(base: BaseSeccion, zonas: readonly ZonaDibujada[
           const s = l.sitios[i];
           // En su sitio o, si pisa algo, arrimada a la izquierda o a la derecha de la zona.
           for (const x of [s.x, Math.ceil(l.zona.x0 + 12 + medio), Math.floor(l.zona.x1 - 4 - medio)]) {
-            const r = { x0: x - medio, y0: s.y - 9, x1: x + medio, y1: s.y + 9 };
+            const r = { x0: x - medio, y0: s.y - ALTO_EN_PANTALLA / 2, x1: x + medio, y1: s.y + ALTO_EN_PANTALLA / 2 };
             if (ocupados.some((o) => pisan(o, r))) continue;
             l.sitios.splice(i, 1);
             ocupados.push(r);

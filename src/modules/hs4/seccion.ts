@@ -361,7 +361,7 @@ export function calcularSeccionHs4(j: JustificacionHs4, edificio: Edificio): Sec
     const y = yBanda !== null ? yBanda - Math.floor(k / 2) * 22 : ySalida - 22 - k * 22;
     etiquetas.push({ key: `et-${id}`, elementoId: id, x, y });
   });
-  if (j.elementos.some((e) => e.id === "acometida")) etiquetas.push({ key: "et-acometida", elementoId: "acometida", x: 34, y: yAcom + 26 });
+  if (j.elementos.some((e) => e.id === "acometida")) etiquetas.push({ key: "et-acometida", elementoId: "acometida", x: 34, y: yAcom + 40 });
   for (const l of locales) etiquetas.push({ key: `et-${l.elementoId}`, elementoId: l.elementoId, x: l.x + l.w / 2, y: l.y - 10 });
   if (acometida.grupo) {
     etiquetas.push({ key: "et-grupo", elementoId: "grupo-presion", x: acometida.xGrupo + 66, y: acometida.yGrupo });
