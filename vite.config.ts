@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 // https://vite.dev/config/
 //
 // `base` para GitHub Pages: el sitio se sirve en
-// https://<usuario>.github.io/concreta-instalaciones/, así que en BUILD los
+// https://<usuario>.github.io/concreta-cte/, así que en BUILD los
 // assets cuelgan de ese subpath. En DEV se mantiene "/" para no estorbar el
 // servidor local. El routing usa HashRouter, así que el base solo afecta a la
 // carga de assets (no a las rutas, que viven tras el #).
@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
   // mode === "production" en `vite build` Y en `vite preview` (preview sirve el
   // build de producción); "development" en `vite dev`. Así el preview local
   // coincide con Pages y el dev se queda en "/".
-  const base = mode === "production" ? "/concreta-instalaciones/" : "/";
+  const base = mode === "production" ? "/concreta-cte/" : "/";
   return {
     base,
     build: {

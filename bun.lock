@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "concreta-instalaciones",
+      "name": "concreta-cte",
       "dependencies": {
         "@anthropic-ai/sdk": "0.111.0",
         "@google/genai": "2.11.0",
