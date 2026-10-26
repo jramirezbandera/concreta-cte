@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { crearProyectoDemo, DEMO_ID, DEMO_NOMBRE } from "../demo";
+import { crearProyectoDemo, crearProyectoDemoConSupuestos, DEMO_ID, DEMO_NOMBRE } from "../demo";
 import { justificarHs3 } from "../../../modules/hs3/justificacion";
 import type { Hs3Estado } from "../../../modules/hs3/estado";
 import { hs5EstadoDefaults } from "../../../modules/hs5/estado";
@@ -15,10 +15,13 @@ import { zonaClimaticaDe, zonaTermicaHS3De } from "../../../data/zonasClimaticas
 import type { JustificacionKey } from "../tipos";
 import { estadoDe } from "../progreso";
 import { edificioDeCaso } from "../../edificio/casos";
+import { evaluarExpediente } from "../../obra/evaluar";
+import { antesDeEntregar, entregables } from "../../obra/entrega";
+import { pendientesEstudioBasico } from "../../obra/estudioBasico";
 import { resumenEdificio } from "../../edificio/derivar";
 
 // =============================================================================
-// crearProyectoDemo — feature-6 T2.6. Tres invariantes:
+// crearProyectoDemoConSupuestos — feature-6 T2.6. Tres invariantes:
 //   1) DETERMINISMO TOTAL: mismo nowIso → proyectos deep-equal (nada de
 //      Date.now/Math.random escondidos).
 //   2) COHERENCIA: el veredicto que calcula el expediente (feature-16) coincide
@@ -31,23 +34,23 @@ const NOW = "2026-08-22T10:00:00.000Z";
 /** Las 5 justificaciones shipped que el Demo siembra. */
 const CLAVES_DEMO = ["hs3", "hs4", "hs5", "hs6", "he1"] as const satisfies readonly JustificacionKey[];
 
-describe("crearProyectoDemo — determinismo", () => {
+describe("crearProyectoDemoConSupuestos — determinismo", () => {
   it("dos llamadas con el mismo nowIso producen proyectos deep-equal", () => {
-    const a = crearProyectoDemo(NOW);
-    const b = crearProyectoDemo(NOW);
+    const a = crearProyectoDemoConSupuestos(NOW);
+    const b = crearProyectoDemoConSupuestos(NOW);
     expect(a).toStrictEqual(b);
   });
 
   it("nowIso se inyecta tal cual en creado y modificado (sin Date.now)", () => {
     const otro = "1999-12-31T23:59:59.000Z";
-    const p = crearProyectoDemo(otro);
+    const p = crearProyectoDemoConSupuestos(otro);
     expect(p.creado).toBe(otro);
     expect(p.modificado).toBe(otro);
   });
 
   it("cada llamada devuelve objetos frescos: mutar un Demo no contamina otro ni los defaults", () => {
-    const a = crearProyectoDemo(NOW);
-    const b = crearProyectoDemo(NOW);
+    const a = crearProyectoDemoConSupuestos(NOW);
+    const b = crearProyectoDemoConSupuestos(NOW);
     const tramosA = (a.justificaciones.hs5!.inputs as unknown as Hs5Estado).tramos;
     tramosA.pop();
     tramosA[0]!.pendiente_pct = 999;
@@ -56,8 +59,8 @@ describe("crearProyectoDemo — determinismo", () => {
   });
 });
 
-describe("crearProyectoDemo — el estado calculado coincide con el motor (feature-16)", () => {
-  const p = crearProyectoDemo(NOW);
+describe("crearProyectoDemoConSupuestos — el estado calculado coincide con el motor (feature-16)", () => {
+  const p = crearProyectoDemoConSupuestos(NOW);
 
   it("hs3: el veredicto calculado coincide con re-justificar desde El edificio (feature-15)", () => {
     const j = p.justificaciones.hs3!;
@@ -125,8 +128,8 @@ describe("crearProyectoDemo — el estado calculado coincide con el motor (featu
   });
 });
 
-describe("crearProyectoDemo — datos generales y campos heredados materializados", () => {
-  const p = crearProyectoDemo(NOW);
+describe("crearProyectoDemoConSupuestos — datos generales y campos heredados materializados", () => {
+  const p = crearProyectoDemoConSupuestos(NOW);
 
   it("identidad del Demo: id fijo 'demo' y nombre visible", () => {
     expect(p.id).toBe(DEMO_ID);
@@ -179,5 +182,45 @@ describe("crearProyectoDemo — datos generales y campos heredados materializado
     const hs6 = p.justificaciones.hs6!.inputs as unknown as Hs6Estado;
     expect(hs6.municipio).toBe("Cáceres");
     expect(hs6.zona).toBe("II");
+  });
+});
+
+// =============================================================================
+// crearProyectoDemo — el que siembra la app: el de los supuestos, completo. Sin
+// nada que no cumpla, sin avisos sin revisar y sin nada por decidir.
+// =============================================================================
+
+describe("crearProyectoDemo — el ejemplo sale entero", () => {
+  const p = crearProyectoDemo(NOW);
+
+  it("es determinista y no toca el Demo con supuestos", () => {
+    expect(crearProyectoDemo(NOW)).toStrictEqual(p);
+    const base = crearProyectoDemoConSupuestos(NOW);
+    expect(base.edificio).toEqual(edificioDeCaso("plurifamiliar_locales"));
+    expect(base.datosGenerales.pluviometria).toBeUndefined();
+    expect(p.id).toBe(DEMO_ID);
+    expect(p.nombre).toBe(DEMO_NOMBRE);
+  });
+
+  it("cada justificación cumple, no aplica o va a un programa externo", () => {
+    for (const ev of evaluarExpediente(p).justificaciones) {
+      expect(["cumple", "no_aplica", "externo"], ev.key).toContain(ev.estado);
+    }
+  });
+
+  it("antes de entregar no queda nada", () => {
+    expect(antesDeEntregar(p)).toEqual([]);
+  });
+
+  it("el estudio básico de seguridad y salud, completo; solo faltan los firmantes, que son del estudio", () => {
+    expect(entregables(p).seguridadSalud).toMatchObject({ resultado: "basico", listos: 15, total: 15 });
+    expect(pendientesEstudioBasico(p).map((d) => d.id)).toEqual(["firmantes"]);
+  });
+
+  it("HE 0 y HE 1, con el programa y la referencia del documento, sin resultados inventados", () => {
+    const g = p.justificaciones.he0he1_global!;
+    expect(g.programa).toBe("HULC");
+    expect(g.refExterna).toBeTruthy();
+    expect(g.verificacion).toBeUndefined();
   });
 });

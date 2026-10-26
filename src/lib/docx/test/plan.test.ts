@@ -4,7 +4,7 @@ import JSZip from "jszip";
 import { anchosDeTabla, MAX_COLUMNAS, planificarDocx, repartirAnchos } from "../plan";
 import { documentoMemoria } from "../render";
 import { bloquesMemoria, memoriaCte, type BloqueMemoria } from "../../obra/memoria";
-import { crearProyectoDemo } from "../../proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../proyecto/demo";
 import { ESTUDIO_VACIO, membreteDe, type Estudio } from "../../estudio/estudio";
 import { piezasMemoria, textoParrafo, textoPlanoMemoria } from "../../cte/memoria";
 import type { MemoriaDoc } from "../../cte/presentacion";
@@ -130,7 +130,7 @@ describe("tablas «Norma | Proyecto» (feature-31)", () => {
   });
 
   it("el .docx se genera con las tablas tipadas", async () => {
-    const blob = await Packer.toBlob(documentoMemoria([{ tipo: "parrafo", texto: "Antes" }, b, { tipo: "parrafo", texto: "Después" }], membreteDe(ESTUDIO_VACIO, crearProyectoDemo("2026-10-11T10:00:00.000Z"))));
+    const blob = await Packer.toBlob(documentoMemoria([{ tipo: "parrafo", texto: "Antes" }, b, { tipo: "parrafo", texto: "Después" }], membreteDe(ESTUDIO_VACIO, crearProyectoDemoConSupuestos("2026-10-11T10:00:00.000Z"))));
     const xml = await (await JSZip.loadAsync(await blob.arrayBuffer())).file("word/document.xml")!.async("string");
     expect(xml).toContain("Evacuación");
     expect(xml).toContain("(1) Desde la puerta de la vivienda.");
@@ -140,7 +140,7 @@ describe("tablas «Norma | Proyecto» (feature-31)", () => {
 
 describe("documentoMemoria", () => {
   it("el Demo sale como un .docx con su texto y en A4", async () => {
-    const p = crearProyectoDemo("2026-10-04T10:00:00.000Z");
+    const p = crearProyectoDemoConSupuestos("2026-10-04T10:00:00.000Z");
     const doc = documentoMemoria(bloquesMemoria(memoriaCte(p)), membreteDe(ESTUDIO_VACIO, p));
     const zip = await JSZip.loadAsync(await Packer.toBuffer(doc));
     const xml = await zip.file("word/document.xml")!.async("string");
@@ -151,7 +151,7 @@ describe("documentoMemoria", () => {
   });
 
   it("con la cabecera del estudio y el pie con el título y la página (feature-29)", async () => {
-    const p = crearProyectoDemo("2026-10-04T10:00:00.000Z");
+    const p = crearProyectoDemoConSupuestos("2026-10-04T10:00:00.000Z");
     p.datosGenerales = { ...p.datosGenerales, documento: { titulo: "PROYECTO DE EJECUCIÓN PARA VIVIENDA" } };
     const zip = await JSZip.loadAsync(await Packer.toBuffer(documentoMemoria(bloquesMemoria(memoriaCte(p)), membreteDe(ESTUDIO, p))));
     const archivos = Object.keys(zip.files);
@@ -166,7 +166,7 @@ describe("documentoMemoria", () => {
   });
 
   it("sin estudio, sin cabecera; el pie lleva el nombre del proyecto", async () => {
-    const p = crearProyectoDemo("2026-10-04T10:00:00.000Z");
+    const p = crearProyectoDemoConSupuestos("2026-10-04T10:00:00.000Z");
     const zip = await JSZip.loadAsync(await Packer.toBuffer(documentoMemoria(bloquesMemoria(memoriaCte(p)), membreteDe(ESTUDIO_VACIO, p))));
     expect(Object.keys(zip.files).some((f) => /^word\/header/.test(f))).toBe(false);
     const footer = await zip.file(Object.keys(zip.files).find((f) => /^word\/footer\d*\.xml$/.test(f))!)!.async("string");

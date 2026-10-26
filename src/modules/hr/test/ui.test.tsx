@@ -3,6 +3,7 @@ import { cleanup, render, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DEMO_ID } from "../../../lib/proyecto/demo";
 import { inicializarStorage } from "../../../lib/proyecto/storage";
+import { crearProyectoDemoConSupuestos } from "../../../lib/proyecto/demo";
 
 // =============================================================================
 // HR (feature-25) sobre el router real y el Demo: la pantalla común de SI con las
@@ -26,7 +27,7 @@ beforeEach(() => {
   cleanup();
   localStorage.clear();
   window.location.hash = "";
-  inicializarStorage("2026-10-05T00:00:00.000Z");
+  inicializarStorage("2026-10-05T00:00:00.000Z", undefined, crearProyectoDemoConSupuestos);
 });
 
 describe("HR · Protección frente al ruido (feature-25)", () => {

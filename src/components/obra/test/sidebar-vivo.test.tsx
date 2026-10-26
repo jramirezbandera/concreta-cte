@@ -3,7 +3,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { ProyectoProvider, useProyecto } from "../../../lib/proyecto/ProyectoContext";
-import { crearProyectoDemo } from "../../../lib/proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../../lib/proyecto/demo";
 import { Sidebar } from "../../layout/Sidebar";
 
 // =============================================================================
@@ -37,7 +37,7 @@ describe("Sidebar — estado calculado", () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter initialEntries={["/p/demo"]}>
-        <ProyectoProvider proyectoInicial={crearProyectoDemo("2026-10-04T10:00:00.000Z")} persistir={false}>
+        <ProyectoProvider proyectoInicial={crearProyectoDemoConSupuestos("2026-10-04T10:00:00.000Z")} persistir={false}>
           <Sidebar isOpen onClose={() => {}} />
           <SubirPlantas />
         </ProyectoProvider>

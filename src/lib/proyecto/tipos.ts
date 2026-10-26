@@ -454,6 +454,8 @@ export const LS_INDICE = "concreta-inst-v2-proyectos";
 export const LS_PROYECTO_PREFIX = "concreta-inst-v2-proyecto-";
 /** Clave localStorage del id del proyecto activo (último abierto — redirige rutas legacy). */
 export const LS_ACTIVO = "concreta-inst-v2-proyecto-activo";
+/** Clave localStorage de la versión de la Demo guardada: si no es la de ahora, se cambia al arrancar. */
+export const LS_DEMO_VERSION = "concreta-inst-v2-demo-version";
 
 /** Índice de proyectos de la versión 1: solo se cuenta, para avisar en Inicio. */
 export const LS_INDICE_V1 = "concreta-inst-proyectos";

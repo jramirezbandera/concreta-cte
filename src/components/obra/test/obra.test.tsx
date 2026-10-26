@@ -3,7 +3,7 @@ import { cleanup, render, screen, waitFor, within } from "@testing-library/react
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { ProyectoProvider } from "../../../lib/proyecto/ProyectoContext";
-import { crearProyectoDemo } from "../../../lib/proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../../lib/proyecto/demo";
 import type { Proyecto } from "../../../lib/proyecto/tipos";
 import { LoQueSeJustifica } from "../LoQueSeJustifica";
 import { AntesDeEntregar } from "../AntesDeEntregar";
@@ -27,7 +27,7 @@ vi.mock("../../../lib/ai/pdfPrep", async (importOriginal) => ({
   leerPdf: async (file: File) => ({ nombre: file.name, bytes: 4, paginas: textoPdf.paginas.length, textos: textoPdf.paginas, imagenes: async () => [], cerrar: () => {} }),
 }));
 
-const demo = (): Proyecto => crearProyectoDemo("2026-10-04T10:00:00.000Z");
+const demo = (): Proyecto => crearProyectoDemoConSupuestos("2026-10-04T10:00:00.000Z");
 
 function montar(ui: React.ReactNode, proyecto: Proyecto = demo()) {
   return render(

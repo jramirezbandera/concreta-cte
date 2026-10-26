@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso } from "../../../lib/edificio/casos";
-import { crearProyectoDemo } from "../../../lib/proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../../lib/proyecto/demo";
 import { filasQueEntraHs1 } from "../entra";
 import { hs1EstadoDefaults, type Hs1Estado } from "../estado";
 import { toFichaData } from "../ficha";
@@ -16,7 +16,7 @@ import { franjaDe, fraseHs1, metricasHs1, textoAviso, textoEtiqueta, textoIncump
 // =============================================================================
 
 const demo = () => {
-  const p = crearProyectoDemo("2026-01-01T00:00:00.000Z");
+  const p = crearProyectoDemoConSupuestos("2026-01-01T00:00:00.000Z");
   return { p, j: justificarHs1(hs1EstadoDefaults, p.edificio, obraHs1De(p.datosGenerales)) };
 };
 const est = (d: Partial<Hs1Estado> = {}): Hs1Estado => ({ ...hs1EstadoDefaults, ...d });

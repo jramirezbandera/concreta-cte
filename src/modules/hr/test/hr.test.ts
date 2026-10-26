@@ -4,7 +4,7 @@ import type { MemoriaDoc } from "../../../lib/cte/presentacion";
 import { edificioDeCaso } from "../../../lib/edificio/casos";
 import type { Edificio } from "../../../lib/edificio/tipos";
 import { obraDeCaso, proyectoParaModulo } from "../../../lib/proyecto/alcance";
-import { crearProyectoDemo } from "../../../lib/proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../../lib/proyecto/demo";
 import type { DatosGenerales, Proyecto } from "../../../lib/proyecto/tipos";
 import { dRASuelo, dRATecho, dRATrasdosado, solucionDe } from "../../../lib/constructivo/catalogo";
 import { comprobarFachada, comprobarHorizontal, comprobarVertical, type EntradaVertical, type FachadaFlanco } from "../comprobar";
@@ -19,7 +19,7 @@ import { exigenciaExterior, mixto, tramoHuecos } from "../tablas";
 // (Catálogo). Los ejemplos son los de esos documentos.
 // =============================================================================
 
-const demo = crearProyectoDemo("2026-10-05T10:00:00.000Z");
+const demo = crearProyectoDemoConSupuestos("2026-10-05T10:00:00.000Z");
 type Justs = Proyecto["justificaciones"];
 const con = (edificio: Edificio, estado: Partial<HrEstado> = {}, dg: Partial<DatosGenerales> = {}, justificaciones: Justs = {}): JustificacionHr =>
   justificarHr({ ...hrEstadoDefaults, ...estado }, { edificio, datosGenerales: { ...demo.datosGenerales, ...dg }, justificaciones });

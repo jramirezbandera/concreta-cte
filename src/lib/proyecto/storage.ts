@@ -1,7 +1,7 @@
 import type { DatosGenerales, Edificio, Proyecto } from "./tipos";
-import { LS_ACTIVO, LS_INDICE, LS_INDICE_V1, LS_PROYECTO_PREFIX, PROYECTO_SCHEMA_VERSION } from "./tipos";
+import { LS_ACTIVO, LS_DEMO_VERSION, LS_INDICE, LS_INDICE_V1, LS_PROYECTO_PREFIX, PROYECTO_SCHEMA_VERSION } from "./tipos";
 import { canonicalStringify as jsonCanonico, inputsFingerprint } from "../pdf/utils";
-import { crearProyectoDemo } from "./demo";
+import { crearProyectoDemo, DEMO_VERSION } from "./demo";
 import { parseSeguridadSalud } from "../ebss/datos";
 
 // =============================================================================
@@ -347,12 +347,20 @@ export function inicializarStorage(
   _genId: () => string = defaultGenId,
   crearDemo: (nowIso: string) => Proyecto = crearProyectoDemo,
   s: Storage = localStorage,
+  versionDemo: string = DEMO_VERSION,
 ): { activo: string } {
   let ids = leerIndice(s);
   if (ids === null) {
     escribirIndice([], s);
     guardarProyecto(crearDemo(nowIso), s);
+    s.setItem(LS_DEMO_VERSION, versionDemo);
     ids = leerIndice(s) ?? [];
+  } else if (s.getItem(LS_DEMO_VERSION) !== versionDemo) {
+    // La Demo guardada es de una versión anterior: se cambia por la de ahora, en
+    // su sitio. Si se borró, no vuelve.
+    const demo = crearDemo(nowIso);
+    if (ids.includes(demo.id)) guardarProyecto(demo, s);
+    s.setItem(LS_DEMO_VERSION, versionDemo);
   }
   const activoActual = proyectoActivoId(s);
   if ((activoActual === null || !ids.includes(activoActual)) && ids.length > 0) {

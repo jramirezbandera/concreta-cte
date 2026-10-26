@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { crearProyectoDemo } from "../../proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../proyecto/demo";
 import type { Proyecto } from "../../proyecto/tipos";
 import { antesDeEntregar, entregables } from "../entrega";
 import { bloquesMemoria, memoriaCte, textoPlanoMemoriaCte } from "../memoria";
@@ -9,7 +9,7 @@ import { verificacionDePrueba } from "../../energia/test/informeSintetico";
 // «Antes de entregar», los entregables y la memoria CTE (feature-16 §C–§E).
 // =============================================================================
 
-const demo = (): Proyecto => crearProyectoDemo("2026-10-04T10:00:00.000Z");
+const demo = (): Proyecto => crearProyectoDemoConSupuestos("2026-10-04T10:00:00.000Z");
 
 /** El Demo con la red a 60 kPa: HS4 no cumple. */
 function conHs4Fallando(): Proyecto {

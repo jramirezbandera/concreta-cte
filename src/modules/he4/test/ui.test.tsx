@@ -3,6 +3,7 @@ import { cleanup, render, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DEMO_ID } from "../../../lib/proyecto/demo";
 import { inicializarStorage } from "../../../lib/proyecto/storage";
+import { crearProyectoDemoConSupuestos } from "../../../lib/proyecto/demo";
 
 // =============================================================================
 // HE4 (feature-22) sobre el router real y el Demo: la pantalla común de SI con
@@ -26,7 +27,7 @@ beforeEach(() => {
   cleanup();
   localStorage.clear();
   window.location.hash = "";
-  inicializarStorage("2026-08-23T00:00:00.000Z");
+  inicializarStorage("2026-08-23T00:00:00.000Z", undefined, crearProyectoDemoConSupuestos);
 });
 
 describe("HE4 · ACS de origen renovable (feature-22)", () => {

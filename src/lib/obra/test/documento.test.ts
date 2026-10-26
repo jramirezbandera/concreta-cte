@@ -3,7 +3,7 @@ import { justificacionRegistry } from "../../../data/justificacionRegistry";
 import { cuadroInicial, fuenteCorta, memoriaCte, numeroFijo, SECCIONES, sinSupuestos, textoPlanoMemoriaCte, type MemoriaCte } from "../memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../edificio/casos";
 import { obraDeCaso } from "../../proyecto/alcance";
-import { crearProyectoDemo } from "../../proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../proyecto/demo";
 import type { Proyecto } from "../../proyecto/tipos";
 import { ESTUDIO_VACIO, firmantesDe, membreteDe, parseEstudio, type Estudio } from "../../estudio/estudio";
 
@@ -50,7 +50,7 @@ describe("fuenteCorta", () => {
 // ─── El cuadro inicial y la numeración fija (pasos 1 y 2) ──────────────────────
 
 function deCaso(caso: CasoEdificio): Proyecto {
-  const p: Proyecto = { ...crearProyectoDemo("2026-10-10T10:00:00.000Z"), edificio: edificioDeCaso(caso), justificaciones: {} };
+  const p: Proyecto = { ...crearProyectoDemoConSupuestos("2026-10-10T10:00:00.000Z"), edificio: edificioDeCaso(caso), justificaciones: {} };
   p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso(caso) ?? {}) };
   return p;
 }

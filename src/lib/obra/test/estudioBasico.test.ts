@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Packer } from "docx";
-import { crearProyectoDemo } from "../../proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../proyecto/demo";
 import { edificioDeCaso, type CasoEdificio } from "../../edificio/casos";
 import { obraDeCaso } from "../../proyecto/alcance";
 import type { Proyecto } from "../../proyecto/tipos";
@@ -43,7 +43,7 @@ const COMPLETO_DE_DATOS: EstudioSeguridadSalud = {
 };
 
 function deCaso(caso: CasoEdificio, ss?: EstudioSeguridadSalud): Proyecto {
-  const p: Proyecto = { ...crearProyectoDemo(AHORA), edificio: edificioDeCaso(caso), justificaciones: {} };
+  const p: Proyecto = { ...crearProyectoDemoConSupuestos(AHORA), edificio: edificioDeCaso(caso), justificaciones: {} };
   p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso(caso) ?? {}), documento: { promotor: "Promotora Ejemplo" } };
   if (ss) p.seguridadSalud = ss;
   return p;
@@ -52,7 +52,7 @@ function deCaso(caso: CasoEdificio, ss?: EstudioSeguridadSalud): Proyecto {
 const conSs = (p: Proyecto, ss: EstudioSeguridadSalud): Proyecto => ({ ...p, seguridadSalud: { ...(p.seguridadSalud ?? {}), ...ss } });
 
 const CASOS: [string, () => Proyecto][] = [
-  ["el Demo", () => conSs(crearProyectoDemo(AHORA), { ...COMPLETO_DE_DATOS, amianto: { estado: "no_identificado" } })],
+  ["el Demo", () => conSs(crearProyectoDemoConSupuestos(AHORA), { ...COMPLETO_DE_DATOS, amianto: { estado: "no_identificado" } })],
   ["unifamiliar", () => deCaso("unifamiliar", COMPLETO_DE_DATOS)],
   ["plurifamiliar", () => deCaso("plurifamiliar", COMPLETO_DE_DATOS)],
   ["reforma_local_vivienda", () => deCaso("reforma_local_vivienda", { ...COMPLETO_DE_DATOS, amianto: { estado: "posible", ubicacion: "bajantes del patio", friable: false } })],

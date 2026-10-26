@@ -406,6 +406,29 @@ describe("storage — inicializarStorage", () => {
     expect(listarProyectos(s)).toHaveLength(1);
   });
 
+  it("una Demo de otra versión se cambia por la de ahora, en su sitio; los demás no se tocan", () => {
+    inicializarStorage(NOW, genId, demoSintetica, s, "1");
+    const otro = crearProyecto("Otro", dg(), ed(), NOW, genId, s);
+    guardarProyecto({ ...cargarProyecto("demo-id", s)!, nombre: "Demo tocada" }, s);
+    inicializarStorage(DESPUES, genId, demoSintetica, s, "2");
+    expect(listarProyectos(s).map((x) => x.id)).toEqual(["demo-id", otro.id]);
+    expect(cargarProyecto("demo-id", s)!.nombre).toBe("Demo");
+    expect(cargarProyecto("demo-id", s)!.creado).toBe(DESPUES);
+    expect(cargarProyecto(otro.id, s)!.nombre).toBe("Otro");
+    // Con la versión al día, lo tocado se queda.
+    guardarProyecto({ ...cargarProyecto("demo-id", s)!, nombre: "Demo tocada" }, s);
+    inicializarStorage(DESPUES, genId, demoSintetica, s, "2");
+    expect(cargarProyecto("demo-id", s)!.nombre).toBe("Demo tocada");
+  });
+
+  it("una Demo borrada no vuelve al cambiar de versión", () => {
+    inicializarStorage(NOW, genId, demoSintetica, s, "1");
+    const otro = crearProyecto("Otro", dg(), ed(), NOW, genId, s);
+    eliminarProyecto("demo-id", s);
+    inicializarStorage(DESPUES, genId, demoSintetica, s, "2");
+    expect(listarProyectos(s).map((x) => x.id)).toEqual([otro.id]);
+  });
+
   it("si el activo apunta a un proyecto eliminado, se re-fija a uno existente", () => {
     const a = crearProyecto("A", dg(), ed(), NOW, genId, s);
     crearProyecto("B", dg(), ed(), NOW, genId, s);

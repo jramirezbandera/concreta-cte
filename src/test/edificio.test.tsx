@@ -3,6 +3,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DEMO_ID } from "../lib/proyecto/demo";
 import { inicializarStorage } from "../lib/proyecto/storage";
+import { crearProyectoDemoConSupuestos } from "../lib/proyecto/demo";
 
 // =============================================================================
 // El edificio (feature-12) sobre el router real: la sección es el editor (lo
@@ -24,7 +25,7 @@ beforeEach(() => {
   cleanup();
   localStorage.clear();
   window.location.hash = "";
-  inicializarStorage("2026-08-23T00:00:00.000Z");
+  inicializarStorage("2026-08-23T00:00:00.000Z", undefined, crearProyectoDemoConSupuestos);
 });
 
 describe("El edificio", () => {

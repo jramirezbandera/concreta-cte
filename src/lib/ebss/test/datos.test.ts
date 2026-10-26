@@ -11,7 +11,7 @@ import {
   preguntaCabezaFamilia,
 } from "../datos";
 import { SERVICIOS_AFECTADOS, type EstudioSeguridadSalud } from "../tipos";
-import { crearProyectoDemo } from "../../proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../proyecto/demo";
 import { obraDeCaso } from "../../proyecto/alcance";
 import { edificioDeCaso, type CasoEdificio } from "../../edificio/casos";
 import { cargarProyecto, exportarProyecto, guardarProyecto, importarProyecto } from "../../proyecto/storage";
@@ -24,7 +24,7 @@ import type { Proyecto } from "../../proyecto/tipos";
 const AHORA = "2026-10-16T10:00:00.000Z";
 
 function deCaso(caso: CasoEdificio, ss?: EstudioSeguridadSalud): Proyecto {
-  const p: Proyecto = { ...crearProyectoDemo(AHORA), edificio: edificioDeCaso(caso), justificaciones: {} };
+  const p: Proyecto = { ...crearProyectoDemoConSupuestos(AHORA), edificio: edificioDeCaso(caso), justificaciones: {} };
   p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso(caso) ?? {}) };
   if (ss) p.seguridadSalud = ss;
   return p;
@@ -131,7 +131,7 @@ describe("parseSeguridadSalud", () => {
 describe("el proyecto guardado", () => {
   it("un expediente sin seguridad y salud se sigue leyendo igual", () => {
     const s = storageFake();
-    const p = crearProyectoDemo(AHORA);
+    const p = crearProyectoDemoConSupuestos(AHORA);
     guardarProyecto(p, s);
     const leido = cargarProyecto(p.id, s);
     expect(leido).toEqual(p);
@@ -140,7 +140,7 @@ describe("el proyecto guardado", () => {
 
   it("se guarda, se exporta y se importa con sus datos", () => {
     const s = storageFake();
-    const p = { ...crearProyectoDemo(AHORA), seguridadSalud: COMPLETO };
+    const p = { ...crearProyectoDemoConSupuestos(AHORA), seguridadSalud: COMPLETO };
     guardarProyecto(p, s);
     expect(cargarProyecto(p.id, s)?.seguridadSalud).toEqual(COMPLETO);
     const r = importarProyecto(exportarProyecto(p));
@@ -149,7 +149,7 @@ describe("el proyecto guardado", () => {
 
   it("al leer, lo mal formado se descarta", () => {
     const s = storageFake();
-    const p = { ...crearProyectoDemo(AHORA), seguridadSalud: { amianto: { estado: "quizas" } } as unknown as EstudioSeguridadSalud };
+    const p = { ...crearProyectoDemoConSupuestos(AHORA), seguridadSalud: { amianto: { estado: "quizas" } } as unknown as EstudioSeguridadSalud };
     guardarProyecto(p, s);
     expect(cargarProyecto(p.id, s)?.seguridadSalud).toBeUndefined();
   });
@@ -199,16 +199,16 @@ describe("mano de obra", () => {
 
 describe("lo que pide la obra", () => {
   it("amianto obligatorio en obra sobre edificio existente", () => {
-    expect(amiantoObligatorio(crearProyectoDemo(AHORA))).toBe(false);
+    expect(amiantoObligatorio(crearProyectoDemoConSupuestos(AHORA))).toBe(false);
     expect(amiantoObligatorio(deCaso("reforma_local_vivienda"))).toBe(true);
     for (const intervencion of ["reforma", "ampliacion", "cambio_uso"] as const) {
-      const p = crearProyectoDemo(AHORA);
+      const p = crearProyectoDemoConSupuestos(AHORA);
       expect(amiantoObligatorio({ ...p, datosGenerales: { ...p.datosGenerales, intervencion } })).toBe(true);
     }
   });
 
   it("y en obra nueva si se derriba una construcción existente", () => {
-    expect(amiantoObligatorio({ ...crearProyectoDemo(AHORA), seguridadSalud: { demolicionPrevia: true } })).toBe(true);
+    expect(amiantoObligatorio({ ...crearProyectoDemoConSupuestos(AHORA), seguridadSalud: { demolicionPrevia: true } })).toBe(true);
   });
 
   it("la pregunta del cabeza de familia, solo con viviendas", () => {

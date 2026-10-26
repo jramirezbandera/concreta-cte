@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { crearProyectoDemo } from "../../proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../proyecto/demo";
 import { edificioDeCaso, type CasoEdificio } from "../../edificio/casos";
 import { obraDeCaso } from "../../proyecto/alcance";
 import type { JustificacionKey, Proyecto } from "../../proyecto/tipos";
@@ -13,7 +13,7 @@ import { antesDeEntregar } from "../entrega";
 // =============================================================================
 
 const AHORA = "2026-10-19T10:00:00.000Z";
-const demo = (): Proyecto => crearProyectoDemo(AHORA);
+const demo = (): Proyecto => crearProyectoDemoConSupuestos(AHORA);
 
 function deCaso(caso: CasoEdificio): Proyecto {
   const p: Proyecto = { ...demo(), edificio: edificioDeCaso(caso), justificaciones: {} };

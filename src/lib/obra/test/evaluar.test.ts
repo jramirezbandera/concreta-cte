@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { crearProyectoDemo } from "../../proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../proyecto/demo";
 import { edificioDeCaso, CASOS_EDIFICIO } from "../../edificio/casos";
 import type { Proyecto } from "../../proyecto/tipos";
 import { estadoEfectivo, evaluarExpediente } from "../evaluar";
@@ -14,7 +14,7 @@ import type { Hs4Estado } from "../../../modules/hs4/estado";
 // =============================================================================
 
 const NOW = "2026-10-04T10:00:00.000Z";
-const demo = (): Proyecto => crearProyectoDemo(NOW);
+const demo = (): Proyecto => crearProyectoDemoConSupuestos(NOW);
 
 afterEach(() => vi.restoreAllMocks());
 

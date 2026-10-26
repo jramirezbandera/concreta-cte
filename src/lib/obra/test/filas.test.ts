@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { FilaQueEntra } from "../../../components/justificacion/QueEntra";
-import { crearProyectoDemo } from "../../proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../proyecto/demo";
 import { resumenEdificio } from "../../edificio/derivar";
 import type { Proyecto } from "../../proyecto/tipos";
 import { filasObra, piezasDeQueEntra, recuentoObra, rotuloGrupo, textoRecuento, type FilaObra } from "../filas";
@@ -10,7 +10,7 @@ import { verificacionDePrueba } from "../../energia/test/informeSintetico";
 // «Lo que se justifica» (feature-16 §B).
 // =============================================================================
 
-const demo = (): Proyecto => crearProyectoDemo("2026-10-04T10:00:00.000Z");
+const demo = (): Proyecto => crearProyectoDemoConSupuestos("2026-10-04T10:00:00.000Z");
 
 function fila(p: Proyecto, id: string): FilaObra {
   const f = filasObra(p)

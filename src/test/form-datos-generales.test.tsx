@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DEMO_ID } from "../lib/proyecto/demo";
 import { inicializarStorage, listarProyectos } from "../lib/proyecto/storage";
+import { crearProyectoDemoConSupuestos } from "../lib/proyecto/demo";
 import { edificioDeCaso } from "../lib/edificio/casos";
 
 // =============================================================================
@@ -31,7 +32,7 @@ beforeEach(() => {
 
 describe("Datos de la obra", () => {
   it("ya no describe el edificio, y fuera de un campo Backspace queda neutralizado", async () => {
-    inicializarStorage("2026-08-23T00:00:00.000Z");
+    inicializarStorage("2026-08-23T00:00:00.000Z", undefined, crearProyectoDemoConSupuestos);
     await renderApp(`#/p/${DEMO_ID}/datos`);
     await screen.findByRole("heading", { name: "Datos de la obra" });
 
@@ -67,7 +68,7 @@ describe("Datos de la obra", () => {
   });
 
   it("clima y terreno de HS1: lo del Demo, el freático a una profundidad y su validación", async () => {
-    inicializarStorage("2026-08-23T00:00:00.000Z");
+    inicializarStorage("2026-08-23T00:00:00.000Z", undefined, crearProyectoDemoConSupuestos);
     await renderApp(`#/p/${DEMO_ID}/datos`);
     await screen.findByRole("heading", { name: "Datos de la obra" });
     const user = userEvent.setup();
@@ -90,7 +91,7 @@ describe("Datos de la obra", () => {
   });
 
   it("dentro de un campo de texto, Backspace se respeta (sigue borrando)", async () => {
-    inicializarStorage("2026-08-23T00:00:00.000Z");
+    inicializarStorage("2026-08-23T00:00:00.000Z", undefined, crearProyectoDemoConSupuestos);
     await renderApp(`#/p/${DEMO_ID}/datos`);
 
     const nombre = await screen.findByLabelText("Nombre del proyecto");
@@ -106,7 +107,7 @@ describe("Datos de la obra", () => {
 
 describe("Nuevo proyecto", () => {
   it("se crea desde un caso de partida y abre El edificio", async () => {
-    inicializarStorage("2026-08-23T00:00:00.000Z");
+    inicializarStorage("2026-08-23T00:00:00.000Z", undefined, crearProyectoDemoConSupuestos);
     const user = userEvent.setup();
     await renderApp("#/nuevo");
 

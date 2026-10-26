@@ -3,6 +3,7 @@ import { cleanup, render, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DEMO_ID } from "../../../lib/proyecto/demo";
 import { inicializarStorage } from "../../../lib/proyecto/storage";
+import { crearProyectoDemoConSupuestos } from "../../../lib/proyecto/demo";
 
 // =============================================================================
 // HS4 v4 (feature-15) sobre el router real y el Demo («Plurifamiliar con
@@ -27,7 +28,7 @@ beforeEach(() => {
   cleanup();
   localStorage.clear();
   window.location.hash = "";
-  inicializarStorage("2026-08-23T00:00:00.000Z");
+  inicializarStorage("2026-08-23T00:00:00.000Z", undefined, crearProyectoDemoConSupuestos);
 });
 
 describe("HS4 · desde El edificio (feature-15)", () => {

@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { ProyectoProvider, useProyecto } from "../../lib/proyecto/ProyectoContext";
 import { ThemeProvider } from "../../lib/theme/ThemeProvider";
-import { crearProyectoDemo } from "../../lib/proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../lib/proyecto/demo";
 import { edificioDeCaso } from "../../lib/edificio/casos";
 import { obraDeCaso } from "../../lib/proyecto/alcance";
 import type { Proyecto } from "../../lib/proyecto/tipos";
@@ -21,7 +21,7 @@ import { AntesDeEntregar } from "../../components/obra/AntesDeEntregar";
 const AHORA = "2026-10-18T10:00:00.000Z";
 
 function reforma(): Proyecto {
-  const p: Proyecto = { ...crearProyectoDemo(AHORA), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
+  const p: Proyecto = { ...crearProyectoDemoConSupuestos(AHORA), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
   p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso("reforma_local_vivienda") ?? {}), documento: { promotor: "Promotora Ejemplo" } };
   // Abre un hueco en un muro de carga: así propone la apertura de huecos, una ficha redactada por la app.
   p.datosGenerales.alcance = { ...p.datosGenerales.alcance, estructura: true };

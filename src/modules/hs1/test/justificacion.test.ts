@@ -2,7 +2,7 @@ import { setCerramientos } from "../../../lib/constructivo/cerramientos";
 import { describe, it, expect } from "vitest";
 import { edificioDeCaso } from "../../../lib/edificio/casos";
 import type { Edificio } from "../../../lib/edificio/tipos";
-import { crearProyectoDemo } from "../../../lib/proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../../lib/proyecto/demo";
 import { hs1EstadoDefaults, type Hs1Estado } from "../estado";
 import { justificarHs1, obraHs1De, type ElementoHs1, type JustificacionHs1, type ObraHs1 } from "../justificacion";
 import { partesDe, presenciaAguaDe } from "../partes";
@@ -76,7 +76,7 @@ describe("lo que entra desde El edificio", () => {
 
 describe("justificación", () => {
   it("el Demo: grado 1 en el muro, 2 en el suelo y 5 en la fachada con la zona pluviométrica supuesta", () => {
-    const p = crearProyectoDemo("2026-01-01T00:00:00.000Z");
+    const p = crearProyectoDemoConSupuestos("2026-01-01T00:00:00.000Z");
     const j = justificarHs1(est(), p.edificio, obraHs1De(p.datosGenerales));
     expect(j.veredicto).toBe("ok");
     expect(j.elementos.map((e) => e.id)).toEqual(["terreno", "muro", "suelo-sotano", "fachada", "cubierta"]);

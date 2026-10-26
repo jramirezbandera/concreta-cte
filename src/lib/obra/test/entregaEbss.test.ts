@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { crearProyectoDemo } from "../../proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../proyecto/demo";
 import { edificioDeCaso } from "../../edificio/casos";
 import { obraDeCaso } from "../../proyecto/alcance";
 import type { Proyecto } from "../../proyecto/tipos";
@@ -29,7 +29,7 @@ const COMPLETO: EstudioSeguridadSalud = {
 };
 
 function reforma(ss?: EstudioSeguridadSalud): Proyecto {
-  const p: Proyecto = { ...crearProyectoDemo(AHORA), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
+  const p: Proyecto = { ...crearProyectoDemoConSupuestos(AHORA), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
   p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso("reforma_local_vivienda") ?? {}), documento: { promotor: "Promotora Ejemplo" } };
   // Abre un hueco en un muro de carga: así propone la apertura de huecos, una ficha redactada por la app.
   p.datosGenerales.alcance = { ...p.datosGenerales.alcance, estructura: true };
@@ -42,7 +42,7 @@ const ebss = (p: Proyecto) => antesDeEntregar(p).filter((x) => x.key === CLAVE_S
 describe("el estudio básico en «Antes de entregar»", () => {
   it("sin empezar, no llena la lista", () => {
     expect(ebss(reforma())).toEqual([]);
-    expect(ebss(crearProyectoDemo(AHORA))).toEqual([]);
+    expect(ebss(crearProyectoDemoConSupuestos(AHORA))).toEqual([]);
   });
 
   it("empezado y vacío: los datos que nombra el plan, uno a uno, y el resto en una línea", () => {

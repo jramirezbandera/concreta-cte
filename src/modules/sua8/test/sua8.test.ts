@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { textoParrafo, textoPlanoMemoria } from "../../../lib/cte/memoria";
 import { edificioDeCaso, type CasoEdificio } from "../../../lib/edificio/casos";
 import { obraDeCaso, proyectoParaModulo } from "../../../lib/proyecto/alcance";
-import { crearProyectoDemo } from "../../../lib/proyecto/demo";
+import { crearProyectoDemoConSupuestos } from "../../../lib/proyecto/demo";
 import type { DatosGenerales, Proyecto } from "../../../lib/proyecto/tipos";
 import { sua8 } from "../definicion";
 import { sua8EstadoDefaults, type Sua8Estado } from "../estado";
@@ -14,7 +14,7 @@ import { areaCaptura, nivelDe } from "../tablas";
 // research/verificacion-sua6-sua8.md, bloques C3 a C5.
 // =============================================================================
 
-const base = crearProyectoDemo("2026-10-04T10:00:00.000Z").datosGenerales;
+const base = crearProyectoDemoConSupuestos("2026-10-04T10:00:00.000Z").datosGenerales;
 const caso = (c: CasoEdificio, estado: Partial<Sua8Estado> = {}, dg: Partial<DatosGenerales> = {}) =>
   justificarSua8({ ...sua8EstadoDefaults, ...estado }, { edificio: edificioDeCaso(c), datosGenerales: { ...base, ...dg } });
 
@@ -123,7 +123,7 @@ describe("SUA8 · con El edificio", () => {
   });
 
   it("en un edificio existente sin variación, Ne, C4 y Na antes y después (feature-30)", () => {
-    const p: Proyecto = { ...crearProyectoDemo("2026-10-10T10:00:00.000Z"), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
+    const p: Proyecto = { ...crearProyectoDemoConSupuestos("2026-10-10T10:00:00.000Z"), edificio: edificioDeCaso("reforma_local_vivienda"), justificaciones: {} };
     p.datosGenerales = { ...p.datosGenerales, ...(obraDeCaso("reforma_local_vivienda") ?? {}) };
     const j = justificarSua8(sua8EstadoDefaults, proyectoParaModulo(p, "sua8"));
     expect(j.existente?.sinVariacion).toBe(true);

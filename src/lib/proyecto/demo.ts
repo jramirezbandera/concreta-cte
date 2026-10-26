@@ -7,6 +7,10 @@
 // justificación materializan a mano los campos heredados del contexto (zona
 // térmica HS3, zona climática HE1, presión de acometida…). El estado de cada
 // justificación no se guarda: se calcula (feature-16, `lib/obra/evaluar.ts`).
+//
+// Dos capas: `crearProyectoDemoConSupuestos` deja lo habitual y lo supuesto (los
+// tests lo usan para ver cómo salen los avisos) y `crearProyectoDemo`, el que
+// siembra la app, lo completa para que el ejemplo salga entero.
 // =============================================================================
 
 import { hs3EstadoDefaults, type Hs3Estado } from "../../modules/hs3/estado";
@@ -19,7 +23,15 @@ import { habEstadoDefaults, type EstanciaHab, type HabEstado } from "../../modul
 import { he3EstadoDefaults, type He3Estado } from "../../modules/he3/estado";
 import { ictEstadoDefaults } from "../../modules/ict/estado";
 import { riteEstadoDefaults, type RiteEstado } from "../../modules/rite/estado";
+import { hs2EstadoDefaults, type Hs2Estado } from "../../modules/hs2/estado";
+import { si3EstadoDefaults, type Si3Estado } from "../../modules/si3/estado";
+import { sua2EstadoDefaults, type Sua2Estado } from "../../modules/sua2/estado";
+import { hrEstadoDefaults, type HrEstado } from "../../modules/hr/estado";
+import { he4EstadoDefaults, type He4Estado } from "../../modules/he4/estado";
+import { rebtEstadoDefaults, type RebtEstado } from "../../modules/rebt/estado";
+import type { Edificio } from "../edificio/tipos";
 import type { AccEstado } from "../../modules/acc/estado";
+import type { EstudioSeguridadSalud } from "../ebss/tipos";
 import { COMPUTAN_HABITUAL, type TipoEstancia } from "../habitabilidad/norma";
 import type { ZonaClimatica } from "../../modules/he1/tablas";
 import {
@@ -32,6 +44,7 @@ import { resumenEdificio } from "../edificio/derivar";
 import type {
   DatosGenerales,
   JustificacionEnProyecto,
+  JustificacionKey,
   Proyecto,
 } from "./tipos";
 
@@ -40,6 +53,13 @@ export const DEMO_ID = "demo";
 
 /** Nombre visible del proyecto Demo. */
 export const DEMO_NOMBRE = "Demo — Vivienda C/ Mayor 12";
+
+/**
+ * Versión de la Demo: al cambiar lo que siembra, se sube y el arranque cambia la
+ * Demo guardada por la nueva (`inicializarStorage`). Lo que se haya tocado en
+ * ella se pierde: es el ejemplo, no un proyecto.
+ */
+export const DEMO_VERSION = "2";
 
 // -----------------------------------------------------------------------------
 // DATOS DE LA OBRA DEL DEMO — obra nueva en Cáceres (459 m), Zona de radón II
@@ -139,6 +159,118 @@ const RITE_DEMO: RiteEstado = {
  */
 const ACC_DEMO: AccEstado = { normaOtra: "Norma de accesibilidad de demostración (sustituir por la de la comunidad)" };
 
+// -----------------------------------------------------------------------------
+// LO QUE COMPLETA EL DEMO — todo DE DEMOSTRACIÓN, como el estudio geotécnico:
+// con ello el ejemplo que siembra la app sale entero (`crearProyectoDemo`).
+// -----------------------------------------------------------------------------
+
+/**
+ * Los datos de la obra que el Demo con supuestos deja sin dar. El clima, el rayo
+ * y el ruido son SUPUESTOS DE DEMOSTRACIÓN, pendientes de lectura en las
+ * figuras; ninguno es «el valor del DB para Cáceres»: HS 1, la envolvente III/B
+ * de las notas 6.3 y 6.4 de research/verificacion-hs1.md; HS 5, la envolvente
+ * A-40 (125 mm/h) de la A6e de research/verificacion-hs5-pluviales.md; Ng y Ld,
+ * valores tipo. Los firmantes del documento no van: son del estudio de quien usa
+ * la app (Inicio, «Tu estudio»).
+ */
+const DATOS_COMPLETOS_DEMO: Partial<DatosGenerales> = {
+  zonaPluviometricaHs1: "III",
+  zonaEolica: "B",
+  pluviometria: { zona: "A", isoyeta: 40 },
+  densidadImpactosNg: 2,
+  ldZona: 60,
+  documento: {
+    titulo: "Proyecto de ejecución de edificio de 6 viviendas, local y garaje",
+    fase: "basico_ejecucion",
+    emplazamiento: "Calle Mayor nº 12, Cáceres",
+    promotor: "Promotora de demostración, S. L.",
+  },
+};
+
+/**
+ * Lo que El edificio del caso no dice: la superficie construida de cada zona,
+ * qué es el cuarto de instalaciones, el uso previsto del local y el ascensor.
+ */
+const CONSTRUIDA_DEMO: Record<string, number> = { z1: 186, z2: 178, z3: 42, z4: 468, z5: 44, z6: 17 };
+
+function completarEdificioDemo(e: Edificio): Edificio {
+  const edificio = structuredClone(e);
+  for (const g of edificio.grupos) {
+    for (const z of g.zonas) {
+      const construida = CONSTRUIDA_DEMO[z.id];
+      if (construida !== undefined) z.superficieConstruida_m2 = construida;
+      if (z.uso === "local_sin_uso") z.usoPrevisto = "comercial";
+      if (z.uso === "instalaciones") z.cuarto = "contadores_electricidad";
+    }
+  }
+  edificio.ascensor = true;
+  return edificio;
+}
+
+/** Las decisiones y los datos de cada módulo que el Demo con supuestos deja en lo habitual. */
+const DECISIONES_DEMO: Partial<Record<JustificacionKey, object>> = {
+  hs2: { ...hs2EstadoDefaults, recogida: "calle", dobles: { A: 1, B: 1 } } satisfies Hs2Estado,
+  si3: { ...si3EstadoDefaults, recorrido_m: 22, recorridoGaraje_m: 31 } satisfies Si3Estado,
+  sua2: { ...sua2EstadoDefaults, alturaGaraje_m: 2.3 } satisfies Sua2Estado,
+  hr: {
+    ...hrEstadoDefaults,
+    // Qué linda con qué: las dos viviendas de cada planta, y el portal y el local bajo la P1.
+    colindancias: { "entre:g1": true, "debajo:z3": true, "debajo:z2": true },
+    huecosDormitorio: 20,
+    huecosEstancia: 30,
+  } satisfies HrEstado,
+  he4: { ...he4EstadoDefaults, scop: 2.9, perdidas_pct: 10 } satisfies He4Estado,
+  rebt: {
+    ...rebtEstadoDefaults,
+    ascensor_kW: 11.5,
+    otrosServicios_kW: 1.5,
+    garaje_kW: 14,
+    longitudLga_m: 12,
+    longitudDi_m: 22,
+    resistividad_ohm_m: 300,
+  } satisfies RebtEstado,
+};
+
+/**
+ * El estudio básico de seguridad y salud (feature-35), DE DEMOSTRACIÓN. El
+ * presupuesto y las jornadas NO son realistas para este edificio: se quedan por
+ * debajo de los umbrales del art. 4 del RD 1627/1997 para que el ejemplo
+ * enseñe el estudio básico (con cifras realistas haría falta el estudio
+ * completo, que la app no redacta). El centro asistencial lleva rótulo para que
+ * no pase a un estudio real.
+ */
+const SEGURIDAD_SALUD_DEMO: EstudioSeguridadSalud = {
+  presupuesto: { pem: 300_000, gg_pct: 13, bi_pct: 6, iva_pct: 10 },
+  manoDeObra: { plazoDias: 100, maxTrabajadores: 8, jornadas: 480 },
+  subterraneas: false,
+  coordinacion: { variosProyectistas: false, variasEmpresas: true },
+  entorno: {
+    centroAsistencial: { nombre: "Centro asistencial de demostración (sustituir por el más próximo)", distancia_km: 3, tiempo_min: 10 },
+    viaPublica: true,
+    edificioEnUso: false,
+    servicios: { linea_aerea: false, linea_enterrada: true, transformador: false, gas: false, agua: true, saneamiento: true, telecomunicaciones: true },
+  },
+  medios: { gruaTorre: true, gruaMovil: false },
+  planos: "SS01–SS02",
+};
+
+/**
+ * Los avisos que el Demo da por revisados, por módulo: los que solo piden
+ * confirmar algo (la presión de la compañía, las longitudes tipo, los casos
+ * especiales que resuelve un criterio).
+ */
+const REVISADOS_DEMO: Partial<Record<JustificacionKey, string[]>> = {
+  hs4: ["presion-red-supuesta", "longitudes-estimadas"],
+  hs5: ["garaje-s1-bombeo"],
+  hs6: ["nucleo-garaje"],
+  si6: ["sector-sotano"],
+  sua3: ["cierrapuertas"],
+  sua9: ["viviendas-accesibles"],
+  hr: ["local"],
+  he5: ["mixto"],
+  he6: ["mixto"],
+};
+
 /** Una estancia del Demo: [id, nombre, tipo, Su, hueco]. */
 type FilaEstancia = [string, string, TipoEstancia, number, number | null];
 
@@ -177,10 +309,11 @@ const ESTANCIAS_DEMO: HabEstado["estancias"] = {
  * forma opaca que persiste el proyecto); las estructuras internas ya son
  * copias frescas (structuredClone en el caller).
  */
-function justificacionDemo(inputs: object): JustificacionEnProyecto {
+function justificacionDemo(inputs: object, revisados?: string[]): JustificacionEnProyecto {
   return {
     inputs: { ...inputs } as Record<string, unknown>,
     schemaVersion: "1",
+    ...(revisados ? { revisados: [...revisados] } : {}),
   };
 }
 
@@ -197,15 +330,17 @@ function letraInviernoDe(zonaAnejoB: string): ZonaClimatica {
 }
 
 // -----------------------------------------------------------------------------
-// CONSTRUCTOR DEL DEMO
+// CONSTRUCTORES DEL DEMO
 // -----------------------------------------------------------------------------
 
 /**
- * Construye el proyecto Demo completo. Pura y determinista: mismo `nowIso` →
- * mismo proyecto (deep-equal). Cada llamada devuelve objetos FRESCOS (sin
- * referencias compartidas con los defaults de los módulos).
+ * El Demo con las decisiones habituales y lo que no se sabe SUPUESTO: cada
+ * módulo enseña sus avisos. Lo usan los tests para ver cómo sale lo supuesto; la
+ * app siembra `crearProyectoDemo`, que lo completa. Pura y determinista: mismo
+ * `nowIso` → mismo proyecto (deep-equal). Cada llamada devuelve objetos FRESCOS
+ * (sin referencias compartidas con los defaults de los módulos).
  */
-export function crearProyectoDemo(nowIso: string): Proyecto {
+export function crearProyectoDemoConSupuestos(nowIso: string): Proyecto {
   const dg = DATOS_GENERALES_DEMO;
   const edificio = edificioDeCaso("plurifamiliar_locales");
   const resumen = resumenEdificio(edificio);
@@ -272,5 +407,29 @@ export function crearProyectoDemo(nowIso: string): Proyecto {
       rite: justificacionDemo(structuredClone(RITE_DEMO)),
       acc: justificacionDemo(structuredClone(ACC_DEMO)),
     },
+  };
+}
+
+/**
+ * El Demo que siembra la app: el de los supuestos con todo rellenado, para que
+ * el ejemplo salga entero, sin avisos ni nada por decidir. Los datos que añade
+ * son DE DEMOSTRACIÓN, como los demás del Demo. HE 0 y HE 1 los verifica HULC:
+ * lleva el programa y la referencia del documento, no resultados (serían
+ * inventados; los da el informe que se lee en La obra).
+ */
+export function crearProyectoDemo(nowIso: string): Proyecto {
+  const p = crearProyectoDemoConSupuestos(nowIso);
+  const justificaciones = { ...p.justificaciones };
+  for (const key of new Set([...Object.keys(DECISIONES_DEMO), ...Object.keys(REVISADOS_DEMO)]) as Set<JustificacionKey>) {
+    const inputs = DECISIONES_DEMO[key] ?? justificaciones[key]?.inputs ?? {};
+    justificaciones[key] = justificacionDemo(structuredClone(inputs), REVISADOS_DEMO[key]);
+  }
+  justificaciones.he0he1_global = { inputs: {}, schemaVersion: "1", programa: "HULC", refExterna: "Anejo de eficiencia energética, HULC (documento de demostración)" };
+  return {
+    ...p,
+    datosGenerales: { ...p.datosGenerales, ...structuredClone(DATOS_COMPLETOS_DEMO) },
+    edificio: completarEdificioDemo(p.edificio),
+    justificaciones,
+    seguridadSalud: structuredClone(SEGURIDAD_SALUD_DEMO),
   };
 }
